@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PilotIA — Le CRM intelligent pour PME</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --dark:#080c14;
+  --dark2:#0e1420;
+  --dark3:#141c2e;
+  --blue:#3b82f6;
+  --blue2:#2563eb;
+  --blue-glow:rgba(59,130,246,0.15);
+  --text:#f0f4ff;
+  --text2:#8899bb;
+  --text3:#4a5a78;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.12);
+  --card:#0e1420;
+  --card2:#111827;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,12,20,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.5px}
+.nav-logo span{color:var(--blue)}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{font-size:14px;color:var(--text2);text-decoration:none;transition:color 0.2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{padding:9px 20px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.2s}
+.nav-cta:hover{background:var(--blue2)}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 40px 60px;position:relative;overflow:hidden}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(59,130,246,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.04) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 70% at 50% 50%,black 30%,transparent 100%)}
+.hero-glow{position:absolute;top:20%;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(59,130,246,0.12) 0%,transparent 70%);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);border-radius:20px;font-size:12px;color:#93c5fd;margin-bottom:28px}
+.badge-dot{width:6px;height:6px;background:#3b82f6;border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+h1{font-family:'Syne',sans-serif;font-size:clamp(42px,6vw,76px);font-weight:800;line-height:1.05;letter-spacing:-2px;max-width:800px;margin-bottom:24px}
+h1 .accent{color:var(--blue)}
+h1 .underline{position:relative;display:inline-block}
+.hero-sub{font-size:18px;color:var(--text2);max-width:520px;line-height:1.7;margin-bottom:40px;font-weight:300}
+.hero-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center}
+.btn-main{padding:14px 28px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s}
+.btn-main:hover{background:var(--blue2);transform:translateY(-1px)}
+.btn-ghost{padding:14px 28px;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;text-decoration:none;display:inline-block}
+.btn-ghost:hover{border-color:rgba(255,255,255,0.25);color:var(--text)}
+.hero-stats{display:flex;gap:40px;margin-top:60px;padding-top:40px;border-top:1px solid var(--border);flex-wrap:wrap;justify-content:center}
+.stat{text-align:center}
+.stat-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:#fff}
+.stat-label{font-size:13px;color:var(--text3);margin-top:4px}
+
+/* DEMO PREVIEW */
+.preview-section{padding:60px 40px;display:flex;justify-content:center}
+.preview-wrap{max-width:900px;width:100%;background:var(--dark2);border:1px solid var(--border2);border-radius:16px;overflow:hidden}
+.preview-bar{padding:12px 16px;background:var(--dark3);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.dot{width:10px;height:10px;border-radius:50%}
+.dot-r{background:#ff5f57}.dot-y{background:#febc2e}.dot-g{background:#28c840}
+.preview-url{flex:1;text-align:center;font-size:12px;color:var(--text3);font-family:monospace}
+.preview-content{padding:0}
+.mini-app{display:flex;height:380px}
+.mini-sidebar{width:160px;background:#080c14;border-right:1px solid var(--border);padding:16px 8px;display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+.mini-logo{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;padding:0 8px;margin-bottom:12px}
+.mini-nav{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;font-size:12px;color:#4a5a78;cursor:pointer}
+.mini-nav.active{background:rgba(59,130,246,0.12);color:#93c5fd}
+.mini-nav svg{width:13px;height:13px;flex-shrink:0}
+.mini-main{flex:1;background:var(--dark2);padding:16px}
+.mini-title{font-size:13px;font-weight:500;color:#fff;margin-bottom:12px}
+.mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.mini-stat{background:var(--dark3);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.mini-stat-label{font-size:10px;color:var(--text3);margin-bottom:4px}
+.mini-stat-val{font-size:18px;font-weight:600;color:#fff;font-family:'Syne',sans-serif}
+.mini-table{background:var(--dark3);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.mini-th{display:grid;grid-template-columns:1fr 80px 60px;padding:8px 12px;border-bottom:1px solid var(--border);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px}
+.mini-tr{display:grid;grid-template-columns:1fr 80px 60px;padding:8px 12px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text2);align-items:center}
+.mini-tr:last-child{border-bottom:none}
+.mini-badge{padding:2px 7px;border-radius:4px;font-size:10px;font-weight:500}
+.mb-green{background:rgba(16,185,129,0.12);color:#34d399}
+.mb-blue{background:rgba(59,130,246,0.12);color:#93c5fd}
+.mb-amber{background:rgba(245,158,11,0.12);color:#fbbf24}
+
+/* FEATURES */
+.features-section{padding:80px 40px;max-width:1100px;margin:0 auto}
+.section-label{font-size:12px;color:var(--blue);text-transform:uppercase;letter-spacing:2px;font-weight:500;margin-bottom:12px;text-align:center}
+.section-title{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,42px);font-weight:700;text-align:center;margin-bottom:16px;letter-spacing:-1px}
+.section-sub{font-size:16px;color:var(--text2);text-align:center;max-width:500px;margin:0 auto 56px;line-height:1.7}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.feature-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;transition:border-color 0.2s}
+.feature-card:hover{border-color:rgba(59,130,246,0.3)}
+.feature-icon{width:40px;height:40px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.feature-icon svg{width:18px;height:18px;color:#3b82f6;stroke:currentColor}
+.feature-title{font-size:15px;font-weight:500;color:#fff;margin-bottom:8px}
+.feature-desc{font-size:13px;color:var(--text2);line-height:1.6}
+
+/* PRICING */
+.pricing-section{padding:80px 40px;max-width:1000px;margin:0 auto}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start;margin-top:0}
+.plan-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;position:relative;transition:transform 0.2s}
+.plan-card:hover{transform:translateY(-3px)}
+.plan-card.featured{border-color:rgba(59,130,246,0.5);background:linear-gradient(135deg,#0e1420 0%,#0d1829 100%)}
+.featured-tag{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--blue);color:#fff;font-size:11px;font-weight:500;padding:4px 14px;border-radius:20px;white-space:nowrap}
+.plan-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#fff;margin-bottom:4px}
+.plan-desc{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.5}
+.plan-price{display:flex;align-items:baseline;gap:4px;margin-bottom:6px}
+.price-num{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:#fff}
+.price-period{font-size:13px;color:var(--text3)}
+.price-note{font-size:12px;color:var(--text3);margin-bottom:24px}
+.plan-cta{width:100%;padding:11px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;margin-bottom:24px}
+.cta-blue{background:var(--blue);color:#fff;border:none}
+.cta-blue:hover{background:var(--blue2)}
+.cta-outline{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.cta-outline:hover{border-color:rgba(255,255,255,0.2);color:var(--text)}
+.plan-features{display:flex;flex-direction:column;gap:10px}
+.pf-item{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text2);line-height:1.4}
+.pf-item svg{width:14px;height:14px;flex-shrink:0;margin-top:1px}
+.pf-yes{color:#10b981}
+.pf-no{color:var(--text3)}
+.pf-item.disabled{color:var(--text3)}
+.divider{height:1px;background:var(--border);margin:16px 0}
+
+/* APP SECTION */
+.app-section{padding:80px 40px;max-width:1100px;margin:0 auto}
+.app-tabs{display:flex;gap:8px;justify-content:center;margin-bottom:40px;flex-wrap:wrap}
+.app-tab{padding:8px 18px;border:1px solid var(--border);border-radius:20px;font-size:13px;color:var(--text2);cursor:pointer;transition:all 0.2s;background:transparent}
+.app-tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.app-tab:hover:not(.active){border-color:var(--border2);color:var(--text)}
+.app-frame{background:var(--dark2);border:1px solid var(--border2);border-radius:16px;overflow:hidden}
+
+/* CRM APP */
+.crm-app{display:flex;height:500px}
+.crm-sidebar{width:190px;background:#080c14;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.crm-logo{padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.crm-logo-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff}
+.crm-logo-sub{font-size:10px;color:#4a5a78;margin-top:2px}
+.crm-nav{padding:10px 8px;flex:1}
+.crm-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;font-size:12px;color:#4a5a78;cursor:pointer;margin-bottom:1px;transition:all 0.15s}
+.crm-item:hover{background:rgba(255,255,255,0.04);color:#8899bb}
+.crm-item.active{background:rgba(59,130,246,0.14);color:#93c5fd}
+.crm-item svg{width:14px;height:14px;flex-shrink:0}
+.crm-badge{margin-left:auto;background:#3b82f6;color:#fff;font-size:9px;padding:1px 5px;border-radius:8px}
+.crm-pro{margin-left:auto;background:rgba(245,158,11,0.2);color:#fbbf24;font-size:9px;padding:1px 5px;border-radius:3px}
+.crm-footer{padding:12px;border-top:1px solid var(--border)}
+.crm-plan{font-size:10px;color:#4a5a78}
+.crm-plan-name{font-size:11px;color:#fbbf24;font-weight:500;margin-top:1px}
+.upgrade-link{display:block;margin-top:8px;padding:6px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);border-radius:5px;font-size:10px;color:#93c5fd;text-align:center;cursor:pointer}
+.crm-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.crm-topbar{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--dark2);flex-shrink:0}
+.crm-page-title{font-size:14px;font-weight:500;color:#fff}
+.crm-actions{display:flex;gap:8px}
+.btn-sm{padding:6px 12px;border-radius:6px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-sm-blue{background:#3b82f6;color:#fff;border:none}
+.btn-sm-ghost{background:transparent;color:#8899bb;border:1px solid rgba(255,255,255,0.1)}
+.crm-content{flex:1;overflow-y:auto;padding:16px 18px;background:var(--dark3)}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.sc{background:var(--dark2);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.sc-label{font-size:10px;color:#4a5a78;margin-bottom:5px}
+.sc-val{font-size:20px;font-weight:600;color:#fff;font-family:'Syne',sans-serif}
+.sc-sub{font-size:10px;color:#10b981;margin-top:2px}
+
+.data-card{background:var(--dark2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.dc-header{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.dc-title{font-size:12px;font-weight:500;color:#fff}
+table{width:100%;border-collapse:collapse}
+thead tr{border-bottom:1px solid var(--border)}
+th{padding:9px 14px;text-align:left;font-size:10px;font-weight:500;color:#4a5a78;text-transform:uppercase;letter-spacing:0.5px}
+td{padding:11px 14px;font-size:12px;color:#8899bb;border-bottom:1px solid rgba(255,255,255,0.04)}
+tr:last-child td{border-bottom:none}
+.cell-flex{display:flex;align-items:center;gap:8px}
+.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500}
+.av-b{background:rgba(59,130,246,0.15);color:#93c5fd}
+.av-g{background:rgba(16,185,129,0.15);color:#34d399}
+.av-a{background:rgba(245,158,11,0.15);color:#fbbf24}
+.sbadge{display:inline-flex;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:500}
+.sb-green{background:rgba(16,185,129,0.1);color:#34d399}
+.sb-blue{background:rgba(59,130,246,0.1);color:#93c5fd}
+.sb-amber{background:rgba(245,158,11,0.1);color:#fbbf24}
+.sb-gray{background:rgba(74,90,120,0.2);color:#4a5a78}
+
+/* Chat Section */
+.chat-section-inner{display:flex;height:500px}
+.chat-contacts{width:200px;background:#080c14;border-right:1px solid var(--border);padding:12px 8px;display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+.chat-contact-hd{font-size:10px;color:#4a5a78;text-transform:uppercase;letter-spacing:0.5px;padding:0 8px;margin-bottom:6px}
+.cc-item{padding:9px 10px;border-radius:7px;cursor:pointer;transition:background 0.15s}
+.cc-item:hover{background:rgba(255,255,255,0.04)}
+.cc-name{font-size:12px;color:#8899bb;font-weight:500}
+.cc-sub{font-size:10px;color:#4a5a78;margin-top:1px}
+.chat-main{flex:1;display:flex;flex-direction:column;background:var(--dark2)}
+.chat-hd{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.ai-dot{width:8px;height:8px;background:#10b981;border-radius:50%}
+.chat-hd-name{font-size:13px;font-weight:500;color:#fff}
+.chat-hd-sub{font-size:11px;color:#4a5a78;display:flex;align-items:center;gap:4px}
+.pro-tag{padding:2px 7px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);border-radius:10px;font-size:10px;color:#fbbf24;margin-left:auto}
+.chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.cmsg{display:flex;gap:8px;max-width:85%}
+.cmsg.user{align-self:flex-end;flex-direction:row-reverse}
+.cmsg-av{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500}
+.cav-ai{background:rgba(59,130,246,0.15);color:#93c5fd;border:1px solid rgba(59,130,246,0.25)}
+.cav-u{background:#3b82f6;color:#fff}
+.cbubble{padding:9px 12px;border-radius:10px;font-size:12px;line-height:1.5}
+.cbubble-ai{background:var(--dark3);color:#8899bb;border:1px solid var(--border);border-radius:3px 10px 10px 10px}
+.cbubble-user{background:#3b82f6;color:#fff;border-radius:10px 3px 10px 10px}
+.icard{margin-top:8px;background:var(--dark2);border:1px solid var(--border);border-radius:7px;overflow:hidden}
+.irow{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-bottom:1px solid var(--border);font-size:11px}
+.irow:last-child{border-bottom:none}
+.il{color:#4a5a78}.iv{font-weight:500;color:#fff}
+.chat-sugs{padding:8px 16px;display:flex;flex-wrap:wrap;gap:6px;flex-shrink:0;border-top:1px solid var(--border)}
+.csug{padding:5px 10px;background:var(--dark3);border:1px solid var(--border);border-radius:12px;font-size:11px;color:#8899bb;cursor:pointer;transition:all 0.15s}
+.csug:hover{background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:#93c5fd}
+.chat-input-row{padding:10px 16px;display:flex;gap:8px;align-items:center;border-top:1px solid var(--border);flex-shrink:0}
+.ci{flex:1;padding:8px 12px;background:var(--dark3);border:1px solid var(--border);border-radius:16px;font-size:12px;color:#fff;font-family:'Inter',sans-serif;outline:none}
+.ci::placeholder{color:#4a5a78}
+.ci:focus{border-color:rgba(59,130,246,0.4)}
+.csend{width:30px;height:30px;background:#3b82f6;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.csend svg{width:12px;height:12px;stroke:white;fill:none}
+.typing-ind{display:flex;align-items:center;gap:4px;padding:9px 12px}
+.typing-ind span{width:5px;height:5px;background:#4a5a78;border-radius:50%;animation:bounce 1.2s infinite}
+.typing-ind span:nth-child(2){animation-delay:0.2s}
+.typing-ind span:nth-child(3){animation-delay:0.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
+
+/* AGENDA */
+.agenda-section{display:flex;height:500px}
+.ag-cal-col{width:220px;background:#080c14;border-right:1px solid var(--border);padding:14px;flex-shrink:0}
+.ag-cal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.ag-month{font-size:13px;font-weight:500;color:#fff}
+.ag-nav{width:22px;height:22px;border:1px solid var(--border);border-radius:5px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:#8899bb;background:var(--dark2)}
+.cal-grid-hd{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:4px}
+.cgh{font-size:9px;color:#4a5a78;padding:3px 0}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cd{font-size:11px;text-align:center;padding:5px 2px;border-radius:4px;cursor:pointer;color:#8899bb;position:relative}
+.cd:hover{background:rgba(255,255,255,0.04)}
+.cd.today{background:#3b82f6;color:#fff;font-weight:500}
+.cd.has-ev::after{content:'';position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:4px;height:4px;background:#f59e0b;border-radius:50%}
+.cd.empty{color:transparent;cursor:default}
+.ag-main{flex:1;padding:16px;overflow-y:auto;background:var(--dark3)}
+.ag-day-title{font-size:11px;color:#4a5a78;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px}
+.rdv-card{background:var(--dark2);border:1px solid var(--border);border-radius:9px;padding:11px 14px;display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.rdv-time{font-size:11px;font-weight:500;color:#4a5a78;min-width:38px}
+.rdv-bar{width:3px;height:32px;border-radius:2px;flex-shrink:0}
+.rdv-info{flex:1}
+.rdv-name{font-size:12px;font-weight:500;color:#fff}
+.rdv-type{font-size:11px;color:#4a5a78;margin-top:1px}
+.rdv-dot{width:8px;height:8px;border-radius:50%}
+
+/* KANBAN */
+.kanban-section{padding:16px;background:var(--dark3);height:500px;overflow-y:auto}
+.kb-title{font-size:14px;font-weight:500;color:#fff;margin-bottom:14px}
+.kb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.kb-col{background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:10px}
+.kb-col-hd{font-size:10px;font-weight:500;color:#4a5a78;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.kb-cnt{background:var(--dark3);border:1px solid var(--border);border-radius:8px;padding:1px 6px;font-size:10px;color:#8899bb}
+.kb-card{background:var(--dark3);border:1px solid var(--border);border-radius:7px;padding:9px 11px;margin-bottom:6px}
+.kb-company{font-size:12px;font-weight:500;color:#fff;margin-bottom:2px}
+.kb-contact{font-size:10px;color:#4a5a78}
+.kb-footer{display:flex;align-items:center;justify-content:space-between;margin-top:7px}
+.kb-val{font-size:11px;font-weight:500;color:#3b82f6}
+
+/* CTA SECTION */
+.cta-section{padding:100px 40px;text-align:center;position:relative;overflow:hidden}
+.cta-glow{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:500px;height:300px;background:radial-gradient(ellipse,rgba(59,130,246,0.1) 0%,transparent 70%)}
+.cta-title{font-family:'Syne',sans-serif;font-size:clamp(32px,5vw,56px);font-weight:800;letter-spacing:-1.5px;margin-bottom:20px}
+.cta-sub{font-size:17px;color:var(--text2);margin-bottom:40px;line-height:1.7}
+.cta-note{font-size:13px;color:var(--text3);margin-top:16px}
+
+/* FOOTER */
+footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.footer-logo{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff}
+.footer-logo span{color:var(--blue)}
+.footer-links{display:flex;gap:24px}
+.footer-links a{font-size:13px;color:var(--text3);text-decoration:none;transition:color 0.2s}
+.footer-links a:hover{color:var(--text2)}
+.footer-copy{font-size:12px;color:var(--text3)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  nav{padding:0 20px}
+  .nav-links{display:none}
+  h1{font-size:36px}
+  .hero{padding:80px 20px 40px}
+  .features-grid,.pricing-grid{grid-template-columns:1fr}
+  .features-section,.pricing-section,.app-section{padding:60px 20px}
+  .crm-sidebar{display:none}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .kb-grid{grid-template-columns:1fr}
+  footer{flex-direction:column;text-align:center;padding:24px 20px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Pilot<span>IA</span></div>
+  <div class="nav-links">
+    <a href="#features">Fonctionnalités</a>
+    <a href="#pricing">Tarifs</a>
+    <a href="#demo">Démo</a>
+  </div>
+  <button class="nav-cta" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">Essayer gratuitement</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-badge"><div class="badge-dot"></div>CRM intelligent pour TPE/PME</div>
+  <h1>Pilotez votre business<br>avec l'<span class="accent">intelligence</span> artificielle</h1>
+  <p class="hero-sub">Fini les Excel perdus et les relances oubliées. PilotIA centralise vos clients, vos RDV et votre prospection — et l'IA fait le reste.</p>
+  <div class="hero-actions">
+    <button class="btn-main" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">Démarrer gratuitement</button>
+    <a href="#pricing" class="btn-ghost">Voir les tarifs</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">2 min</div><div class="stat-label">Pour importer vos clients</div></div>
+    <div class="stat"><div class="stat-num">0 €</div><div class="stat-label">Pour commencer</div></div>
+    <div class="stat"><div class="stat-num">30j</div><div class="stat-label">D'essai Pro offert</div></div>
+  </div>
+</section>
+
+<!-- APERÇU -->
+<section class="preview-section">
+  <div class="preview-wrap">
+    <div class="preview-bar">
+      <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+      <div class="preview-url">app.pilotia.fr — Tableau de bord</div>
+    </div>
+    <div class="mini-app">
+      <div class="mini-sidebar">
+        <div class="mini-logo">PilotIA</div>
+        <div class="mini-nav active"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
+        <div class="mini-nav"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>Clients</div>
+        <div class="mini-nav"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Agenda</div>
+        <div class="mini-nav"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Prospects</div>
+      </div>
+      <div class="mini-main">
+        <div class="mini-title">Tableau de bord</div>
+        <div class="mini-grid">
+          <div class="mini-stat"><div class="mini-stat-label">Clients actifs</div><div class="mini-stat-val">12</div></div>
+          <div class="mini-stat"><div class="mini-stat-label">CA potentiel</div><div class="mini-stat-val">8 400€</div></div>
+        </div>
+        <div class="mini-table">
+          <div class="mini-th"><span>Client</span><span>Offre</span><span>Statut</span></div>
+          <div class="mini-tr"><span>Martin & Co</span><span>Pro</span><span><span class="mini-badge mb-green">Actif</span></span></div>
+          <div class="mini-tr"><span>Boulangerie</span><span>Starter</span><span><span class="mini-badge mb-amber">Relancer</span></span></div>
+          <div class="mini-tr"><span>Cabinet P.</span><span>Pro</span><span><span class="mini-badge mb-blue">Essai</span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div class="section-label">Fonctionnalités</div>
+  <h2 class="section-title">Tout ce dont votre PME a besoin</h2>
+  <p class="section-sub">Un seul outil pour remplacer vos fichiers Excel, votre agenda papier et vos relances manuelles.</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75M21 21v-2a4 4 0 00-3-3.85"/></svg></div>
+      <div class="feature-title">Portefeuille clients</div>
+      <div class="feature-desc">Centralisez tous vos contacts. Importez votre Excel en 30 secondes. Suivez chaque client en un coup d'œil.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+      <div class="feature-title">Agenda & RDV</div>
+      <div class="feature-desc">Planifiez vos rendez-vous directement dans l'outil. Plus aucun RDV oublié, tout est centralisé.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+      <div class="feature-title">Pipeline de prospection</div>
+      <div class="feature-desc">Visualisez vos prospects en kanban : à contacter, en discussion, à relancer. Priorisez en un regard.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+      <div class="feature-title">Assistant IA (Pro)</div>
+      <div class="feature-desc">Posez vos questions en langage naturel. L'IA analyse votre portefeuille et vous dit quoi faire en priorité.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg></div>
+      <div class="feature-title">Import Excel instantané</div>
+      <div class="feature-desc">Glissez-déposez votre fichier client existant. PilotIA importe tout automatiquement en 30 secondes.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div>
+      <div class="feature-title">Rapports automatiques (Pro)</div>
+      <div class="feature-desc">Recevez chaque semaine un résumé de votre activité, des alertes relances et des opportunités à saisir.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+  <div class="section-label">Tarifs</div>
+  <h2 class="section-title">Simple, transparent, sans surprise</h2>
+  <p class="section-sub">Commencez gratuitement. Évoluez quand vous êtes prêt.</p>
+  <div class="pricing-grid">
+
+    <!-- FREE -->
+    <div class="plan-card">
+      <div class="plan-name">Gratuit</div>
+      <div class="plan-desc">Pour découvrir PilotIA et gérer vos premiers clients.</div>
+      <div class="plan-price"><span class="price-num">0€</span><span class="price-period">/mois</span></div>
+      <div class="price-note">Pour toujours gratuit</div>
+      <button class="plan-cta cta-outline" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">Commencer gratuitement</button>
+      <div class="plan-features">
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Jusqu'à 10 clients</div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Agenda & RDV</div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Import Excel (1 fois)</div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Pipeline de base (3 colonnes)</div>
+        <div class="divider"></div>
+        <div class="pf-item disabled"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-no"><path d="M18 6L6 18M6 6l12 12"/></svg>Assistant IA</div>
+        <div class="pf-item disabled"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-no"><path d="M18 6L6 18M6 6l12 12"/></svg>Rapports automatiques</div>
+        <div class="pf-item disabled"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-no"><path d="M18 6L6 18M6 6l12 12"/></svg>Relances automatisées</div>
+      </div>
+    </div>
+
+    <!-- STARTER -->
+    <div class="plan-card featured">
+      <div class="featured-tag">Le plus populaire</div>
+      <div class="plan-name">Starter</div>
+      <div class="plan-desc">Pour les PME qui veulent structurer leur suivi client efficacement.</div>
+      <div class="plan-price"><span class="price-num">199€</span><span class="price-period">/mois</span></div>
+      <div class="price-note">Sans engagement · 30 jours offerts</div>
+      <button class="plan-cta cta-blue" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">Essayer 30 jours gratuitement</button>
+      <div class="plan-features">
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Clients illimités</div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Agenda & RDV avancé</div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Import Excel illimité</div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Pipeline complet + relances</div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Alertes relances automatiques</div>
+        <div class="divider"></div>
+        <div class="pf-item disabled"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-no"><path d="M18 6L6 18M6 6l12 12"/></svg>Assistant IA</div>
+        <div class="pf-item disabled"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-no"><path d="M18 6L6 18M6 6l12 12"/></svg>Rapports automatiques</div>
+      </div>
+    </div>
+
+    <!-- PRO -->
+    <div class="plan-card">
+      <div class="plan-name">Pro</div>
+      <div class="plan-desc">Pour les entreprises qui veulent que l'IA pilote leur activité à leur place.</div>
+      <div class="plan-price"><span class="price-num">449€</span><span class="price-period">/mois</span></div>
+      <div class="price-note">Sans engagement · 30 jours offerts</div>
+      <button class="plan-cta cta-blue" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">Essayer 30 jours gratuitement</button>
+      <div class="plan-features">
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Tout Starter inclus</div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><strong>Assistant IA</strong> — questions en langage naturel</div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Rapport hebdomadaire automatique</div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Analyse des prospects chauds</div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>CA potentiel en temps réel</div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Onboarding personnalisé inclus</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- APP DEMO -->
+<section class="app-section" id="demo">
+  <div class="section-label">Démo interactive</div>
+  <h2 class="section-title">Testez l'outil en direct</h2>
+  <p class="section-sub">Explorez toutes les fonctionnalités de PilotIA sans créer de compte.</p>
+
+  <div class="app-tabs">
+    <button class="app-tab active" onclick="showTab('dashboard',this)">Tableau de bord</button>
+    <button class="app-tab" onclick="showTab('clients',this)">Clients</button>
+    <button class="app-tab" onclick="showTab('agenda',this)">Agenda</button>
+    <button class="app-tab" onclick="showTab('prospection',this)">Prospection</button>
+    <button class="app-tab" onclick="showTab('assistant',this)">Assistant IA ✦</button>
+  </div>
+
+  <div class="app-frame">
+
+    <!-- DASHBOARD -->
+    <div id="tab-dashboard" class="crm-app">
+      <div class="crm-sidebar">
+        <div class="crm-logo"><div class="crm-logo-name">PilotIA</div><div class="crm-logo-sub">CRM intelligent</div></div>
+        <div class="crm-nav">
+          <div class="crm-item active"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
+          <div class="crm-item" onclick="showTab('clients',document.querySelectorAll('.app-tab')[1])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>Clients<span class="crm-badge">12</span></div>
+          <div class="crm-item" onclick="showTab('agenda',document.querySelectorAll('.app-tab')[2])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Agenda</div>
+          <div class="crm-item" onclick="showTab('prospection',document.querySelectorAll('.app-tab')[3])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Prospection<span class="crm-badge">7</span></div>
+          <div class="crm-item" onclick="showTab('assistant',document.querySelectorAll('.app-tab')[4])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09z"/></svg>Assistant IA<span class="crm-pro">PRO</span></div>
+        </div>
+        <div class="crm-footer"><div class="crm-plan">Offre actuelle</div><div class="crm-plan-name">Starter — Gratuit</div><div class="upgrade-link">Activer Pro →</div></div>
+      </div>
+      <div class="crm-main">
+        <div class="crm-topbar"><div class="crm-page-title">Tableau de bord</div><div class="crm-actions"><button class="btn-sm btn-sm-ghost">Exporter</button><button class="btn-sm btn-sm-blue">+ Client</button></div></div>
+        <div class="crm-content">
+          <div class="stats-row">
+            <div class="sc"><div class="sc-label">Clients actifs</div><div class="sc-val">12</div><div class="sc-sub">+2 ce mois</div></div>
+            <div class="sc"><div class="sc-label">RDV cette semaine</div><div class="sc-val">5</div></div>
+            <div class="sc"><div class="sc-label">Prospects</div><div class="sc-val">7</div><div class="sc-sub">3 à relancer</div></div>
+            <div class="sc"><div class="sc-label">CA potentiel</div><div class="sc-val">8 400€</div></div>
+          </div>
+          <div class="data-card">
+            <div class="dc-header"><span class="dc-title">Activité récente</span></div>
+            <table>
+              <thead><tr><th>Client</th><th>Dernière action</th><th>Statut</th></tr></thead>
+              <tbody>
+                <tr><td><div class="cell-flex"><div class="av av-b">MR</div>Martin & Rénovation</div></td><td>Relance email</td><td><span class="sbadge sb-green">Fait</span></td></tr>
+                <tr><td><div class="cell-flex"><div class="av av-g">BL</div>Boulangerie Lenoir</div></td><td>RDV confirmé</td><td><span class="sbadge sb-blue">Planifié</span></td></tr>
+                <tr><td><div class="cell-flex"><div class="av av-a">CP</div>Cabinet Perrin</div></td><td>Devis envoyé</td><td><span class="sbadge sb-amber">En attente</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENTS -->
+    <div id="tab-clients" class="crm-app" style="display:none">
+      <div class="crm-sidebar">
+        <div class="crm-logo"><div class="crm-logo-name">PilotIA</div><div class="crm-logo-sub">CRM intelligent</div></div>
+        <div class="crm-nav">
+          <div class="crm-item" onclick="showTab('dashboard',document.querySelectorAll('.app-tab')[0])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
+          <div class="crm-item active"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>Clients<span class="crm-badge">12</span></div>
+          <div class="crm-item" onclick="showTab('agenda',document.querySelectorAll('.app-tab')[2])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Agenda</div>
+          <div class="crm-item" onclick="showTab('prospection',document.querySelectorAll('.app-tab')[3])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Prospection</div>
+          <div class="crm-item" onclick="showTab('assistant',document.querySelectorAll('.app-tab')[4])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09 3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09z"/></svg>Assistant IA<span class="crm-pro">PRO</span></div>
+        </div>
+        <div class="crm-footer"><div class="crm-plan">Offre actuelle</div><div class="crm-plan-name">Starter</div></div>
+      </div>
+      <div class="crm-main">
+        <div class="crm-topbar"><div class="crm-page-title">Portefeuille clients</div><div class="crm-actions"><button class="btn-sm btn-sm-ghost">Importer Excel</button><button class="btn-sm btn-sm-blue">+ Client</button></div></div>
+        <div class="crm-content">
+          <div class="data-card" style="margin-bottom:10px;padding:14px 14px 10px;background:var(--dark2);border:1px dashed rgba(59,130,246,0.25);border-radius:10px;text-align:center;cursor:pointer">
+            <div style="font-size:13px;font-weight:500;color:#93c5fd;margin-bottom:4px">Importer vos clients existants</div>
+            <div style="font-size:12px;color:#4a5a78">Glissez votre fichier .xlsx ou .csv ici — import automatique en 30 sec</div>
+          </div>
+          <div class="data-card">
+            <div class="dc-header"><span class="dc-title">12 clients</span><button class="btn-sm btn-sm-ghost">Filtrer</button></div>
+            <table>
+              <thead><tr><th>Entreprise</th><th>Contact</th><th>Offre</th><th>Statut</th></tr></thead>
+              <tbody>
+                <tr><td><div class="cell-flex"><div class="av av-b">MR</div>Martin & Rénovation</div></td><td>Pierre Martin</td><td>Pro</td><td><span class="sbadge sb-green">Actif</span></td></tr>
+                <tr><td><div class="cell-flex"><div class="av av-g">BL</div>Boulangerie Lenoir</div></td><td>Sophie Lenoir</td><td>Starter</td><td><span class="sbadge sb-amber">À relancer</span></td></tr>
+                <tr><td><div class="cell-flex"><div class="av av-a">CP</div>Cabinet Perrin</div></td><td>Marc Perrin</td><td>Pro</td><td><span class="sbadge sb-blue">Essai 30j</span></td></tr>
+                <tr><td><div class="cell-flex"><div class="av" style="background:rgba(139,92,246,0.15);color:#a78bfa">AG</div>Auto Garage 42</div></td><td>Laurent Vidal</td><td>Starter</td><td><span class="sbadge" style="background:rgba(74,90,120,0.2);color:#4a5a78">Inactif</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AGENDA -->
+    <div id="tab-agenda" class="agenda-section" style="display:none">
+      <div class="ag-cal-col">
+        <div class="ag-cal-hd"><div class="ag-nav">‹</div><div class="ag-month">Mars 2026</div><div class="ag-nav">›</div></div>
+        <div class="cal-grid-hd"><div class="cgh">L</div><div class="cgh">M</div><div class="cgh">M</div><div class="cgh">J</div><div class="cgh">V</div><div class="cgh">S</div><div class="cgh">D</div></div>
+        <div class="cal-grid" id="cal2"></div>
+      </div>
+      <div class="ag-main">
+        <div class="ag-day-title">Lundi 23 mars — Aujourd'hui</div>
+        <div class="rdv-card"><div class="rdv-time">09h00</div><div class="rdv-bar" style="background:#3b82f6"></div><div class="rdv-info"><div class="rdv-name">Boulangerie Lenoir</div><div class="rdv-type">Présentation offre Starter</div></div><div class="rdv-dot" style="background:#3b82f6"></div></div>
+        <div class="rdv-card"><div class="rdv-time">14h30</div><div class="rdv-bar" style="background:#10b981"></div><div class="rdv-info"><div class="rdv-name">Cabinet Perrin</div><div class="rdv-type">Suivi démo chatbot IA</div></div><div class="rdv-dot" style="background:#10b981"></div></div>
+        <div class="rdv-card" style="border:1px dashed rgba(255,255,255,0.08);background:transparent;cursor:pointer"><div class="rdv-time" style="color:#4a5a78">+</div><div class="rdv-bar" style="background:rgba(255,255,255,0.06)"></div><div class="rdv-info"><div class="rdv-name" style="color:#4a5a78;font-weight:400">Nouveau rendez-vous</div></div><button class="btn-sm btn-sm-blue">Planifier</button></div>
+      </div>
+    </div>
+
+    <!-- PROSPECTION -->
+    <div id="tab-prospection" class="kanban-section" style="display:none">
+      <div class="kb-title">Pipeline de prospection</div>
+      <div class="kb-grid">
+        <div class="kb-col">
+          <div class="kb-col-hd">À contacter<span class="kb-cnt">3</span></div>
+          <div class="kb-card"><div class="kb-company">Garage Lefèvre</div><div class="kb-contact">Jean Lefèvre</div><div class="kb-footer"><span class="sbadge" style="background:rgba(74,90,120,0.2);color:#4a5a78;font-size:10px;padding:2px 7px;border-radius:4px;">Froid</span><span class="kb-val">200€/m</span></div></div>
+          <div class="kb-card"><div class="kb-company">Pharmacie Dubois</div><div class="kb-contact">Claire Dubois</div><div class="kb-footer"><span class="sbadge" style="background:rgba(74,90,120,0.2);color:#4a5a78;font-size:10px;padding:2px 7px;border-radius:4px;">Froid</span><span class="kb-val">450€/m</span></div></div>
+          <div class="kb-card"><div class="kb-company">Optic Grandjean</div><div class="kb-contact">T. Grandjean</div><div class="kb-footer"><span class="sbadge" style="background:rgba(74,90,120,0.2);color:#4a5a78;font-size:10px;padding:2px 7px;border-radius:4px;">Froid</span><span class="kb-val">199€/m</span></div></div>
+        </div>
+        <div class="kb-col">
+          <div class="kb-col-hd">En discussion<span class="kb-cnt">2</span></div>
+          <div class="kb-card"><div class="kb-company">Immobilier Roux</div><div class="kb-contact">Paul Roux · RDV jeudi</div><div class="kb-footer"><span class="sbadge sb-amber" style="font-size:10px;padding:2px 7px;border-radius:4px;">Chaud</span><span class="kb-val">449€/m</span></div></div>
+          <div class="kb-card"><div class="kb-company">Assurance Moreau</div><div class="kb-contact">Devis envoyé</div><div class="kb-footer"><span class="sbadge sb-amber" style="font-size:10px;padding:2px 7px;border-radius:4px;">Tiède</span><span class="kb-val">449€/m</span></div></div>
+        </div>
+        <div class="kb-col">
+          <div class="kb-col-hd">À relancer<span class="kb-cnt">2</span></div>
+          <div class="kb-card"><div class="kb-company">BTP Marchand</div><div class="kb-contact">Relance J+7 due</div><div class="kb-footer"><span class="sbadge" style="background:rgba(239,68,68,0.1);color:#f87171;font-size:10px;padding:2px 7px;border-radius:4px;">Urgent</span><span class="kb-val">199€/m</span></div></div>
+          <div class="kb-card"><div class="kb-company">Kiné Beaumont</div><div class="kb-contact">Pas de réponse x2</div><div class="kb-footer"><span class="sbadge sb-amber" style="font-size:10px;padding:2px 7px;border-radius:4px;">Tiède</span><span class="kb-val">199€/m</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ASSISTANT IA -->
+    <div id="tab-assistant" class="chat-section-inner" style="display:none">
+      <div class="chat-contacts">
+        <div class="chat-contact-hd">Analyses rapides</div>
+        <div class="cc-item" onclick="askAI('Quels clients dois-je relancer en priorité ?')"><div class="cc-name">Relances urgentes</div><div class="cc-sub">3 en attente</div></div>
+        <div class="cc-item" onclick="askAI('Quel est mon CA potentiel ce mois-ci ?')"><div class="cc-name">CA potentiel</div><div class="cc-sub">Pipeline actif</div></div>
+        <div class="cc-item" onclick="askAI('Quels prospects sont les plus chauds ?')"><div class="cc-name">Prospects chauds</div><div class="cc-sub">2 identifiés</div></div>
+        <div class="cc-item" onclick="askAI('Génère un rapport hebdomadaire de mon activité')"><div class="cc-name">Rapport semaine</div><div class="cc-sub">Auto-généré</div></div>
+        <div class="chat-contact-hd" style="margin-top:12px">Clients</div>
+        <div class="cc-item" onclick="askAI('Donne-moi un résumé du dossier Martin et Rénovation')"><div class="cc-name">Martin & Rénov.</div><div class="cc-sub">Pro · Actif</div></div>
+        <div class="cc-item" onclick="askAI('Quand dois-je relancer Boulangerie Lenoir ?')"><div class="cc-name">Boulangerie Lenoir</div><div class="cc-sub">À relancer</div></div>
+      </div>
+      <div class="chat-main">
+        <div class="chat-hd">
+          <div class="ai-dot"></div>
+          <div><div class="chat-hd-name">Assistant IA PilotIA</div><div class="chat-hd-sub">Analyse votre portefeuille en temps réel</div></div>
+          <div class="pro-tag">Pro</div>
+        </div>
+        <div class="chat-msgs" id="ai-messages">
+          <div class="cmsg ai">
+            <div class="cmsg-av cav-ai">IA</div>
+            <div>
+              <div class="cbubble cbubble-ai">
+                Bonjour ! J'ai analysé votre portefeuille. Voici votre résumé :
+                <div class="icard">
+                  <div class="irow"><span class="il">Clients actifs</span><span class="iv">12</span></div>
+                  <div class="irow"><span class="il">Relances urgentes</span><span style="background:rgba(239,68,68,0.1);color:#f87171;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500;">3 en retard</span></div>
+                  <div class="irow"><span class="il">RDV aujourd'hui</span><span style="background:rgba(245,158,11,0.1);color:#fbbf24;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500;">2 prévus</span></div>
+                  <div class="irow"><span class="il">CA potentiel</span><span style="background:rgba(16,185,129,0.1);color:#34d399;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500;">8 400 €</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chat-sugs" id="ai-sugs">
+          <div class="csug" onclick="askAI('Quels clients dois-je relancer en priorité ?')">Relances prioritaires</div>
+          <div class="csug" onclick="askAI('Quel est mon CA potentiel ?')">CA potentiel</div>
+          <div class="csug" onclick="askAI('Génère un rapport hebdomadaire')">Rapport semaine</div>
+        </div>
+        <div class="chat-input-row">
+          <input class="ci" id="ai-input" placeholder="Posez une question sur vos clients..." onkeydown="if(event.key==='Enter')sendAI()">
+          <button class="csend" onclick="sendAI()"><svg stroke-width="2" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-section">
+  <div class="cta-glow"></div>
+  <div class="hero-badge" style="margin-bottom:24px"><div class="badge-dot"></div>Démarrez en 2 minutes</div>
+  <h2 class="cta-title">Votre business mérite<br>mieux qu'un Excel</h2>
+  <p class="cta-sub">Rejoignez les PME qui ont remplacé leurs fichiers<br>par un CRM IA qui travaille à leur place.</p>
+  <button class="btn-main" style="font-size:16px;padding:16px 36px">Créer mon compte gratuit</button>
+  <div class="cta-note">Aucune carte bancaire requise · 30 jours Pro offerts</div>
+</section>
+
+<footer>
+  <div class="footer-logo">Pilot<span>IA</span></div>
+  <div class="footer-links">
+    <a href="#">Fonctionnalités</a>
+    <a href="#">Tarifs</a>
+    <a href="#">Contact</a>
+    <a href="#">CGU</a>
+  </div>
+  <div class="footer-copy">© 2026 PilotIA — Tous droits réservés</div>
+</footer>
+
+<script>
+function showTab(name, btn) {
+  ['dashboard','clients','agenda','prospection','assistant'].forEach(t => {
+    const el = document.getElementById('tab-'+t);
+    if(el) el.style.display = 'none';
+  });
+  document.querySelectorAll('.app-tab').forEach(b => b.classList.remove('active'));
+  const tab = document.getElementById('tab-'+name);
+  if(tab) tab.style.display = (name==='prospection'||name==='agenda') ? 'flex' : 'flex';
+  if(name==='prospection') tab.style.display='block';
+  if(btn) btn.classList.add('active');
+}
+
+const cal2 = document.getElementById('cal2');
+if(cal2){
+  [0,1].forEach(()=>{const d=document.createElement('div');d.className='cd empty';d.textContent='.';cal2.appendChild(d)});
+  [5,10,14,18,23,25].forEach(()=>{});
+  const evDays=[5,10,14,18,23,25];
+  for(let i=1;i<=31;i++){
+    const d=document.createElement('div');
+    d.className='cd'+(i===23?' today':'')+(evDays.includes(i)?' has-ev':'');
+    d.textContent=i;
+    cal2.appendChild(d);
+  }
+}
+
+const clientCtx = {
+  clients:[
+    {name:"Martin & Rénovation",offre:"Pro",statut:"Actif",dernierContact:"aujourd'hui",valeur:449},
+    {name:"Boulangerie Lenoir",offre:"Starter",statut:"À relancer",dernierContact:"il y a 8 jours",valeur:199},
+    {name:"Cabinet Perrin",offre:"Pro",statut:"Essai 30j",dernierContact:"il y a 3 jours",valeur:449},
+    {name:"Auto Garage 42",offre:"Starter",statut:"Inactif",dernierContact:"il y a 22 jours",valeur:199},
+  ],
+  prospects:[
+    {name:"Immobilier Roux",statut:"Chaud",valeur:449,action:"RDV jeudi"},
+    {name:"Assurance Moreau",statut:"Tiède",valeur:449,action:"Devis envoyé"},
+    {name:"BTP Marchand",statut:"Urgent",valeur:199,action:"Relance J+7 due"},
+    {name:"Kiné Beaumont",statut:"Tiède",valeur:199,action:"Pas de réponse x2"},
+  ]
+};
+
+function askAI(q){ document.getElementById('ai-input').value=q; sendAI(); }
+
+async function sendAI(){
+  const input = document.getElementById('ai-input');
+  const text = input.value.trim();
+  if(!text) return;
+  addChatMsg('user', text);
+  input.value='';
+  document.getElementById('ai-sugs').style.display='none';
+  showTypingAI();
+  const sys=`Tu es l'assistant IA de PilotIA, un CRM pour TPE/PME. Tu analyses le portefeuille de l'utilisateur.
+Données: ${JSON.stringify(clientCtx)}
+Réponds en français, de façon concise (4-6 lignes max), orientée action. Bullet points si liste. Toujours une recommandation concrète en fin de réponse.`;
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:600,system:sys,messages:[{role:"user",content:text}]})});
+    const d=await r.json();
+    removeTypingAI();
+    if(d.content&&d.content[0]) addChatMsg('ai',d.content[0].text);
+    else addChatMsg('ai',"Erreur de connexion. Réessayez.");
+  }catch(e){removeTypingAI();addChatMsg('ai',"Connexion impossible à l'IA.");}
+}
+
+function addChatMsg(role,text){
+  const msgs=document.getElementById('ai-messages');
+  const div=document.createElement('div');
+  div.className='cmsg '+role;
+  const av=document.createElement('div');
+  av.className='cmsg-av '+(role==='ai'?'cav-ai':'cav-u');
+  av.textContent=role==='ai'?'IA':'FL';
+  const bwrap=document.createElement('div');
+  const b=document.createElement('div');
+  b.className='cbubble '+(role==='ai'?'cbubble-ai':'cbubble-user');
+  b.textContent=text;
+  bwrap.appendChild(b);
+  div.appendChild(av);
+  div.appendChild(bwrap);
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function showTypingAI(){
+  const msgs=document.getElementById('ai-messages');
+  const div=document.createElement('div');
+  div.className='cmsg ai';div.id='typing-ai';
+  div.innerHTML='<div class="cmsg-av cav-ai">IA</div><div><div class="cbubble cbubble-ai"><div class="typing-ind"><span></span><span></span><span></span></div></div></div>';
+  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+}
+function removeTypingAI(){const t=document.getElementById('typing-ai');if(t)t.remove();}
+</script>
+</body>
+</html>
