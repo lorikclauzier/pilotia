@@ -1569,17 +1569,42 @@ function importProspectsFromData(rows) {
   if (!rows.length) { showToast('Aucune donnée trouvée'); return; }
   const headers = Object.keys(rows[0]);
   const colMap  = detectColumns(headers);
+  const findCol = (keys) => headers.find(h => keys.some(k => h.toLowerCase().replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').includes(k))) || '';
+  const prenomCol  = findCol(['prenom','firstname','first name']);
+  const statutCol  = colMap['Statut'] || findCol(['statut','status','etat','etape','stage']);
+  const sourceCol  = findCol(['source','provenance','canal']);
+  const relanceCol = findCol(['relance','rappel','prochaine','next']);
+  const noteCol    = findCol(['note','commentaire','remarque']);
+  const valeurCol  = findCol(['valeur','montant','budget','chiffre']);
+
   const prospects = getProspects();
   const existing  = new Set(prospects.map(p => (p.email||'').toLowerCase()));
   let added = 0;
+
   rows.forEach(r => {
-    const nom   = (r[colMap['Nom']] || '').trim(); if (!nom) return;
+    let nom = (r[colMap['Nom']] || '').trim();
+    const prenom = prenomCol ? (r[prenomCol] || '').trim() : '';
+    if (prenom) nom = (prenom + ' ' + nom).trim();
+    if (!nom) return;
     const email = (r[colMap['Email']] || '').trim();
     if (email && existing.has(email.toLowerCase())) return;
-    prospects.unshift({ id: Date.now().toString() + Math.random(), nom, entreprise: (r[colMap['Entreprise']]||'').trim(), email, tel: (r[colMap['Téléphone']]||'').trim(), source: 'Import', valeur:'', relance:'', note:'', statut:'nouveau', date: new Date().toISOString() });
+    prospects.unshift({
+      id: Date.now().toString() + Math.random(),
+      nom,
+      entreprise: (r[colMap['Entreprise']] || '').trim(),
+      email,
+      tel: (r[colMap['Téléphone']] || '').trim(),
+      source: sourceCol ? (r[sourceCol] || 'Import').trim() : 'Import',
+      valeur: valeurCol ? (r[valeurCol] || '') : '',
+      relance: relanceCol ? prospRelanceDate(r[relanceCol]) : '',
+      note: noteCol ? (r[noteCol] || '').trim() : '',
+      statut: normalizeProspStatut(statutCol ? r[statutCol] : ''),
+      date: new Date().toISOString()
+    });
     if (email) existing.add(email.toLowerCase());
     added++;
   });
+
   saveProspects(prospects);
   addActivity('add', `Import prospects : ${added} ajoutés`);
   renderKanban();
@@ -1590,6 +1615,27 @@ function importProspectsFromData(rows) {
   res.textContent = `✓ ${added} prospect(s) importé(s) dans le Kanban !`;
   document.getElementById('prosp-file-input').value = '';
   showToast(`${added} prospects importés ✓`);
+}
+
+function normalizeProspStatut(val) {
+  const v = (val || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  if (!v || v.includes('nouveau') || v.includes('contacter') || v === 'lead' || v === 'new') return 'nouveau';
+  if (v.includes('contacte') || v === 'contact') return 'contacte';
+  if (v.includes('demo') || v.includes('discussion') || v.includes('interesse') || v.includes('interess')) return 'demo';
+  if (v.includes('nego') || v.includes('proposition') || v.includes('offre') || v.includes('envoy') || v.includes('devis')) return 'nego';
+  if (v.includes('gagne') || v.includes('ferme') || v.includes('conclu') || v.includes('signe') || v.includes('won') || v.includes('client')) return 'gagne';
+  return 'nouveau';
+}
+
+function prospRelanceDate(val) {
+  if (!val) return '';
+  if (typeof val === 'number') {
+    // Excel serial number → JS date
+    const d = new Date(Math.round((val - 25569) * 86400 * 1000));
+    return d.toISOString().split('T')[0];
+  }
+  const d = new Date(val);
+  return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
 }
 
 // ── PLAN MODAL CLOSE ON OUTSIDE CLICK ──
