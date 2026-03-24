@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PilotIA — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --dark:#080c14;
+  --dark2:#0e1420;
+  --dark3:#141c2e;
+  --blue:#3b82f6;
+  --blue2:#2563eb;
+  --text:#f0f4ff;
+  --text2:#8899bb;
+  --text3:#4a5a78;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.12);
+}
+body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;display:flex}
+
+/* Sidebar */
+.sidebar{width:220px;background:var(--dark2);border-right:1px solid var(--border);padding:24px 12px;display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-logo{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;padding:0 10px;margin-bottom:28px;letter-spacing:-0.5px}
+.sidebar-logo span{color:var(--blue)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;font-size:13px;color:var(--text2);cursor:pointer;transition:all 0.15s;text-decoration:none}
+.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+.nav-item.active{background:rgba(59,130,246,0.12);color:#93c5fd}
+.nav-item svg{width:15px;height:15px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8}
+.sidebar-spacer{flex:1}
+.user-info{padding:10px;border-radius:8px;border:1px solid var(--border);margin-top:8px}
+.user-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-email{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn-logout{width:100%;margin-top:10px;padding:8px;background:transparent;border:1px solid var(--border2);border-radius:7px;font-size:12px;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s}
+.btn-logout:hover{border-color:rgba(239,68,68,0.4);color:#fca5a5}
+
+/* Main */
+.main{flex:1;padding:36px;overflow-y:auto}
+.main-header{margin-bottom:32px}
+.main-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:700;color:#fff;letter-spacing:-0.5px;margin-bottom:4px}
+.main-sub{font-size:14px;color:var(--text2)}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.stat-card{background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:20px}
+.stat-label{font-size:12px;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px}
+.stat-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:#fff;margin-bottom:4px}
+.stat-delta{font-size:12px;color:#34d399}
+
+/* Table */
+.section-title{font-size:15px;font-weight:500;color:#fff;margin-bottom:14px}
+.table-wrap{background:var(--dark2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.table-head{display:grid;grid-template-columns:1fr 140px 100px 100px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px}
+.table-row{display:grid;grid-template-columns:1fr 140px 100px 100px;padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);align-items:center;transition:background 0.15s}
+.table-row:last-child{border-bottom:none}
+.table-row:hover{background:rgba(255,255,255,0.02)}
+.table-row .name{color:var(--text);font-weight:500}
+.badge{padding:3px 9px;border-radius:5px;font-size:11px;font-weight:500;display:inline-block}
+.badge-green{background:rgba(16,185,129,0.12);color:#34d399}
+.badge-blue{background:rgba(59,130,246,0.12);color:#93c5fd}
+.badge-amber{background:rgba(245,158,11,0.12);color:#fbbf24}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">Pilot<span>IA</span></div>
+
+  <a href="#" class="nav-item active">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Dashboard
+  </a>
+  <a href="#" class="nav-item">
+    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Contacts
+  </a>
+  <a href="#" class="nav-item">
+    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Activité
+  </a>
+  <a href="#" class="nav-item">
+    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Messages
+  </a>
+  <a href="#" class="nav-item">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+    Paramètres
+  </a>
+
+  <div class="sidebar-spacer"></div>
+
+  <div class="user-info">
+    <div class="user-name" id="user-name">—</div>
+    <div class="user-email" id="user-email">—</div>
+  </div>
+  <button class="btn-logout" id="logout-btn">Se déconnecter</button>
+</aside>
+
+<!-- Main content -->
+<main class="main">
+  <div class="main-header">
+    <div class="main-title">Bonjour, <span id="greeting-name">—</span> 👋</div>
+    <div class="main-sub">Voici un aperçu de votre activité.</div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Contacts</div>
+      <div class="stat-val">248</div>
+      <div class="stat-delta">+12 ce mois</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Deals actifs</div>
+      <div class="stat-val">34</div>
+      <div class="stat-delta">+5 cette semaine</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Taux de conversion</div>
+      <div class="stat-val">18%</div>
+      <div class="stat-delta">+2% vs mois dernier</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">CA pipeline</div>
+      <div class="stat-val">84k€</div>
+      <div class="stat-delta">+11k ce mois</div>
+    </div>
+  </div>
+
+  <div class="section-title">Derniers contacts</div>
+  <div class="table-wrap">
+    <div class="table-head">
+      <div>Nom</div>
+      <div>Entreprise</div>
+      <div>Statut</div>
+      <div>Valeur</div>
+    </div>
+    <div class="table-row"><div class="name">Sophie Martin</div><div>Acme SAS</div><div><span class="badge badge-green">Client</span></div><div>12 000 €</div></div>
+    <div class="table-row"><div class="name">Thomas Roux</div><div>NovaTech</div><div><span class="badge badge-blue">Lead</span></div><div>8 500 €</div></div>
+    <div class="table-row"><div class="name">Claire Bernard</div><div>Studio CB</div><div><span class="badge badge-amber">En cours</span></div><div>4 200 €</div></div>
+    <div class="table-row"><div class="name">Marc Lefevre</div><div>DigiPro</div><div><span class="badge badge-green">Client</span></div><div>21 000 €</div></div>
+    <div class="table-row"><div class="name">Julie Morel</div><div>FlowAgency</div><div><span class="badge badge-blue">Lead</span></div><div>6 800 €</div></div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // ⚠️ Remplace ces valeurs par les tiennes (Settings > API dans Supabase)
+  const SUPABASE_URL = 'https://wpyhxotefkpvqzpndpgg.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_m_m0c4egKS1E9LsVcJ93IQ_v7TYy-BS';
+
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Vérifie la session — redirige vers login si pas connecté
+  supabaseClient.auth.getSession().then(({ data: { session } }) => {
+    if (!session) {
+      window.location.href = 'login.html';
+      return;
+    }
+    const user = session.user;
+    const name = user.user_metadata?.full_name || user.email.split('@')[0];
+    document.getElementById('user-name').textContent = name;
+    document.getElementById('user-email').textContent = user.email;
+    document.getElementById('greeting-name').textContent = name.split(' ')[0];
+  });
+
+  document.getElementById('logout-btn').addEventListener('click', async () => {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'login.html';
+  });
+</script>
+</body>
+</html>
