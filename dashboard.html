@@ -1606,7 +1606,7 @@ function importProspectsFromData(rows) {
   const sourceCol  = findSmart(['source','canal','provenance','ou on'], null);
   const relanceCol = findSmart(['prochaine relance','relance','rappel','follow-up','follow up','next'], null);
   const noteCol    = findSmart(['observation','note','commentaire','remarque'], null);
-  const valeurCol  = findSmart(['valeur','montant','budget','deal value','chiffre'], null);
+  const valeurCol  = findSmart(['valeur estimee','valeur','deal value','montant','budget','chiffre','val'], null);
 
   const prospects = getProspects();
   const existing  = new Set(prospects.map(p => (p.email||'').toLowerCase()));
