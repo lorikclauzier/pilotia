@@ -1581,37 +1581,55 @@ function parseProspCSV(text) {
 function importProspectsFromData(rows) {
   if (!rows.length) { showToast('Aucune donnée trouvée'); return; }
   const headers = Object.keys(rows[0]);
-  const colMap  = detectColumns(headers);
-  const findCol = (keys) => headers.find(h => keys.some(k => h.toLowerCase().replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').includes(k))) || '';
-  const prenomCol  = findCol(['prenom','firstname','first name']);
-  const statutCol  = colMap['Statut'] || findCol(['statut','status','etat','etape','stage']);
-  const sourceCol  = findCol(['source','provenance','canal']);
-  const relanceCol = findCol(['relance','rappel','prochaine','next']);
-  const noteCol    = findCol(['note','commentaire','remarque']);
-  const valeurCol  = findCol(['valeur','montant','budget','chiffre']);
+
+  // Smart matcher: exact > startsWith > includes — avoids 'nom' matching inside 'prenom'
+  const normH = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  const findSmart = (keys, excludeCol) => {
+    for (const pass of ['exact','starts','includes']) {
+      const found = headers.find(h => {
+        if (excludeCol && h === excludeCol) return false;
+        const hn = normH(h);
+        return keys.some(k => pass==='exact' ? hn===k : pass==='starts' ? hn.startsWith(k) : hn.includes(k));
+      });
+      if (found) return found;
+    }
+    return '';
+  };
+
+  // Detect prenom FIRST, then nom excluding that column (prevents 'nom' matching inside 'prenom')
+  const prenomCol  = findSmart(['prenom','firstname','first name'], null);
+  const nomCol     = findSmart(['nom complet','full name','nom & prenom','nom &','nom'], prenomCol) || prenomCol;
+  const emailCol   = findSmart(['email professionnel','email','mail','courriel'], null);
+  const telCol     = findSmart(['telephone portable','mobile','tel','telephone','phone'], null);
+  const coCol      = findSmart(['entreprise / organisation','organisation','entreprise','societe','company','boite'], null);
+  const statutCol  = findSmart(['statut commercial','statut','status','etat','etape','stage','stade'], null);
+  const sourceCol  = findSmart(['source','canal','provenance','ou on'], null);
+  const relanceCol = findSmart(['prochaine relance','relance','rappel','follow-up','follow up','next'], null);
+  const noteCol    = findSmart(['observation','note','commentaire','remarque'], null);
+  const valeurCol  = findSmart(['valeur','montant','budget','deal value','chiffre'], null);
 
   const prospects = getProspects();
   const existing  = new Set(prospects.map(p => (p.email||'').toLowerCase()));
   let added = 0;
 
   rows.forEach(r => {
-    let nom = (r[colMap['Nom']] || '').trim();
-    const prenom = prenomCol ? (r[prenomCol] || '').trim() : '';
+    let nom    = nomCol    ? (r[nomCol]    || '').toString().trim() : '';
+    const prenom = (prenomCol && prenomCol !== nomCol) ? (r[prenomCol] || '').toString().trim() : '';
     if (prenom) nom = (prenom + ' ' + nom).trim();
     if (!nom) return;
-    const email = (r[colMap['Email']] || '').trim();
+    const email = emailCol ? (r[emailCol] || '').toString().trim() : '';
     if (email && existing.has(email.toLowerCase())) return;
     prospects.unshift({
       id: Date.now().toString() + Math.random(),
       nom,
-      entreprise: (r[colMap['Entreprise']] || '').trim(),
+      entreprise: coCol     ? (r[coCol]     || '').toString().trim() : '',
       email,
-      tel: (r[colMap['Téléphone']] || '').trim(),
-      source: sourceCol ? (r[sourceCol] || 'Import').trim() : 'Import',
-      valeur: valeurCol ? (r[valeurCol] || '') : '',
-      relance: relanceCol ? prospRelanceDate(r[relanceCol]) : '',
-      note: noteCol ? (r[noteCol] || '').trim() : '',
-      statut: normalizeProspStatut(statutCol ? r[statutCol] : ''),
+      tel:        telCol    ? (r[telCol]    || '').toString().trim() : '',
+      source:     sourceCol ? (r[sourceCol] || 'Import').toString().trim() : 'Import',
+      valeur:     valeurCol ? (r[valeurCol] || '').toString()        : '',
+      relance:    relanceCol ? prospRelanceDate(r[relanceCol])        : '',
+      note:       noteCol   ? (r[noteCol]   || '').toString().trim() : '',
+      statut:     normalizeProspStatut(statutCol ? r[statutCol] : ''),
       date: new Date().toISOString()
     });
     if (email) existing.add(email.toLowerCase());
