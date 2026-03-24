@@ -149,6 +149,55 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 /* CONTACTS COUNT BADGE */
 .nav-badge{display:inline-flex;align-items:center;justify-content:center;background:rgba(59,130,246,0.2);color:#93c5fd;border-radius:5px;font-size:10px;padding:1px 6px;margin-left:auto}
 
+/* PLAN BADGE */
+.plan-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;margin-bottom:8px}
+.plan-free{background:rgba(74,90,120,0.2);color:var(--text3)}
+.plan-starter{background:rgba(59,130,246,0.15);color:#93c5fd}
+.plan-pro{background:rgba(245,158,11,0.15);color:#fbbf24}
+
+/* LOCK OVERLAY */
+.lock-overlay{position:absolute;inset:0;background:rgba(8,12,20,0.85);backdrop-filter:blur(4px);border-radius:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;gap:12px}
+.lock-icon{font-size:36px}
+.lock-title{font-size:16px;font-weight:600;color:#fff}
+.lock-sub{font-size:13px;color:var(--text3);text-align:center;max-width:280px;line-height:1.6}
+
+/* KANBAN */
+.prosp-tabs{display:flex;gap:8px;margin-bottom:24px;border-bottom:1px solid var(--border);padding-bottom:0}
+.prosp-tab{padding:10px 18px;font-size:13px;color:var(--text3);cursor:pointer;border:none;background:none;font-family:'Inter',sans-serif;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s}
+.prosp-tab:hover{color:var(--text)}
+.prosp-tab.active{color:#93c5fd;border-bottom-color:var(--blue)}
+.kanban-board{display:flex;gap:14px;overflow-x:auto;padding-bottom:12px;min-height:500px}
+.kb-col{flex:0 0 220px;background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.kb-col-hd{display:flex;align-items:center;justify-content:space-between;padding:4px 2px 10px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.kb-col-name{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px}
+.kb-cnt{background:rgba(255,255,255,0.08);color:var(--text3);border-radius:5px;padding:1px 7px;font-size:11px}
+.kb-card{background:var(--dark3);border:1px solid var(--border);border-radius:9px;padding:12px;cursor:grab;transition:all 0.15s;user-select:none}
+.kb-card:hover{border-color:rgba(59,130,246,0.3);transform:translateY(-1px)}
+.kb-card.dragging{opacity:0.4;cursor:grabbing}
+.kb-col.drag-over{border-color:var(--blue);background:rgba(59,130,246,0.06)}
+.kb-card-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px}
+.kb-card-co{font-size:11px;color:var(--text3);margin-bottom:8px}
+.kb-card-footer{display:flex;align-items:center;justify-content:space-between}
+.kb-source{font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,0.06);color:var(--text3)}
+.kb-relance{font-size:10px;color:#f87171}
+.kb-add{border:1px dashed rgba(255,255,255,0.1);border-radius:8px;padding:9px;text-align:center;font-size:12px;color:var(--text3);cursor:pointer;transition:all 0.15s}
+.kb-add:hover{border-color:rgba(59,130,246,0.4);color:#93c5fd}
+
+/* PROSPECT STATS */
+.prosp-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.chart-card{background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:20px}
+.chart-title{font-size:13px;font-weight:500;color:#fff;margin-bottom:16px}
+.pie-wrap{display:flex;align-items:center;gap:24px}
+.pie-legend{display:flex;flex-direction:column;gap:8px}
+.pie-legend-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
+.pie-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.relance-list{display:flex;flex-direction:column;gap:0}
+.relance-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.relance-item:last-child{border-bottom:none}
+.relance-name{color:var(--text);font-weight:500}
+.relance-days{font-size:11px;color:#f87171;background:rgba(239,68,68,0.1);padding:2px 8px;border-radius:5px}
+
 /* IMPORT */
 .import-methods{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px}
 .import-card{background:var(--dark2);border:2px solid var(--border);border-radius:14px;padding:28px;cursor:pointer;transition:all 0.2s;text-align:center}
@@ -197,6 +246,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 <!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-logo">pylot<span>IA</span></div>
+  <div class="plan-badge plan-free" id="plan-badge-sidebar" style="margin:0 10px 16px">● <span id="plan-label-sidebar">Free</span></div>
 
   <button class="nav-item active" id="nav-dashboard" onclick="showSection('dashboard')">
     <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -214,6 +264,10 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
   <button class="nav-item" id="nav-messages" onclick="showSection('messages')">
     <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     Messages
+  </button>
+  <button class="nav-item" id="nav-prospection" onclick="showSection('prospection')">
+    <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    Prospection
   </button>
   <button class="nav-item" id="nav-import" onclick="showSection('import')">
     <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -332,6 +386,82 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
       </div>
       <div class="msg-main" id="msg-main">
         <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:13px">Sélectionnez une conversation</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROSPECTION -->
+  <div class="section" id="section-prospection">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Prospection</div>
+        <div class="page-sub">Gérez votre pipeline commercial</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="plan-badge plan-free" id="plan-badge-prosp">Free</span>
+        <button class="btn btn-blue" onclick="openProspModal()">+ Nouveau prospect</button>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="prosp-tabs">
+      <button class="prosp-tab active" id="ptab-kanban" onclick="switchProspTab('kanban')">Kanban</button>
+      <button class="prosp-tab" id="ptab-stats" onclick="switchProspTab('stats')">Statistiques <span id="stats-lock-icon" style="font-size:10px">🔒</span></button>
+      <button class="prosp-tab" id="ptab-import" onclick="switchProspTab('import')">Import prospects <span id="import-lock-icon" style="font-size:10px">🔒</span></button>
+    </div>
+
+    <!-- TAB: KANBAN -->
+    <div id="prosp-tab-kanban">
+      <div id="free-prospect-warning" style="display:none;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#fbbf24;align-items:center;gap:10px">
+        ⚠️ Plan Free : limité à 20 prospects. <a href="#" onclick="event.preventDefault();openUpgradeModal()" style="color:#fbbf24;text-decoration:underline;margin-left:4px">Passer au Starter →</a>
+      </div>
+      <div class="kanban-board" id="kanban-board"></div>
+    </div>
+
+    <!-- TAB: STATS -->
+    <div id="prosp-tab-stats" style="display:none;position:relative;min-height:300px">
+      <div id="stats-lock" class="lock-overlay" style="display:none;position:relative;min-height:300px;border-radius:12px;background:var(--dark2)">
+        <div class="lock-icon">🔒</div>
+        <div class="lock-title">Statistiques — Plan Starter requis</div>
+        <div class="lock-sub">Visualisez votre taux de conversion, vos sources et relances urgentes.</div>
+        <button class="btn btn-blue" onclick="openUpgradeModal()" style="margin-top:8px">Voir les offres →</button>
+      </div>
+      <div id="prosp-stats-wrap">
+        <div class="prosp-stats" id="prosp-stats-cards"></div>
+        <div class="chart-row">
+          <div class="chart-card">
+            <div class="chart-title">Répartition par étape</div>
+            <div class="pie-wrap">
+              <canvas id="pie-chart" width="140" height="140"></canvas>
+              <div class="pie-legend" id="pie-legend"></div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">Relances urgentes</div>
+            <div class="relance-list" id="relance-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: IMPORT PROSPECTS -->
+    <div id="prosp-tab-import" style="display:none;position:relative;min-height:200px">
+      <div id="import-prosp-lock" class="lock-overlay" style="display:none;position:relative;min-height:200px;border-radius:12px;background:var(--dark2)">
+        <div class="lock-icon">🔒</div>
+        <div class="lock-title">Import prospects — Plan Starter requis</div>
+        <div class="lock-sub">Importez vos prospects en masse depuis Excel ou CSV.</div>
+        <button class="btn btn-blue" onclick="openUpgradeModal()" style="margin-top:8px">Voir les offres →</button>
+      </div>
+      <div id="prosp-import-wrap" style="max-width:600px">
+        <p style="font-size:13px;color:var(--text2);margin-bottom:20px">Importez vos prospects depuis un fichier CSV ou Excel. Les colonnes <strong>Nom, Entreprise, Email, Téléphone</strong> sont reconnues automatiquement.</p>
+        <div class="drop-zone" id="prosp-drop-zone" onclick="document.getElementById('prosp-file-input').click()" ondrop="handleProspDrop(event)" ondragover="handleProspDragOver(event)" ondragleave="handleProspDragLeave()">
+          <div class="drop-zone-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+          <div class="drop-zone-title">Glissez votre fichier prospects ici</div>
+          <div class="drop-zone-sub">Formats acceptés : .xlsx, .xls, .csv</div>
+          <button class="btn btn-ghost" onclick="event.stopPropagation();document.getElementById('prosp-file-input').click()">Choisir un fichier</button>
+          <input type="file" id="prosp-file-input" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleProspFileSelect(event)">
+        </div>
+        <div id="prosp-import-result" style="display:none;margin-top:16px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:10px;padding:14px 16px;font-size:13px;color:#34d399"></div>
       </div>
     </div>
   </div>
@@ -536,6 +666,93 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 
 <div id="toast"></div>
 
+<!-- MODAL PROSPECT -->
+<div class="modal-overlay" id="modal-prospect">
+  <div class="modal" style="width:500px;max-width:95vw">
+    <div class="modal-title" id="prosp-modal-title">Nouveau prospect</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Nom complet *</label>
+        <input class="form-input" id="p-nom" placeholder="Jean Dupont">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Entreprise</label>
+        <input class="form-input" id="p-entreprise" placeholder="Acme SAS">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Email</label>
+        <input class="form-input" id="p-email" placeholder="jean@example.com" type="email">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Téléphone</label>
+        <input class="form-input" id="p-tel" placeholder="06 00 00 00 00">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Source</label>
+        <select class="form-select" id="p-source">
+          <option value="Manuel">Manuel</option>
+          <option value="LinkedIn">LinkedIn</option>
+          <option value="Site web">Site web</option>
+          <option value="Recommandation">Recommandation</option>
+          <option value="Salon/Événement">Salon / Événement</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Valeur estimée (€)</label>
+        <input class="form-input" id="p-valeur" placeholder="0" type="number" min="0">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Date de relance</label>
+        <input class="form-input" id="p-relance" type="date">
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:12px">
+      <label class="form-label">Note</label>
+      <textarea class="form-input" id="p-note" rows="3" placeholder="Notes libres..." style="resize:vertical"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-danger" id="prosp-delete-btn" onclick="deleteProspect(editingProspId)" style="display:none;margin-right:auto">Supprimer</button>
+      <button class="btn btn-ghost" onclick="closeProspModal()">Annuler</button>
+      <button class="btn btn-blue" id="prosp-modal-submit" onclick="saveProspect()">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL UPGRADE -->
+<div class="modal-overlay" id="modal-upgrade">
+  <div class="modal" style="width:520px;max-width:95vw">
+    <div class="modal-title" style="text-align:center;margin-bottom:6px">Passez à la vitesse supérieure</div>
+    <div style="text-align:center;font-size:13px;color:var(--text3);margin-bottom:24px">Débloquez tout le potentiel de pylotIA</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+      <div style="background:var(--dark3);border:1px solid rgba(59,130,246,0.3);border-radius:12px;padding:20px">
+        <div style="font-size:11px;color:#93c5fd;font-weight:700;letter-spacing:1px;margin-bottom:10px">STARTER</div>
+        <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:#fff">29€<span style="font-size:13px;font-weight:400;color:var(--text3)">/mois</span></div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.8;margin-top:14px">
+          ✓ Prospects illimités<br>
+          ✓ Statistiques avancées<br>
+          ✓ Import en masse<br>
+          ✓ Relances programmées
+        </div>
+        <button class="btn btn-blue" style="width:100%;margin-top:16px" onclick="activatePlan('starter')">Activer Starter</button>
+      </div>
+      <div style="background:var(--dark3);border:1px solid rgba(245,158,11,0.3);border-radius:12px;padding:20px">
+        <div style="font-size:11px;color:#fbbf24;font-weight:700;letter-spacing:1px;margin-bottom:10px">PRO ★</div>
+        <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:#fff">59€<span style="font-size:13px;font-weight:400;color:var(--text3)">/mois</span></div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.8;margin-top:14px">
+          ✓ Tout Starter inclus<br>
+          ✓ ✦ IA rédaction emails<br>
+          ✓ Rapports automatiques<br>
+          ✓ Support prioritaire
+        </div>
+        <button class="btn" style="width:100%;margin-top:16px;background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:9px;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif" onclick="activatePlan('pro')">Activer Pro</button>
+      </div>
+    </div>
+    <div style="text-align:center">
+      <button class="btn btn-ghost" onclick="closeUpgradeModal()" style="font-size:12px;color:var(--text3)">Rester sur le plan Free</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
@@ -561,6 +778,7 @@ supabaseClient.auth.getSession().then(({ data: { session } }) => {
   renderContacts();
   renderMessages();
   renderActivity();
+  updatePlanBadges();
 });
 
 document.getElementById('logout-btn').addEventListener('click', async () => {
@@ -578,6 +796,7 @@ function showSection(name) {
   if (name === 'activite') renderActivity();
   if (name === 'messages') renderMessages();
   if (name === 'import') { selectImportMethod('file'); showImportStep(1); resetImport(); }
+  if (name === 'prospection') initProspection();
 }
 
 // ─── STORAGE HELPERS ──────────────────────────────────
@@ -1010,6 +1229,372 @@ function resetImport() {
   document.getElementById('import-preview-zone').style.display = 'none';
   document.getElementById('file-input').value = '';
 }
+
+// ─── PROSPECTION ──────────────────────────────────────
+const KB_COLS = [
+  { id: 'nouveau',     label: 'Nouveau Lead',      color: '#4a5a78' },
+  { id: 'contacte',   label: 'Contacté',           color: '#93c5fd' },
+  { id: 'demo',       label: 'Démo faite',         color: '#fbbf24' },
+  { id: 'nego',       label: 'En négociation',     color: '#a78bfa' },
+  { id: 'gagne',      label: 'Fermé / Gagné ✓',   color: '#34d399' },
+];
+
+function getProspects() { return JSON.parse(localStorage.getItem('pylotia_prospects') || '[]'); }
+function saveProspects(d) { localStorage.setItem('pylotia_prospects', JSON.stringify(d)); }
+function getPlan() { return localStorage.getItem('pylotia_plan') || 'free'; }
+
+let editingProspId = null;
+let dragProspId = null;
+
+function initProspection() {
+  updatePlanBadges();
+  checkProspLocks();
+  renderKanban();
+}
+
+function updatePlanBadges() {
+  const plan = getPlan();
+  const cls = { free: 'plan-free', starter: 'plan-starter', pro: 'plan-pro' };
+  const txt = { free: '● Free', starter: '✦ Starter', pro: '★ Pro' };
+  ['plan-badge-prosp','plan-badge-sidebar'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = 'plan-badge ' + cls[plan];
+    el.textContent = txt[plan];
+  });
+  const lbl = document.getElementById('plan-label-sidebar');
+  if (lbl) lbl.textContent = { free: 'Free', starter: 'Starter', pro: 'Pro' }[plan];
+}
+
+function checkProspLocks() {
+  const plan = getPlan();
+  const isLocked = plan === 'free';
+  // Tab lock icons
+  document.getElementById('stats-lock-icon').style.display  = isLocked ? 'inline' : 'none';
+  document.getElementById('import-lock-icon').style.display = isLocked ? 'inline' : 'none';
+  // Lock overlays
+  const statsLock = document.getElementById('stats-lock');
+  const statsWrap = document.getElementById('prosp-stats-wrap');
+  if (statsLock) { statsLock.style.display = isLocked ? 'flex' : 'none'; }
+  if (statsWrap) { statsWrap.style.display = isLocked ? 'none' : 'block'; }
+  const importLock = document.getElementById('import-prosp-lock');
+  const importWrap = document.getElementById('prosp-import-wrap');
+  if (importLock) { importLock.style.display = isLocked ? 'flex' : 'none'; }
+  if (importWrap) { importWrap.style.display = isLocked ? 'none' : 'block'; }
+  // Free limit warning
+  const warn = document.getElementById('free-prospect-warning');
+  if (warn) warn.style.display = (isLocked && getProspects().length >= 20) ? 'flex' : 'none';
+}
+
+function switchProspTab(tab) {
+  ['kanban','stats','import'].forEach(t => {
+    document.getElementById('prosp-tab-' + t).style.display = t === tab ? 'block' : 'none';
+    document.getElementById('ptab-' + t).classList.toggle('active', t === tab);
+  });
+  if (tab === 'stats') { checkProspLocks(); renderProspStats(); }
+  if (tab === 'import') checkProspLocks();
+}
+
+// ── KANBAN ──
+function renderKanban() {
+  const prospects = getProspects();
+  const plan = getPlan();
+  const board = document.getElementById('kanban-board');
+  if (!board) return;
+  board.innerHTML = KB_COLS.map(col => {
+    const cards = prospects.filter(p => p.statut === col.id);
+    return `<div class="kb-col" id="kbc-${col.id}"
+      ondragover="kbDragOver(event,'${col.id}')"
+      ondrop="kbDrop(event,'${col.id}')"
+      ondragleave="kbDragLeave(event)">
+      <div class="kb-col-hd">
+        <span class="kb-col-name" style="color:${col.color}">${col.label}</span>
+        <span class="kb-cnt">${cards.length}</span>
+      </div>
+      ${cards.map(p => kbCardHtml(p, plan)).join('')}
+      <div class="kb-add" onclick="openProspModal(null,'${col.id}')">+ Ajouter</div>
+    </div>`;
+  }).join('');
+}
+
+function kbCardHtml(p, plan) {
+  const today = new Date().toISOString().split('T')[0];
+  const overdue  = p.relance && p.relance <= today;
+  const soon     = p.relance && p.relance > today && p.relance <= new Date(Date.now() + 3*86400000).toISOString().split('T')[0];
+  const relBadge = overdue ? `<span class="kb-relance">⚡ Relance</span>` : soon ? `<span class="kb-relance" style="color:#fbbf24">↻ Bientôt</span>` : '';
+  const aiBtn    = plan === 'pro' ? `<button onclick="event.stopPropagation();aiDraftEmail('${p.id}')" style="background:rgba(245,158,11,0.12);color:#fbbf24;border:none;border-radius:5px;padding:2px 8px;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;margin-top:6px">✦ Rédigez email IA</button>` : '';
+  const valeur   = p.valeur ? `<div style="margin-top:6px;font-size:11px;color:#34d399">💶 ${Number(p.valeur).toLocaleString('fr-FR')} €</div>` : '';
+  return `<div class="kb-card" draggable="true"
+    ondragstart="kbDragStart(event,'${p.id}')"
+    ondragend="kbDragEnd(event)"
+    onclick="openProspModal('${p.id}')">
+    <div class="kb-card-name">${p.nom}</div>
+    <div class="kb-card-co">${p.entreprise || '—'}</div>
+    <div class="kb-card-footer">
+      <span class="kb-source">${p.source || 'Manuel'}</span>
+      ${relBadge}
+    </div>
+    ${valeur}
+    ${aiBtn}
+  </div>`;
+}
+
+function kbDragStart(e, id) {
+  dragProspId = id;
+  setTimeout(() => e.target.classList.add('dragging'), 0);
+  e.dataTransfer.effectAllowed = 'move';
+}
+function kbDragEnd(e) { e.target.classList.remove('dragging'); dragProspId = null; }
+function kbDragOver(e, colId) { e.preventDefault(); document.getElementById('kbc-' + colId).classList.add('drag-over'); }
+function kbDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function kbDrop(e, colId) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (!dragProspId) return;
+  const prospects = getProspects();
+  const p = prospects.find(x => x.id === dragProspId);
+  if (p) {
+    p.statut = colId;
+    saveProspects(prospects);
+    addActivity('edit', `Prospect déplacé : ${p.nom} → ${KB_COLS.find(c => c.id === colId)?.label}`);
+    renderKanban();
+  }
+  dragProspId = null;
+}
+
+// ── STATS ──
+function renderProspStats() {
+  if (getPlan() === 'free') return;
+  const prospects = getProspects();
+  const total   = prospects.length;
+  const enCours = prospects.filter(p => ['contacte','demo','nego'].includes(p.statut)).length;
+  const gagnes  = prospects.filter(p => p.statut === 'gagne').length;
+  const taux    = total > 0 ? Math.round(gagnes / total * 100) : 0;
+  const valeur  = prospects.reduce((s, p) => s + (parseFloat(p.valeur) || 0), 0);
+
+  const cards = document.getElementById('prosp-stats-cards');
+  if (cards) cards.innerHTML = [
+    { label: 'Total prospects', val: total,    delta: 'dans le pipeline' },
+    { label: 'En cours',        val: enCours,  delta: 'actifs' },
+    { label: 'Gagnés',          val: gagnes,   delta: 'conclus' },
+    { label: 'Valeur pipeline', val: valeur.toLocaleString('fr-FR') + ' €', delta: 'estimée' },
+  ].map(s => `<div class="stat-card"><div class="stat-label">${s.label}</div><div class="stat-val" style="font-size:${s.label==='Valeur pipeline'?'18px':'28px'}">${s.val}</div><div class="stat-delta">${s.delta}</div></div>`).join('');
+
+  drawPieChart(prospects);
+  renderRelances(prospects);
+}
+
+function drawPieChart(prospects) {
+  const canvas = document.getElementById('pie-chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const colorMap = { nouveau:'#4a5a78', contacte:'#93c5fd', demo:'#fbbf24', nego:'#a78bfa', gagne:'#34d399' };
+  const data = KB_COLS.map(col => ({ label: col.label, color: colorMap[col.id], count: prospects.filter(p => p.statut === col.id).length }));
+  const total = data.reduce((s, d) => s + d.count, 0);
+  ctx.clearRect(0, 0, 140, 140);
+  if (total === 0) {
+    ctx.fillStyle = '#1e2a40'; ctx.beginPath(); ctx.arc(70, 70, 60, 0, 2*Math.PI); ctx.fill();
+    const leg = document.getElementById('pie-legend'); if (leg) leg.innerHTML = '<div style="font-size:12px;color:var(--text3)">Aucun prospect</div>';
+    return;
+  }
+  let angle = -Math.PI / 2;
+  data.forEach(d => {
+    if (!d.count) return;
+    const slice = d.count / total * 2 * Math.PI;
+    ctx.beginPath(); ctx.moveTo(70,70); ctx.arc(70,70,60,angle,angle+slice); ctx.closePath();
+    ctx.fillStyle = d.color; ctx.fill();
+    angle += slice;
+  });
+  ctx.beginPath(); ctx.arc(70,70,35,0,2*Math.PI); ctx.fillStyle = '#0e1420'; ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 16px Syne,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(total, 70, 70);
+  const leg = document.getElementById('pie-legend');
+  if (leg) leg.innerHTML = data.filter(d=>d.count>0).map(d=>`<div class="pie-legend-item"><div class="pie-dot" style="background:${d.color}"></div>${d.label} (${d.count})</div>`).join('');
+}
+
+function renderRelances(prospects) {
+  const today = new Date().toISOString().split('T')[0];
+  const list  = document.getElementById('relance-list'); if (!list) return;
+  const items = prospects.filter(p => p.relance && p.statut !== 'gagne').sort((a,b) => a.relance.localeCompare(b.relance)).slice(0, 6);
+  if (!items.length) { list.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px 0">Aucune relance prévue 🎉</div>'; return; }
+  list.innerHTML = items.map(p => {
+    const dDiff = Math.ceil((new Date(p.relance) - new Date(today)) / 86400000);
+    const label = dDiff < 0 ? `${Math.abs(dDiff)}j retard` : dDiff === 0 ? "Aujourd'hui" : `Dans ${dDiff}j`;
+    const clr   = dDiff <= 0 ? '#f87171' : dDiff <= 2 ? '#fbbf24' : '#34d399';
+    return `<div class="relance-item">
+      <div><div class="relance-name">${p.nom}</div><div style="font-size:11px;color:var(--text3)">${p.entreprise||'—'}</div></div>
+      <span class="relance-days" style="color:${clr};background:${clr}18">${label}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── PROSPECT MODAL ──
+function openProspModal(id, defaultStatut) {
+  editingProspId = id || null;
+  const isEdit = !!id;
+  document.getElementById('prosp-modal-title').textContent  = isEdit ? 'Modifier le prospect' : 'Nouveau prospect';
+  document.getElementById('prosp-modal-submit').textContent = isEdit ? 'Enregistrer' : 'Ajouter';
+  document.getElementById('prosp-delete-btn').style.display  = isEdit ? 'block' : 'none';
+  if (isEdit) {
+    const p = getProspects().find(x => x.id === id);
+    document.getElementById('p-nom').value        = p.nom;
+    document.getElementById('p-entreprise').value = p.entreprise || '';
+    document.getElementById('p-email').value      = p.email || '';
+    document.getElementById('p-tel').value        = p.tel || '';
+    document.getElementById('p-source').value     = p.source || 'Manuel';
+    document.getElementById('p-valeur').value     = p.valeur || '';
+    document.getElementById('p-relance').value    = p.relance || '';
+    document.getElementById('p-note').value       = p.note || '';
+    document.getElementById('modal-prospect').dataset.statut = p.statut;
+  } else {
+    if (getPlan() === 'free' && getProspects().length >= 20) {
+      openUpgradeModal(); return;
+    }
+    ['p-nom','p-entreprise','p-email','p-tel','p-valeur','p-relance','p-note'].forEach(fid => document.getElementById(fid).value = '');
+    document.getElementById('p-source').value = 'Manuel';
+    document.getElementById('modal-prospect').dataset.statut = defaultStatut || 'nouveau';
+  }
+  document.getElementById('modal-prospect').classList.add('open');
+}
+
+function closeProspModal() {
+  document.getElementById('modal-prospect').classList.remove('open');
+  editingProspId = null;
+}
+
+function saveProspect() {
+  const nom = document.getElementById('p-nom').value.trim();
+  if (!nom) { showToast('Le nom est obligatoire'); return; }
+  if (!editingProspId && getPlan() === 'free' && getProspects().length >= 20) {
+    showToast('Limite atteinte (20 prospects)'); openUpgradeModal(); return;
+  }
+  const prospects = getProspects();
+  const data = {
+    nom,
+    entreprise: document.getElementById('p-entreprise').value.trim(),
+    email:      document.getElementById('p-email').value.trim(),
+    tel:        document.getElementById('p-tel').value.trim(),
+    source:     document.getElementById('p-source').value,
+    valeur:     document.getElementById('p-valeur').value,
+    relance:    document.getElementById('p-relance').value,
+    note:       document.getElementById('p-note').value.trim(),
+  };
+  if (editingProspId) {
+    const idx = prospects.findIndex(x => x.id === editingProspId);
+    prospects[idx] = { ...prospects[idx], ...data };
+    addActivity('edit', 'Prospect modifié : ' + nom);
+    showToast('Prospect mis à jour ✓');
+  } else {
+    prospects.unshift({ id: Date.now().toString(), statut: document.getElementById('modal-prospect').dataset.statut || 'nouveau', date: new Date().toISOString(), ...data });
+    addActivity('add', 'Nouveau prospect : ' + nom);
+    showToast('Prospect ajouté ✓');
+  }
+  saveProspects(prospects);
+  closeProspModal();
+  renderKanban();
+  renderProspStats();
+  checkProspLocks();
+}
+
+function deleteProspect(id) {
+  if (!id) return;
+  const prospects = getProspects();
+  const p = prospects.find(x => x.id === id);
+  if (!confirm('Supprimer ' + p.nom + ' ?')) return;
+  saveProspects(prospects.filter(x => x.id !== id));
+  addActivity('delete', 'Prospect supprimé : ' + p.nom);
+  closeProspModal();
+  renderKanban();
+  renderProspStats();
+  showToast('Prospect supprimé');
+}
+
+function aiDraftEmail(prospId) {
+  const p = getProspects().find(x => x.id === prospId);
+  if (!p) return;
+  const draft = `Bonjour ${p.nom.split(' ')[0]},\n\nJe me permets de vous recontacter suite à notre dernier échange concernant ${p.entreprise || 'votre activité'}.\n\nSeriez-vous disponible pour un point cette semaine afin d'avancer ensemble ?\n\nBien cordialement`;
+  prompt('✦ Email rédigé par pylotIA IA :', draft);
+}
+
+// ── UPGRADE MODAL ──
+function openUpgradeModal()  { document.getElementById('modal-upgrade').classList.add('open'); }
+function closeUpgradeModal() { document.getElementById('modal-upgrade').classList.remove('open'); }
+
+function activatePlan(plan) {
+  localStorage.setItem('pylotia_plan', plan);
+  closeUpgradeModal();
+  updatePlanBadges();
+  checkProspLocks();
+  const labels = { free: 'Free', starter: 'Starter', pro: 'Pro' };
+  showToast('Plan ' + labels[plan] + ' activé ✓ (mode démo)');
+  addActivity('edit', 'Plan changé : ' + labels[plan]);
+  if (plan !== 'free') renderProspStats();
+}
+
+// ── IMPORT PROSPECTS ──
+function handleProspDragOver(e)  { e.preventDefault(); document.getElementById('prosp-drop-zone').classList.add('dragover'); }
+function handleProspDragLeave()  { document.getElementById('prosp-drop-zone').classList.remove('dragover'); }
+function handleProspDrop(e)      { e.preventDefault(); document.getElementById('prosp-drop-zone').classList.remove('dragover'); const f = e.dataTransfer.files[0]; if (f) processProspFile(f); }
+function handleProspFileSelect(e){ const f = e.target.files[0]; if (f) processProspFile(f); }
+
+function processProspFile(file) {
+  if (getPlan() === 'free') { openUpgradeModal(); return; }
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!['csv','xlsx','xls'].includes(ext)) { showToast('Format non supporté'); return; }
+  const reader = new FileReader();
+  if (ext === 'csv') {
+    reader.onload = e => importProspectsFromData(parseProspCSV(e.target.result));
+    reader.readAsText(file, 'UTF-8');
+  } else {
+    reader.onload = e => {
+      const wb = XLSX.read(e.target.result, { type: 'array' });
+      importProspectsFromData(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' }));
+    };
+    reader.readAsArrayBuffer(file);
+  }
+}
+
+function parseProspCSV(text) {
+  const lines = text.split('\n').filter(l => l.trim());
+  if (lines.length < 2) return [];
+  const sep = lines[0].includes(';') ? ';' : ',';
+  const headers = lines[0].split(sep).map(h => h.trim().replace(/"/g,''));
+  return lines.slice(1).map(line => {
+    const vals = line.split(sep).map(v => v.trim().replace(/"/g,''));
+    const obj = {}; headers.forEach((h,i) => obj[h] = vals[i] || ''); return obj;
+  }).filter(r => Object.values(r).some(v => v));
+}
+
+function importProspectsFromData(rows) {
+  if (!rows.length) { showToast('Aucune donnée trouvée'); return; }
+  const headers = Object.keys(rows[0]);
+  const colMap  = detectColumns(headers);
+  const prospects = getProspects();
+  const existing  = new Set(prospects.map(p => (p.email||'').toLowerCase()));
+  let added = 0;
+  rows.forEach(r => {
+    const nom   = (r[colMap['Nom']] || '').trim(); if (!nom) return;
+    const email = (r[colMap['Email']] || '').trim();
+    if (email && existing.has(email.toLowerCase())) return;
+    prospects.unshift({ id: Date.now().toString() + Math.random(), nom, entreprise: (r[colMap['Entreprise']]||'').trim(), email, tel: (r[colMap['Téléphone']]||'').trim(), source: 'Import', valeur:'', relance:'', note:'', statut:'nouveau', date: new Date().toISOString() });
+    if (email) existing.add(email.toLowerCase());
+    added++;
+  });
+  saveProspects(prospects);
+  addActivity('add', `Import prospects : ${added} ajoutés`);
+  renderKanban();
+  renderProspStats();
+  checkProspLocks();
+  const res = document.getElementById('prosp-import-result');
+  res.style.display = 'block';
+  res.textContent = `✓ ${added} prospect(s) importé(s) dans le Kanban !`;
+  document.getElementById('prosp-file-input').value = '';
+  showToast(`${added} prospects importés ✓`);
+}
+
+// ── PLAN MODAL CLOSE ON OUTSIDE CLICK ──
+document.getElementById('modal-prospect').addEventListener('click', function(e) { if (e.target === this) closeProspModal(); });
+document.getElementById('modal-upgrade').addEventListener('click', function(e)  { if (e.target === this) closeUpgradeModal(); });
 
 // ─── GOOGLE DRIVE ─────────────────────────────────────
 const GOOGLE_CLIENT_ID = 'VOTRE_CLIENT_ID_GOOGLE.apps.googleusercontent.com';
