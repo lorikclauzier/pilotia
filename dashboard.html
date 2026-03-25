@@ -1662,7 +1662,7 @@ function importProspectsFromData(rows, fileName) {
   res.style.display = 'block';
   res.textContent = `✓ ${added} prospect(s) importé(s) dans le Kanban !${fileName ? ' — ' + fileName : ''}`;
   document.getElementById('prosp-file-input').value = '';
-  showToast(`${added} prospects importés ✓${fileName ? ' — ' + fileName : ''}`);
+  showToast(`${added} prospects importés ✓`);
 }
 
 function normalizeProspStatut(val) {
