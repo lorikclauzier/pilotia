@@ -1561,7 +1561,16 @@ function processProspFile(file) {
   } else {
     reader.onload = e => {
       const wb = XLSX.read(e.target.result, { type: 'array' });
-      importProspectsFromData(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' }));
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+      // Skip title rows: find first row with 3+ non-empty cells as real header row
+      const hIdx = raw.findIndex(r => r.filter(v => String(v||'').trim()).length >= 3);
+      if (hIdx < 0) { showToast('Aucune donnée valide dans ce fichier'); return; }
+      const hdrs = raw[hIdx].map(v => String(v||'').trim());
+      const rows = raw.slice(hIdx + 1)
+        .filter(r => r.some(v => String(v||'').trim()))
+        .map(r => { const o = {}; hdrs.forEach((h, i) => o[h] = String(r[i]||'').trim()); return o; });
+      importProspectsFromData(rows);
     };
     reader.readAsArrayBuffer(file);
   }
@@ -1571,8 +1580,11 @@ function parseProspCSV(text) {
   const lines = text.split('\n').filter(l => l.trim());
   if (lines.length < 2) return [];
   const sep = lines[0].includes(';') ? ';' : ',';
-  const headers = lines[0].split(sep).map(h => h.trim().replace(/"/g,''));
-  return lines.slice(1).map(line => {
+  // Skip title rows: find first line with 3+ non-empty fields as real header row
+  const hIdx = lines.findIndex(l => l.split(sep).filter(v => v.trim().replace(/"/g,'')).length >= 3);
+  if (hIdx < 0) return [];
+  const headers = lines[hIdx].split(sep).map(h => h.trim().replace(/"/g,''));
+  return lines.slice(hIdx + 1).map(line => {
     const vals = line.split(sep).map(v => v.trim().replace(/"/g,''));
     const obj = {}; headers.forEach((h,i) => obj[h] = vals[i] || ''); return obj;
   }).filter(r => Object.values(r).some(v => v));
@@ -1598,7 +1610,7 @@ function importProspectsFromData(rows) {
 
   // Detect prenom FIRST, then nom excluding that column (prevents 'nom' matching inside 'prenom')
   const prenomCol  = findSmart(['prenom','firstname','first name'], null);
-  const nomCol     = findSmart(['nom complet','full name','nom & prenom','nom &','nom'], prenomCol) || prenomCol;
+  const nomCol     = findSmart(['nom complet','full name','nom & prenom','nom &','interlocuteur','name','nom'], prenomCol) || prenomCol;
   const emailCol   = findSmart(['email professionnel','email','mail','courriel'], null);
   const telCol     = findSmart(['telephone portable','mobile','tel','telephone','phone'], null);
   const coCol      = findSmart(['entreprise / organisation','organisation','entreprise','societe','company','boite'], null);
@@ -1650,8 +1662,8 @@ function importProspectsFromData(rows) {
 
 function normalizeProspStatut(val) {
   const v = (val || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-  if (!v || v.includes('nouveau') || v.includes('contacter') || v === 'lead' || v === 'new') return 'nouveau';
-  if (v.includes('contacte') || v === 'contact') return 'contacte';
+  if (!v || v.includes('nouveau') || v.includes('contacter') || v.includes('identification') || v === 'lead' || v === 'new') return 'nouveau';
+  if (v.includes('contacte') || v.includes('essaye') || v.includes('joint') || v.includes('tentative') || v.includes('premier echange') || v === 'contact') return 'contacte';
   if (v.includes('demo') || v.includes('discussion') || v.includes('interesse') || v.includes('interess')) return 'demo';
   if (v.includes('nego') || v.includes('proposition') || v.includes('offre') || v.includes('envoy') || v.includes('devis')) return 'nego';
   if (v.includes('gagne') || v.includes('ferme') || v.includes('conclu') || v.includes('signe') || v.includes('won') || v.includes('client')) return 'gagne';
