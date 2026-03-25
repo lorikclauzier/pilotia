@@ -1,0 +1,11 @@
+pilotia_tests/
+ne pas toucher/
+Claude/
+VS Code/
+Notion Installer/
+*.pdf
+*.py
+README.md
+CLAUDE.md
+.DS_Store
+**/.DS_Store

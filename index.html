@@ -4,6 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>pylotIA — Le CRM intelligent pour PME</title>
+<meta name="description" content="pylotIA centralise vos clients, vos RDV et votre prospection. Importez vos fichiers Excel en 30 secondes. L'IA fait le reste. Essai gratuit 30 jours.">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="pylotIA — Le CRM intelligent pour PME">
+<meta property="og:description" content="Fini les Excel perdus et les relances oubliées. pylotIA centralise vos clients et votre prospection — et l'IA fait le reste.">
+<meta property="og:url" content="https://pilotia.vercel.app/">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://pilotia.vercel.app/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="pylotIA — Le CRM intelligent pour PME">
+<meta name="twitter:description" content="Fini les Excel perdus et les relances oubliées. pylotIA centralise vos clients et votre prospection.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -704,7 +715,8 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
     <a href="#features">Fonctionnalités</a>
     <a href="#pricing">Tarifs</a>
     <a href="mailto:contact@pylotia.fr">Contact</a>
-    <a href="/cgu.html">CGU</a>
+    <a href="cgu.html">CGU</a>
+    <a href="mentions-legales.html">Mentions légales</a>
   </div>
   <div class="footer-copy">© 2026 pylotIA — Tous droits réservés</div>
 </footer>
@@ -752,6 +764,15 @@ const clientCtx = {
 
 function askAI(q){ document.getElementById('ai-input').value=q; sendAI(); }
 
+const aiResponses = {
+  'relance': "🎯 **Relances prioritaires cette semaine :**\n\n• **Boulangerie Lenoir** — 8 jours sans contact, offre Starter active. Relancer par email avant jeudi.\n• **BTP Marchand** — Relance J+7 dépassée, prospect chaud à 199€/m. Appel téléphonique recommandé.\n• **Kiné Beaumont** — 2 tentatives sans réponse. Essayer un SMS de relance court.\n\n➡ Priorité absolue : BTP Marchand aujourd'hui.",
+  'ca': "📊 **CA potentiel actuel :**\n\n• Clients actifs : 2 × 449€ + 2 × 199€ = **1 296€/mois**\n• Pipeline prospects chauds : Immobilier Roux + Assurance Moreau = **898€/mois potentiel**\n• CA total si tout se concrétise : **2 194€/mois**\n\n➡ Convertir Immobilier Roux (RDV jeudi) = +449€/mois garanti.",
+  'prospect': "🔥 **Prospects les plus chauds :**\n\n• **Immobilier Roux** — RDV jeudi, valeur 449€/m. Préparez une démo personnalisée.\n• **Assurance Moreau** — Devis envoyé, valeur 449€/m. Relance à J+3 recommandée.\n\n💡 Ces 2 prospects représentent 898€/mois de CA potentiel.\n\n➡ Concentrez votre énergie sur Immobilier Roux avant le RDV jeudi.",
+  'rapport': "📋 **Rapport hebdomadaire — Semaine 12**\n\n• Clients actifs : **12** (+2 ce mois)\n• RDV effectués : **5** dont 2 demos\n• Prospects contactés : **4**\n• Taux de conversion : **33%**\n• CA récurrent actuel : **1 296€/mois**\n\n✅ Points positifs : RDV Boulangerie Lenoir bien passé\n⚠️ À surveiller : Auto Garage 42 inactif depuis 22 jours\n\n➡ Action de la semaine : Réactiver Auto Garage 42.",
+  'martin': "👤 **Dossier Martin & Rénovation**\n\n• Offre : **Pro** (449€/mois)\n• Statut : ✅ Actif\n• Dernier contact : **aujourd'hui**\n• Email de relance envoyé ce matin\n\n📌 Historique récent :\n— Relance email ✓\n— Renouvellement prévu dans 18 jours\n\n➡ Aucune action urgente. Planifier un appel de satisfaction dans 2 semaines.",
+  'lenoir': "👤 **Dossier Boulangerie Lenoir**\n\n• Offre : **Starter** (199€/mois)\n• Statut : ⚠️ À relancer\n• Dernier contact : **il y a 8 jours**\n\n📌 Recommandation IA :\nDélai de relance dépassé. Envoyer un email personnalisé aujourd'hui avec une suggestion d'upgrade vers Pro.\n\n➡ Modèle d'email disponible dans la section Messages.",
+};
+
 async function sendAI(){
   const input = document.getElementById('ai-input');
   const text = input.value.trim();
@@ -760,16 +781,21 @@ async function sendAI(){
   input.value='';
   document.getElementById('ai-sugs').style.display='none';
   showTypingAI();
-  const sys=`Tu es l'assistant IA de pylotIA, un CRM pour TPE/PME. Tu analyses le portefeuille de l'utilisateur.
-Données: ${JSON.stringify(clientCtx)}
-Réponds en français, de façon concise (4-6 lignes max), orientée action. Bullet points si liste. Toujours une recommandation concrète en fin de réponse.`;
-  try{
-    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:600,system:sys,messages:[{role:"user",content:text}]})});
-    const d=await r.json();
-    removeTypingAI();
-    if(d.content&&d.content[0]) addChatMsg('ai',d.content[0].text);
-    else addChatMsg('ai',"Erreur de connexion. Réessayez.");
-  }catch(e){removeTypingAI();addChatMsg('ai',"Connexion impossible à l'IA.");}
+
+  await new Promise(r => setTimeout(r, 900 + Math.random()*600));
+  removeTypingAI();
+
+  const t = text.toLowerCase();
+  let response = '';
+  if(t.includes('relance') || t.includes('priorité') || t.includes('priorite')) response = aiResponses['relance'];
+  else if(t.includes('ca') || t.includes('chiffre') || t.includes('potentiel') || t.includes('revenu')) response = aiResponses['ca'];
+  else if(t.includes('chaud') || t.includes('prospect')) response = aiResponses['prospect'];
+  else if(t.includes('rapport') || t.includes('hebdo') || t.includes('semaine')) response = aiResponses['rapport'];
+  else if(t.includes('martin')) response = aiResponses['martin'];
+  else if(t.includes('lenoir') || t.includes('boulangerie')) response = aiResponses['lenoir'];
+  else response = "💡 Dans votre compte pylotIA, l'IA analysera vos vraies données en temps réel.\n\nPour cette démo, essayez des questions comme :\n• « Qui dois-je relancer ? »\n• « Quel est mon CA potentiel ? »\n• « Quels sont mes prospects chauds ? »\n• « Rapport hebdomadaire »";
+
+  addChatMsg('ai', response);
 }
 
 function addChatMsg(role,text){
