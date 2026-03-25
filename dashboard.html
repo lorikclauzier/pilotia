@@ -1610,11 +1610,11 @@ function importProspectsFromData(rows) {
 
   // Detect prenom FIRST, then nom excluding that column (prevents 'nom' matching inside 'prenom')
   const prenomCol  = findSmart(['prenom','firstname','first name'], null);
-  const nomCol     = findSmart(['nom complet','full name','nom & prenom','nom &','interlocuteur','name','nom'], prenomCol) || prenomCol;
+  const nomCol     = findSmart(['nom complet','full name','nom & prenom','nom &','interlocuteur','name','nom','contact'], prenomCol) || prenomCol;
   const emailCol   = findSmart(['email professionnel','email','mail','courriel'], null);
   const telCol     = findSmart(['telephone portable','mobile','tel','telephone','phone'], null);
   const coCol      = findSmart(['entreprise / organisation','organisation','entreprise','societe','company','boite'], null);
-  const statutCol  = findSmart(['statut commercial','statut','status','etat','etape','stage','stade'], null);
+  const statutCol  = findSmart(['statut commercial','phase commerciale','statut','status','etat','etape','phase','stage','stade'], null);
   const sourceCol  = findSmart(['source','canal','provenance','ou on'], null);
   const relanceCol = findSmart(['prochaine relance','relance','rappel','follow-up','follow up','next'], null);
   const noteCol    = findSmart(['observation','note','commentaire','remarque'], null);
