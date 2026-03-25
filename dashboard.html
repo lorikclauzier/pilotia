@@ -1556,7 +1556,7 @@ function processProspFile(file) {
   if (!['csv','xlsx','xls'].includes(ext)) { showToast('Format non supporté'); return; }
   const reader = new FileReader();
   if (ext === 'csv') {
-    reader.onload = e => importProspectsFromData(parseProspCSV(e.target.result));
+    reader.onload = e => importProspectsFromData(parseProspCSV(e.target.result), file.name);
     reader.readAsText(file, 'UTF-8');
   } else {
     reader.onload = e => {
@@ -1570,7 +1570,7 @@ function processProspFile(file) {
       const rows = raw.slice(hIdx + 1)
         .filter(r => r.some(v => String(v||'').trim()))
         .map(r => { const o = {}; hdrs.forEach((h, i) => o[h] = String(r[i]||'').trim()); return o; });
-      importProspectsFromData(rows);
+      importProspectsFromData(rows, file.name);
     };
     reader.readAsArrayBuffer(file);
   }
@@ -1590,7 +1590,7 @@ function parseProspCSV(text) {
   }).filter(r => Object.values(r).some(v => v));
 }
 
-function importProspectsFromData(rows) {
+function importProspectsFromData(rows, fileName) {
   if (!rows.length) { showToast('Aucune donnée trouvée'); return; }
   const headers = Object.keys(rows[0]);
 
@@ -1660,9 +1660,9 @@ function importProspectsFromData(rows) {
   checkProspLocks();
   const res = document.getElementById('prosp-import-result');
   res.style.display = 'block';
-  res.textContent = `✓ ${added} prospect(s) importé(s) dans le Kanban !`;
+  res.textContent = `✓ ${added} prospect(s) importé(s) dans le Kanban !${fileName ? ' — ' + fileName : ''}`;
   document.getElementById('prosp-file-input').value = '';
-  showToast(`${added} prospects importés ✓`);
+  showToast(`${added} prospects importés ✓${fileName ? ' — ' + fileName : ''}`);
 }
 
 function normalizeProspStatut(val) {
