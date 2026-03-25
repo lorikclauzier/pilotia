@@ -1611,14 +1611,14 @@ function importProspectsFromData(rows) {
   // Detect prenom FIRST, then nom excluding that column (prevents 'nom' matching inside 'prenom')
   const prenomCol  = findSmart(['prenom','firstname','first name'], null);
   const nomCol     = findSmart(['nom complet','full name','nom & prenom','nom &','interlocuteur','name','nom','contact'], prenomCol) || prenomCol;
-  const emailCol   = findSmart(['email professionnel','email','mail','courriel'], null);
+  const emailCol   = findSmart(['email professionnel','coordonnees','coordonnee','email','mail','courriel'], null);
   const telCol     = findSmart(['telephone portable','mobile','tel','telephone','phone'], null);
-  const coCol      = findSmart(['entreprise / organisation','organisation','entreprise','societe','company','boite'], null);
-  const statutCol  = findSmart(['statut commercial','phase commerciale','statut','status','etat','etape','phase','stage','stade'], null);
-  const sourceCol  = findSmart(['source','canal','provenance','ou on'], null);
+  const coCol      = findSmart(['entreprise / organisation','organisation','raison sociale','raison','entreprise','societe','company','boite'], null);
+  const statutCol  = findSmart(['statut commercial','phase commerciale','situation actuelle','situation','ou on','statut','status','etat','etape','phase','stage','stade'], null);
+  const sourceCol  = findSmart(['source','canal','provenance'], null);
   const relanceCol = findSmart(['prochaine relance','relance','rappel','follow-up','follow up','next'], null);
   const noteCol    = findSmart(['observation','note','commentaire','remarque'], null);
-  const valeurCol  = findSmart(['valeur estimee','valeur','deal value','montant','budget','chiffre','val'], null);
+  const valeurCol  = findSmart(['valeur estimee','valeur','deal value','deal size','montant devis','montant','budget','chiffre','deal','val'], null);
 
   const prospects = getProspects();
   const existing  = new Set(prospects.map(p => (p.email||'').toLowerCase()));
@@ -1629,7 +1629,12 @@ function importProspectsFromData(rows) {
     const prenom = (prenomCol && prenomCol !== nomCol) ? (r[prenomCol] || '').toString().trim() : '';
     if (prenom) nom = (prenom + ' ' + nom).trim();
     if (!nom) return;
-    const email = emailCol ? (r[emailCol] || '').toString().trim() : '';
+    // Extract email from "email / phone" mixed fields (e.g. "user@domain.fr / 06 12 34 56")
+    let emailRaw = emailCol ? (r[emailCol] || '').toString().trim() : '';
+    if (emailRaw.includes('@') && emailRaw.includes('/')) {
+      emailRaw = emailRaw.split('/').find(p => p.includes('@'))?.trim() || emailRaw;
+    }
+    const email = emailRaw;
     if (email && existing.has(email.toLowerCase())) return;
     prospects.unshift({
       id: Date.now().toString() + Math.random(),
@@ -1638,7 +1643,7 @@ function importProspectsFromData(rows) {
       email,
       tel:        telCol    ? (r[telCol]    || '').toString().trim() : '',
       source:     sourceCol ? (r[sourceCol] || 'Import').toString().trim() : 'Import',
-      valeur:     valeurCol ? (r[valeurCol] || '').toString()        : '',
+      valeur:     valeurCol ? (r[valeurCol] || '').toString().replace(/[€$£\s\u00a0]/g,'') : '',
       relance:    relanceCol ? prospRelanceDate(r[relanceCol])        : '',
       note:       noteCol   ? (r[noteCol]   || '').toString().trim() : '',
       statut:     normalizeProspStatut(statutCol ? r[statutCol] : ''),
@@ -1662,11 +1667,14 @@ function importProspectsFromData(rows) {
 
 function normalizeProspStatut(val) {
   const v = (val || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-  if (!v || v.includes('nouveau') || v.includes('contacter') || v.includes('identification') || v === 'lead' || v === 'new') return 'nouveau';
-  if (v.includes('contacte') || v.includes('essaye') || v.includes('joint') || v.includes('tentative') || v.includes('premier echange') || v === 'contact') return 'contacte';
-  if (v.includes('demo') || v.includes('discussion') || v.includes('interesse') || v.includes('interess')) return 'demo';
-  if (v.includes('nego') || v.includes('proposition') || v.includes('offre') || v.includes('envoy') || v.includes('devis')) return 'nego';
+  // Négations d'abord : "pas encore X" = toujours nouveau
+  if (v.includes('pas encore')) return 'nouveau';
+  if (!v || v.includes('nouveau') || v.includes('contacter') || v.includes('to contact') || v.includes('to reach') || v.includes('reach out') || v.includes('a joindre') || v.includes('appeler') || v.includes('identification') || v === 'lead' || v === 'new') return 'nouveau';
   if (v.includes('gagne') || v.includes('ferme') || v.includes('conclu') || v.includes('signe') || v.includes('won') || v.includes('client')) return 'gagne';
+  // prix/tarif avant discussion générique (discussion prix = négo, pas démo)
+  if (v.includes('nego') || v.includes('proposition') || v.includes('proposal') || v.includes('offre') || v.includes('envoy') || v.includes('devis') || v.includes('prix') || v.includes('tarif')) return 'nego';
+  if (v.includes('demo') || v.includes('presentation') || v.includes('presente') || v.includes('discussion') || v.includes('interesse') || v.includes('interess')) return 'demo';
+  if (v.includes('contacte') || v.includes('essaye') || v.includes('joint') || v.includes('tentative') || v.includes('premier echange') || v.includes('appele') || v.includes('parle') || v.includes('call done') || v.includes('contact etabli') || v.includes('premier contact')) return 'contacte';
   return 'nouveau';
 }
 
