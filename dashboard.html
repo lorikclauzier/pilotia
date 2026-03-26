@@ -272,10 +272,6 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
     <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
     Prospection
   </button>
-  <button class="nav-item" id="nav-import" onclick="showSection('import')">
-    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-    Import
-  </button>
   <button class="nav-item" id="nav-parametres" onclick="showSection('parametres')">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
     Paramètres
@@ -338,7 +334,13 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
         <div class="page-title">Contacts</div>
         <div class="page-sub">Gérez votre portefeuille clients</div>
       </div>
-      <button class="btn btn-blue" onclick="openModal()">+ Nouveau contact</button>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost" onclick="showSection('import')" style="display:flex;align-items:center;gap:6px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:15px;height:15px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Importer
+        </button>
+        <button class="btn btn-blue" onclick="openModal()">+ Nouveau contact</button>
+      </div>
     </div>
     <div class="search-bar">
       <input class="search-input" id="search-contacts" placeholder="Rechercher un contact..." oninput="renderContacts()">
@@ -618,7 +620,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
         <div class="settings-card-title">Données</div>
         <div class="settings-card-sub">Gérez vos données et votre compte</div>
         <div style="display:flex;gap:12px;flex-wrap:wrap">
-          <button class="btn btn-ghost" onclick="exportContacts()">Exporter les contacts (JSON)</button>
+          <button class="btn btn-ghost" onclick="exportContacts()">Exporter les contacts (CSV)</button>
           <button class="btn btn-danger" onclick="confirmDeleteData()">Supprimer tous les contacts</button>
         </div>
       </div>
@@ -1055,14 +1057,22 @@ async function updatePassword() {
 }
 
 function exportContacts() {
-  const data = JSON.stringify(getContacts(), null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
+  const contacts = getContacts();
+  if (!contacts.length) { showToast('Aucun contact à exporter'); return; }
+  const headers = ['Nom', 'Entreprise', 'Email', 'Téléphone', 'Statut', 'Note', 'Date ajout'];
+  const rows = contacts.map(c => [
+    c.nom || '', c.entreprise || '', c.email || '', c.tel || '',
+    c.statut || '', (c.note || '').replace(/"/g, '""'),
+    c.date ? new Date(c.date).toLocaleDateString('fr-FR') : ''
+  ]);
+  const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(';')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'contacts-pylotia.json';
+  a.download = 'contacts-pylotia.csv';
   a.click();
-  showToast('Export téléchargé ✓');
-  addActivity('edit', 'Contacts exportés');
+  showToast('Export CSV téléchargé ✓');
+  addActivity('edit', 'Contacts exportés en CSV');
 }
 
 function confirmDeleteData() {
