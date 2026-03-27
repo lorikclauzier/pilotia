@@ -252,6 +252,34 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 .ai-panel-title{font-weight:600;color:#fff;font-size:15px;margin-bottom:4px}
 .ai-panel-sub{font-size:13px;color:var(--text3)}
 
+/* AGENDA */
+.agenda-layout{display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:start}
+.cal-wrap{background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:16px;position:sticky;top:36px}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-title{font-size:14px;font-weight:600;color:#fff;text-transform:capitalize}
+.cal-nav{background:none;border:none;color:var(--text2);cursor:pointer;font-size:16px;padding:4px 8px;border-radius:6px;transition:all 0.15s}
+.cal-nav:hover{background:rgba(255,255,255,0.06);color:#fff}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;gap:2px}
+.cal-dow{font-size:10px;color:var(--text3);padding:4px 0;font-weight:600;text-transform:uppercase}
+.cal-day{font-size:12px;color:var(--text2);padding:6px 2px;border-radius:6px;cursor:pointer;position:relative;transition:all 0.15s;min-height:32px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.cal-day:hover{background:rgba(255,255,255,0.05)}
+.cal-day.today{background:rgba(59,130,246,0.2);color:#93c5fd;font-weight:700}
+.cal-day.selected{background:var(--blue);color:#fff;font-weight:700}
+.cal-day.other-month{color:var(--text3);opacity:0.4}
+.cal-dot{width:4px;height:4px;border-radius:50%;background:var(--blue);position:absolute;bottom:3px}
+.rdv-list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.rdv-date-title{font-size:15px;font-weight:600;color:#fff}
+.rdv-date-sub{font-size:12px;color:var(--text3);margin-left:8px}
+.rdv-card{display:flex;gap:14px;background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;transition:border-color 0.2s}
+.rdv-card:hover{border-color:rgba(59,130,246,0.3)}
+.rdv-time{font-size:13px;font-weight:600;color:#fff;min-width:52px;white-space:nowrap}
+.rdv-bar{width:3px;border-radius:2px;flex-shrink:0}
+.rdv-body{flex:1;min-width:0}
+.rdv-title{font-size:13px;font-weight:500;color:#fff;margin-bottom:3px}
+.rdv-contact{font-size:12px;color:var(--text3)}
+.rdv-type-badge{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;display:inline-block;margin-top:4px}
+.rdv-actions{display:flex;gap:6px;align-items:flex-start}
+
 /* IMPORT */
 .import-methods{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px}
 .import-card{background:var(--dark2);border:2px solid var(--border);border-radius:14px;padding:28px;cursor:pointer;transition:all 0.2s;text-align:center}
@@ -310,6 +338,11 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
     <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
     Contacts
     <span class="nav-badge" id="contacts-count">0</span>
+  </button>
+  <button class="nav-item" id="nav-agenda" onclick="showSection('agenda')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+    Agenda
+    <span class="nav-badge" id="agenda-today-badge" style="display:none">0</span>
   </button>
   <button class="nav-item" id="nav-activite" onclick="showSection('activite')">
     <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -655,6 +688,40 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
     </div>
   </div>
 
+  <!-- AGENDA -->
+  <div class="section" id="section-agenda">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Agenda</div>
+        <div class="page-sub">Gérez vos rendez-vous et appels</div>
+      </div>
+      <button class="btn btn-blue" onclick="openRdvModal()">+ Nouveau RDV</button>
+    </div>
+    <div class="agenda-layout">
+      <!-- Mini calendrier -->
+      <div class="cal-wrap">
+        <div class="cal-header">
+          <button class="cal-nav" onclick="calNav(-1)">←</button>
+          <div class="cal-title" id="cal-month-title"></div>
+          <button class="cal-nav" onclick="calNav(1)">→</button>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+      <!-- Liste des RDV -->
+      <div>
+        <div class="rdv-list-header">
+          <div style="display:flex;align-items:baseline;gap:2px">
+            <div class="rdv-date-title" id="rdv-day-title">—</div>
+            <span class="rdv-date-sub" id="rdv-day-sub"></span>
+          </div>
+        </div>
+        <div id="rdv-list">
+          <div style="padding:32px;text-align:center;color:var(--text3);font-size:13px;background:var(--dark2);border:1px solid var(--border);border-radius:10px">Chargement...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- PARAMÈTRES -->
   <div class="section" id="section-parametres">
     <div class="page-header">
@@ -909,6 +976,61 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
   </div>
 </div>
 
+<!-- MODAL RDV -->
+<div class="modal-overlay" id="modal-rdv">
+  <div class="modal" style="width:480px;max-width:95vw">
+    <div class="modal-title" id="rdv-modal-title">Nouveau rendez-vous</div>
+    <div class="form-group">
+      <label class="form-label">Titre *</label>
+      <input class="form-input" id="rdv-titre" placeholder="Ex: RDV découverte, Appel de suivi...">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Contact associé</label>
+        <select class="form-select" id="rdv-contact">
+          <option value="">— Aucun —</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Type</label>
+        <select class="form-select" id="rdv-type">
+          <option value="rdv">RDV</option>
+          <option value="appel">Appel</option>
+          <option value="demo">Démo</option>
+          <option value="suivi">Suivi</option>
+          <option value="autre">Autre</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Date *</label>
+        <input class="form-input" id="rdv-date" type="date">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Heure</label>
+        <input class="form-input" id="rdv-time" type="time" value="09:00">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Durée</label>
+        <select class="form-select" id="rdv-duree">
+          <option value="30">30 min</option>
+          <option value="60" selected>1h</option>
+          <option value="90">1h30</option>
+          <option value="120">2h</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:12px">
+      <label class="form-label">Notes</label>
+      <textarea class="form-input" id="rdv-notes" rows="2" placeholder="Notes libres..." style="resize:vertical"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-danger" id="rdv-delete-btn" style="display:none;margin-right:auto" onclick="deleteRdv()">Supprimer</button>
+      <button class="btn btn-ghost" onclick="closeRdvModal()">Annuler</button>
+      <button class="btn btn-blue" id="rdv-modal-submit" onclick="saveRdv()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL UPGRADE -->
 <div class="modal-overlay" id="modal-upgrade">
   <div class="modal" style="width:520px;max-width:95vw">
@@ -991,6 +1113,7 @@ function showSection(name) {
   if (name === 'messages') renderMessages();
   if (name === 'import') { selectImportMethod('file'); showImportStep(1); resetImport(); }
   if (name === 'prospection') initProspection();
+  if (name === 'agenda') initAgenda();
   if (name === 'assistant') initAssistant();
 }
 
@@ -1445,14 +1568,284 @@ function resetImport() {
   document.getElementById('file-input').value = '';
 }
 
+// ─── AGENDA ───────────────────────────────────────────
+let calYear, calMonth, calSelectedDate, allAppointments = [];
+
+function initAgenda() {
+  const today = new Date();
+  if (!calYear) { calYear = today.getFullYear(); calMonth = today.getMonth(); }
+  if (!calSelectedDate) calSelectedDate = today.toISOString().split('T')[0];
+  populateRdvContactSelect();
+  loadAppointments();
+}
+
+async function loadAppointments() {
+  try {
+    const { data, error } = await supabaseClient
+      .from('appointments')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .order('date', { ascending: true });
+    if (error) throw error;
+    allAppointments = data || [];
+  } catch (e) {
+    console.warn('Appointments table not ready:', e.message);
+    allAppointments = [];
+  }
+  renderCalendar();
+  renderRdvList();
+  updateAgendaBadge();
+}
+
+function calNav(dir) {
+  calMonth += dir;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const grid = document.getElementById('cal-grid');
+  const title = document.getElementById('cal-month-title');
+  if (!grid || !title) return;
+  const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  title.textContent = months[calMonth] + ' ' + calYear;
+  const today = new Date().toISOString().split('T')[0];
+  const first = new Date(calYear, calMonth, 1);
+  let startDow = first.getDay() || 7; // 1=Mon
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const daysInPrev = new Date(calYear, calMonth, 0).getDate();
+
+  // Days with appointments
+  const apptDates = new Set(allAppointments.map(a => a.date));
+
+  let html = ['L','M','M','J','V','S','D'].map(d => `<div class="cal-dow">${d}</div>`).join('');
+
+  // Previous month padding
+  for (let i = startDow - 1; i > 0; i--) {
+    html += `<div class="cal-day other-month">${daysInPrev - i + 1}</div>`;
+  }
+  // Current month
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = dateStr === today;
+    const isSel = dateStr === calSelectedDate;
+    const hasDot = apptDates.has(dateStr);
+    const cls = ['cal-day', isToday ? 'today' : '', isSel ? 'selected' : ''].filter(Boolean).join(' ');
+    html += `<div class="${cls}" onclick="selectCalDay('${dateStr}')">${d}${hasDot ? '<div class="cal-dot"></div>' : ''}</div>`;
+  }
+  // Next month padding
+  const totalCells = (startDow - 1) + daysInMonth;
+  const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for (let d = 1; d <= remaining; d++) {
+    html += `<div class="cal-day other-month">${d}</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function selectCalDay(dateStr) {
+  calSelectedDate = dateStr;
+  renderCalendar();
+  renderRdvList();
+}
+
+function renderRdvList() {
+  const titleEl = document.getElementById('rdv-day-title');
+  const subEl = document.getElementById('rdv-day-sub');
+  const listEl = document.getElementById('rdv-list');
+  if (!listEl) return;
+
+  const d = new Date(calSelectedDate + 'T00:00:00');
+  const jours = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  const mois = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  titleEl.textContent = `${jours[d.getDay()]} ${d.getDate()} ${mois[d.getMonth()]}`;
+  const today = new Date().toISOString().split('T')[0];
+  subEl.textContent = calSelectedDate === today ? "— Aujourd'hui" : '';
+
+  const rdvs = allAppointments.filter(a => a.date === calSelectedDate).sort((a,b) => (a.time||'').localeCompare(b.time||''));
+
+  if (!rdvs.length) {
+    listEl.innerHTML = `<div style="padding:32px;text-align:center;color:var(--text3);font-size:13px;background:var(--dark2);border:1px solid var(--border);border-radius:10px">
+      Aucun rendez-vous — <button onclick="openRdvModal()" style="background:none;border:none;color:var(--blue);cursor:pointer;font-family:'Inter',sans-serif;font-size:13px">cliquez sur + pour en ajouter un</button></div>`;
+    return;
+  }
+
+  const typeColors = { rdv:'#3b82f6', appel:'#34d399', demo:'#fbbf24', suivi:'#a78bfa', autre:'#4a5a78' };
+  const typeLabels = { rdv:'RDV', appel:'Appel', demo:'Démo', suivi:'Suivi', autre:'Autre' };
+
+  listEl.innerHTML = rdvs.map(r => {
+    const timeStr = r.time ? r.time.slice(0,5).replace(':','h') : '—';
+    const color = typeColors[r.type] || '#4a5a78';
+    return `<div class="rdv-card">
+      <div class="rdv-time">${timeStr}</div>
+      <div class="rdv-bar" style="background:${color}"></div>
+      <div class="rdv-body">
+        <div class="rdv-title">${r.title}</div>
+        ${r.contact_name ? `<div class="rdv-contact">👤 ${r.contact_name}</div>` : ''}
+        <span class="rdv-type-badge" style="background:${color}18;color:${color}">${typeLabels[r.type]||r.type}</span>
+      </div>
+      <div class="rdv-actions">
+        <button class="btn-sm btn-sm-ghost" onclick="editRdv('${r.id}')">✏️</button>
+        <button class="btn-sm btn-sm-red" onclick="confirmDeleteRdv('${r.id}')">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── RDV MODAL ──
+let editingRdvId = null;
+
+function populateRdvContactSelect() {
+  const sel = document.getElementById('rdv-contact');
+  if (!sel) return;
+  const contacts = getContacts();
+  sel.innerHTML = '<option value="">— Aucun —</option>' +
+    contacts.map(c => `<option value="${c.nom}">${c.nom}${c.entreprise ? ' ('+c.entreprise+')' : ''}</option>`).join('');
+}
+
+function openRdvModal(id) {
+  editingRdvId = id || null;
+  document.getElementById('rdv-modal-title').textContent = id ? 'Modifier le rendez-vous' : 'Nouveau rendez-vous';
+  document.getElementById('rdv-modal-submit').textContent = id ? 'Enregistrer' : 'Ajouter';
+  document.getElementById('rdv-delete-btn').style.display = id ? 'block' : 'none';
+  populateRdvContactSelect();
+  if (id) {
+    const r = allAppointments.find(a => a.id === id);
+    if (!r) return;
+    document.getElementById('rdv-titre').value = r.title;
+    document.getElementById('rdv-contact').value = r.contact_name || '';
+    document.getElementById('rdv-type').value = r.type || 'rdv';
+    document.getElementById('rdv-date').value = r.date;
+    document.getElementById('rdv-time').value = r.time ? r.time.slice(0,5) : '09:00';
+    document.getElementById('rdv-duree').value = r.duration_minutes || 60;
+    document.getElementById('rdv-notes').value = r.notes || '';
+  } else {
+    document.getElementById('rdv-titre').value = '';
+    document.getElementById('rdv-contact').value = '';
+    document.getElementById('rdv-type').value = 'rdv';
+    document.getElementById('rdv-date').value = calSelectedDate || new Date().toISOString().split('T')[0];
+    document.getElementById('rdv-time').value = '09:00';
+    document.getElementById('rdv-duree').value = '60';
+    document.getElementById('rdv-notes').value = '';
+  }
+  document.getElementById('modal-rdv').classList.add('open');
+}
+function closeRdvModal() { document.getElementById('modal-rdv').classList.remove('open'); editingRdvId = null; }
+function editRdv(id) { openRdvModal(id); }
+
+async function saveRdv() {
+  const title = document.getElementById('rdv-titre').value.trim();
+  const date = document.getElementById('rdv-date').value;
+  if (!title) { showToast('Le titre est obligatoire'); return; }
+  if (!date) { showToast('La date est obligatoire'); return; }
+  const row = {
+    user_id: currentUser.id,
+    title,
+    contact_name: document.getElementById('rdv-contact').value || null,
+    type: document.getElementById('rdv-type').value,
+    date,
+    time: document.getElementById('rdv-time').value || null,
+    duration_minutes: parseInt(document.getElementById('rdv-duree').value) || 60,
+    notes: document.getElementById('rdv-notes').value || null,
+    status: 'planifié'
+  };
+  try {
+    if (editingRdvId) {
+      const { error } = await supabaseClient.from('appointments').update(row).eq('id', editingRdvId).eq('user_id', currentUser.id);
+      if (error) throw error;
+      showToast('RDV mis à jour ✓');
+      addActivity('edit', 'RDV modifié : ' + title);
+    } else {
+      const { error } = await supabaseClient.from('appointments').insert([row]);
+      if (error) throw error;
+      showToast('RDV ajouté ✓');
+      addActivity('add', 'Nouveau RDV : ' + title);
+    }
+    closeRdvModal();
+    await loadAppointments();
+  } catch (e) {
+    showToast('Erreur : ' + e.message);
+  }
+}
+
+async function confirmDeleteRdv(id) {
+  const r = allAppointments.find(a => a.id === id);
+  if (!r || !confirm('Supprimer le RDV "' + r.title + '" ?')) return;
+  try {
+    const { error } = await supabaseClient.from('appointments').delete().eq('id', id).eq('user_id', currentUser.id);
+    if (error) throw error;
+    showToast('RDV supprimé');
+    addActivity('delete', 'RDV supprimé : ' + r.title);
+    await loadAppointments();
+  } catch (e) {
+    showToast('Erreur : ' + e.message);
+  }
+}
+
+function deleteRdv() {
+  if (editingRdvId) confirmDeleteRdv(editingRdvId).then(() => closeRdvModal());
+}
+
+function updateAgendaBadge() {
+  const today = new Date().toISOString().split('T')[0];
+  const todayCount = allAppointments.filter(a => a.date === today).length;
+  const badge = document.getElementById('agenda-today-badge');
+  if (badge) {
+    badge.textContent = todayCount;
+    badge.style.display = todayCount > 0 ? 'inline-flex' : 'none';
+  }
+}
+
+// Close RDV modal on outside click
+document.getElementById('modal-rdv').addEventListener('click', function(e) { if (e.target === this) closeRdvModal(); });
+
+// Load agenda badge on startup
+supabaseClient.auth.getSession().then(({ data: { session } }) => {
+  if (session) {
+    supabaseClient.from('appointments').select('id,date').eq('user_id', session.user.id)
+      .then(({ data }) => {
+        allAppointments = data || [];
+        updateAgendaBadge();
+        updateDashboardRdvWidget();
+      }).catch(() => {});
+  }
+});
+
+// Dashboard widget: prochains RDV + stat semaine
+function updateDashboardRdvWidget() {
+  const today = new Date();
+  const todayStr = today.toISOString().split('T')[0];
+  // Count this week
+  const startOfWeek = new Date(today); startOfWeek.setDate(today.getDate() - today.getDay() + 1);
+  const endOfWeek = new Date(startOfWeek); endOfWeek.setDate(startOfWeek.getDate() + 6);
+  const startStr = startOfWeek.toISOString().split('T')[0];
+  const endStr = endOfWeek.toISOString().split('T')[0];
+  const weekCount = allAppointments.filter(a => a.date >= startStr && a.date <= endStr).length;
+  // Update dashboard stat
+  const dashPlan = document.getElementById('dash-plan');
+  if (dashPlan && weekCount > 0) { dashPlan.textContent = weekCount + ' RDV'; }
+  const dashPlanDelta = dashPlan?.closest('.stat-card')?.querySelector('.stat-delta');
+  if (dashPlanDelta && weekCount > 0) dashPlanDelta.textContent = 'cette semaine';
+}
+
 // ─── PROSPECTION ──────────────────────────────────────
 const KB_COLS = [
-  { id: 'nouveau',     label: 'Nouveau Lead',      color: '#4a5a78' },
-  { id: 'contacte',   label: 'Contacté',           color: '#93c5fd' },
-  { id: 'demo',       label: 'Démo faite',         color: '#fbbf24' },
-  { id: 'nego',       label: 'En négociation',     color: '#a78bfa' },
-  { id: 'gagne',      label: 'Fermé / Gagné ✓',   color: '#34d399' },
+  { id: 'nouveau_lead',       label: 'Nouveau lead',        color: '#4a5a78' },
+  { id: 'lead_contacte',      label: 'Lead contacté',       color: '#93c5fd' },
+  { id: 'prospect_qualifie',  label: 'Prospect qualifié',   color: '#818cf8' },
+  { id: 'proposition_envoyee',label: 'Proposition envoyée',  color: '#fbbf24' },
+  { id: 'lead_converti',      label: 'Lead converti ✓',     color: '#34d399' },
+  { id: 'non_retenu',         label: 'Non retenu',          color: '#f87171' },
 ];
+
+// Migration auto : anciens statuts → nouveaux (localStorage)
+(function migrateOldStatuts() {
+  const map = { nouveau:'nouveau_lead', contacte:'lead_contacte', demo:'prospect_qualifie', nego:'proposition_envoyee', gagne:'lead_converti' };
+  const prospects = JSON.parse(localStorage.getItem('pylotia_prospects') || '[]');
+  let changed = false;
+  prospects.forEach(p => { if (map[p.statut]) { p.statut = map[p.statut]; changed = true; } });
+  if (changed) localStorage.setItem('pylotia_prospects', JSON.stringify(prospects));
+})();
 
 function getProspects() { return JSON.parse(localStorage.getItem('pylotia_prospects') || '[]'); }
 function saveProspects(d) { localStorage.setItem('pylotia_prospects', JSON.stringify(d)); }
@@ -1581,8 +1974,8 @@ function renderProspStats() {
   if (getPlan() === 'free') return;
   const prospects = getProspects();
   const total   = prospects.length;
-  const enCours = prospects.filter(p => ['contacte','demo','nego'].includes(p.statut)).length;
-  const gagnes  = prospects.filter(p => p.statut === 'gagne').length;
+  const enCours = prospects.filter(p => ['lead_contacte','prospect_qualifie','proposition_envoyee'].includes(p.statut)).length;
+  const gagnes  = prospects.filter(p => p.statut === 'lead_converti').length;
   const taux    = total > 0 ? Math.round(gagnes / total * 100) : 0;
   const valeur  = prospects.reduce((s, p) => s + (parseFloat(p.valeur) || 0), 0);
 
@@ -1590,7 +1983,7 @@ function renderProspStats() {
   if (cards) cards.innerHTML = [
     { label: 'Total prospects', val: total,    delta: 'dans le pipeline' },
     { label: 'En cours',        val: enCours,  delta: 'actifs' },
-    { label: 'Gagnés',          val: gagnes,   delta: 'conclus' },
+    { label: 'Convertis',        val: gagnes,   delta: 'conclus' },
     { label: 'Valeur pipeline', val: valeur.toLocaleString('fr-FR') + ' €', delta: 'estimée' },
   ].map(s => `<div class="stat-card"><div class="stat-label">${s.label}</div><div class="stat-val" style="font-size:${s.label==='Valeur pipeline'?'18px':'28px'}">${s.val}</div><div class="stat-delta">${s.delta}</div></div>`).join('');
 
@@ -1602,7 +1995,7 @@ function drawPieChart(prospects) {
   const canvas = document.getElementById('pie-chart');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  const colorMap = { nouveau:'#4a5a78', contacte:'#93c5fd', demo:'#fbbf24', nego:'#a78bfa', gagne:'#34d399' };
+  const colorMap = { nouveau_lead:'#4a5a78', lead_contacte:'#93c5fd', prospect_qualifie:'#818cf8', proposition_envoyee:'#fbbf24', lead_converti:'#34d399', non_retenu:'#f87171' };
   const data = KB_COLS.map(col => ({ label: col.label, color: colorMap[col.id], count: prospects.filter(p => p.statut === col.id).length }));
   const total = data.reduce((s, d) => s + d.count, 0);
   ctx.clearRect(0, 0, 140, 140);
@@ -1629,7 +2022,7 @@ function drawPieChart(prospects) {
 function renderRelances(prospects) {
   const today = new Date().toISOString().split('T')[0];
   const list  = document.getElementById('relance-list'); if (!list) return;
-  const items = prospects.filter(p => p.relance && p.statut !== 'gagne').sort((a,b) => a.relance.localeCompare(b.relance)).slice(0, 6);
+  const items = prospects.filter(p => p.relance && !['lead_converti','non_retenu'].includes(p.statut)).sort((a,b) => a.relance.localeCompare(b.relance)).slice(0, 6);
   if (!items.length) { list.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px 0">Aucune relance prévue 🎉</div>'; return; }
   list.innerHTML = items.map(p => {
     const dDiff = Math.ceil((new Date(p.relance) - new Date(today)) / 86400000);
@@ -1666,7 +2059,7 @@ function openProspModal(id, defaultStatut) {
     }
     ['p-nom','p-entreprise','p-email','p-tel','p-valeur','p-relance','p-note'].forEach(fid => document.getElementById(fid).value = '');
     document.getElementById('p-source').value = 'Manuel';
-    document.getElementById('modal-prospect').dataset.statut = defaultStatut || 'nouveau';
+    document.getElementById('modal-prospect').dataset.statut = defaultStatut || 'nouveau_lead';
   }
   document.getElementById('modal-prospect').classList.add('open');
 }
@@ -1699,7 +2092,7 @@ function saveProspect() {
     addActivity('edit', 'Prospect modifié : ' + nom);
     showToast('Prospect mis à jour ✓');
   } else {
-    prospects.unshift({ id: Date.now().toString(), statut: document.getElementById('modal-prospect').dataset.statut || 'nouveau', date: new Date().toISOString(), ...data });
+    prospects.unshift({ id: Date.now().toString(), statut: document.getElementById('modal-prospect').dataset.statut || 'nouveau_lead', date: new Date().toISOString(), ...data });
     addActivity('add', 'Nouveau prospect : ' + nom);
     showToast('Prospect ajouté ✓');
   }
@@ -1880,15 +2273,24 @@ function importProspectsFromData(rows, fileName) {
 
 function normalizeProspStatut(val) {
   const v = (val || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-  // Négations d'abord : "pas encore X" = toujours nouveau
-  if (v.includes('pas encore')) return 'nouveau';
-  if (!v || v.includes('nouveau') || v.includes('contacter') || v.includes('to contact') || v.includes('to reach') || v.includes('reach out') || v.includes('a joindre') || v.includes('appeler') || v.includes('identification') || v === 'lead' || v === 'new') return 'nouveau';
-  if (v.includes('gagne') || v.includes('ferme') || v.includes('conclu') || v.includes('signe') || v.includes('won') || v.includes('client')) return 'gagne';
-  // prix/tarif avant discussion générique (discussion prix = négo, pas démo)
-  if (v.includes('nego') || v.includes('proposition') || v.includes('proposal') || v.includes('offre') || v.includes('envoy') || v.includes('devis') || v.includes('prix') || v.includes('tarif')) return 'nego';
-  if (v.includes('demo') || v.includes('presentation') || v.includes('presente') || v.includes('discussion') || v.includes('interesse') || v.includes('interess')) return 'demo';
-  if (v.includes('contacte') || v.includes('essaye') || v.includes('joint') || v.includes('tentative') || v.includes('premier echange') || v.includes('appele') || v.includes('parle') || v.includes('call done') || v.includes('contact etabli') || v.includes('premier contact')) return 'contacte';
-  return 'nouveau';
+  // Exact new statut IDs — pass through directly
+  const validIds = ['nouveau_lead','lead_contacte','prospect_qualifie','proposition_envoyee','lead_converti','non_retenu'];
+  if (validIds.includes(v.replace(/\s+/g,'_'))) return v.replace(/\s+/g,'_');
+  // Négations d'abord
+  if (v.includes('pas encore')) return 'nouveau_lead';
+  // Non retenu / perdu
+  if (v.includes('perdu') || v.includes('non retenu') || v.includes('lost') || v.includes('annule') || v.includes('refuse') || v.includes('no go')) return 'non_retenu';
+  // Lead converti / gagné
+  if (v.includes('converti') || v.includes('gagne') || v.includes('ferme') || v.includes('conclu') || v.includes('signe') || v.includes('won') || v.includes('client')) return 'lead_converti';
+  // Proposition envoyée / négociation
+  if (v.includes('proposition') || v.includes('proposal') || v.includes('nego') || v.includes('offre') || v.includes('envoy') || v.includes('devis') || v.includes('prix') || v.includes('tarif')) return 'proposition_envoyee';
+  // Prospect qualifié / démo / discussion
+  if (v.includes('qualifie') || v.includes('demo') || v.includes('presentation') || v.includes('presente') || v.includes('discussion') || v.includes('interesse') || v.includes('interess')) return 'prospect_qualifie';
+  // Lead contacté
+  if (v.includes('contacte') || v.includes('essaye') || v.includes('joint') || v.includes('tentative') || v.includes('premier echange') || v.includes('appele') || v.includes('parle') || v.includes('call done') || v.includes('contact etabli') || v.includes('premier contact')) return 'lead_contacte';
+  // Nouveau lead (default)
+  if (!v || v.includes('nouveau') || v.includes('contacter') || v.includes('to contact') || v.includes('to reach') || v.includes('reach out') || v.includes('a joindre') || v.includes('appeler') || v.includes('identification') || v === 'lead' || v === 'new') return 'nouveau_lead';
+  return 'nouveau_lead';
 }
 
 function prospRelanceDate(val) {
@@ -1994,7 +2396,7 @@ function buildAIContext() {
   const prospectsStr = prospects.length
     ? prospects.map(p => {
         const relance = p.relance ? new Date(p.relance).toLocaleDateString('fr-FR') : '/';
-        return `• ${p.nom}${p.entreprise?' ('+p.entreprise+')':''} | étape: ${p.statut||'nouveau'} | valeur: ${p.valeur||0}€ | relance: ${relance}${p.note?' | note: '+p.note:''}`;
+        return `• ${p.nom}${p.entreprise?' ('+p.entreprise+')':''} | étape: ${p.statut||'nouveau_lead'} | valeur: ${p.valeur||0}€ | relance: ${relance}${p.note?' | note: '+p.note:''}`;
       }).join('\n')
     : 'Aucun prospect.';
 
