@@ -2721,6 +2721,20 @@ async function genRapport() {
 function updateBottomNav(name) {
   document.querySelectorAll('.bnav-item').forEach(b => b.classList.toggle('active', b.dataset.section === name));
 }
+function toggleMobileMore() {
+  const overlay = document.getElementById('mobile-more-overlay');
+  const sheet = document.getElementById('mobile-more-sheet');
+  const btn = document.getElementById('bnav-more');
+  const isOpen = sheet.style.display === 'block';
+  overlay.style.display = isOpen ? 'none' : 'block';
+  sheet.style.display = isOpen ? 'none' : 'block';
+  btn.classList.toggle('active', !isOpen);
+}
+function closeMobileMore() {
+  document.getElementById('mobile-more-overlay').style.display = 'none';
+  document.getElementById('mobile-more-sheet').style.display = 'none';
+  document.getElementById('bnav-more').classList.remove('active');
+}
 // Hook into showSection
 const _origShowSection = showSection;
 showSection = function(name) {
@@ -2759,11 +2773,35 @@ function closeMobileMsg() {
     <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
     Prospection
   </button>
-  <button class="bnav-item" data-section="parametres" onclick="showSection('parametres')">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-    Paramètres
+  <button class="bnav-item" data-section="assistant" onclick="showSection('assistant')">
+    <svg viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09z"/><path d="M18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/></svg>
+    IA
+  </button>
+  <button class="bnav-item" id="bnav-more" onclick="toggleMobileMore()">
+    <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>
+    Plus
   </button>
 </nav>
+
+<!-- MOBILE MORE MENU -->
+<div id="mobile-more-overlay" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.5)" onclick="closeMobileMore()"></div>
+<div id="mobile-more-sheet" style="display:none;position:fixed;bottom:60px;left:0;right:0;z-index:601;background:var(--dark2);border-top:1px solid var(--border);border-radius:16px 16px 0 0;padding:12px 8px;animation:slideUp 0.2s ease">
+  <div style="text-align:center;padding:0 0 10px;font-size:11px;color:var(--text3);font-weight:500">Autres sections</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+    <button onclick="closeMobileMore();showSection('activite')" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;background:var(--dark3);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-size:11px;cursor:pointer">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Activité
+    </button>
+    <button onclick="closeMobileMore();showSection('messages')" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;background:var(--dark3);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-size:11px;cursor:pointer">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Messages
+    </button>
+    <button onclick="closeMobileMore();showSection('parametres')" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;background:var(--dark3);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-size:11px;cursor:pointer">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      Paramètres
+    </button>
+  </div>
+</div>
 
 </body>
 </html>
