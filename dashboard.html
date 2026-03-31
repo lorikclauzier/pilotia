@@ -1156,22 +1156,298 @@ let currentUser = null;
 let editingId = null;
 let activeConversation = null;
 
-// ─── AUTH ──────────────────────────────────────────────
-supabaseClient.auth.getSession().then(({ data: { session } }) => {
+// ─── CACHE MÉMOIRE (chargé depuis Supabase au démarrage) ──────
+// Toutes les fonctions de rendu lisent ces tableaux de façon synchrone.
+// Toutes les mutations écrivent d'abord en mémoire (rendu immédiat),
+// puis envoient la requête Supabase en arrière-plan.
+let _contacts  = [];   // miroir de la table contacts
+let _prospects = [];   // miroir de la table prospects
+let _plan      = 'free'; // plan lu depuis user_plans
+
+// ─── NORMALISATION DB → OBJET APP ────────────────────────────
+function normalizeContact(row) {
+  return {
+    id:         row.id,
+    nom:        row.nom || '',
+    entreprise: row.entreprise || '',
+    email:      row.email || '',
+    tel:        row.tel || '',
+    statut:     row.statut || 'Lead',
+    note:       row.note || '',
+    date:       row.date_ajout || row.created_at || new Date().toISOString()
+  };
+}
+
+function normalizeProspect(row) {
+  return {
+    id:         row.id,
+    nom:        row.nom || '',
+    entreprise: row.entreprise || '',
+    email:      row.email || '',
+    tel:        row.tel || '',
+    statut:     row.statut || 'nouveau_lead',
+    source:     row.source || 'Manuel',
+    valeur:     row.valeur != null ? String(row.valeur) : '',
+    relance:    row.relance || '',
+    note:       row.note || '',
+    date:       row.date_ajout || row.created_at || new Date().toISOString()
+  };
+}
+
+// ─── CHARGEMENT DEPUIS SUPABASE ───────────────────────────────
+async function loadContactsFromDB() {
+  const { data, error } = await supabaseClient
+    .from('contacts')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('date_ajout', { ascending: false });
+  if (error) { console.error('loadContacts:', error.message); return; }
+  _contacts = (data || []).map(normalizeContact);
+}
+
+async function loadProspectsFromDB() {
+  const { data, error } = await supabaseClient
+    .from('prospects')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('date_ajout', { ascending: false });
+  if (error) { console.error('loadProspects:', error.message); return; }
+  _prospects = (data || []).map(normalizeProspect);
+}
+
+async function loadPlanFromDB() {
+  const { data, error } = await supabaseClient
+    .from('user_plans')
+    .select('plan')
+    .eq('user_id', currentUser.id)
+    .single();
+  // Si aucune ligne (nouvel utilisateur), on reste à 'free'
+  _plan = (error || !data) ? 'free' : (data.plan || 'free');
+}
+
+// ─── ÉCRITURE CONTACTS SUPABASE ───────────────────────────────
+async function dbAddContact(fields) {
+  const row = {
+    user_id:    currentUser.id,
+    nom:        fields.nom,
+    entreprise: fields.entreprise || null,
+    email:      fields.email || null,
+    tel:        fields.tel || null,
+    statut:     fields.statut || 'Lead',
+    note:       fields.note || null,
+    date_ajout: fields.date || new Date().toISOString()
+  };
+  const { data, error } = await supabaseClient.from('contacts').insert([row]).select().single();
+  if (error) throw error;
+  return data;
+}
+
+async function dbUpdateContact(id, fields) {
+  const { error } = await supabaseClient
+    .from('contacts')
+    .update({
+      nom:        fields.nom,
+      entreprise: fields.entreprise || null,
+      email:      fields.email || null,
+      tel:        fields.tel || null,
+      statut:     fields.statut || 'Lead',
+      note:       fields.note || null
+    })
+    .eq('id', id)
+    .eq('user_id', currentUser.id);
+  if (error) throw error;
+}
+
+async function dbDeleteContact(id) {
+  const { error } = await supabaseClient
+    .from('contacts')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', currentUser.id);
+  if (error) throw error;
+}
+
+// ─── ÉCRITURE PROSPECTS SUPABASE ──────────────────────────────
+async function dbAddProspect(fields) {
+  const row = {
+    user_id:    currentUser.id,
+    nom:        fields.nom,
+    entreprise: fields.entreprise || null,
+    email:      fields.email || null,
+    tel:        fields.tel || null,
+    statut:     fields.statut || 'nouveau_lead',
+    source:     fields.source || 'Manuel',
+    valeur:     fields.valeur ? parseFloat(fields.valeur) : null,
+    relance:    fields.relance || null,
+    note:       fields.note || null,
+    date_ajout: fields.date || new Date().toISOString()
+  };
+  const { data, error } = await supabaseClient.from('prospects').insert([row]).select().single();
+  if (error) throw error;
+  return data;
+}
+
+async function dbUpdateProspect(id, fields) {
+  const { error } = await supabaseClient
+    .from('prospects')
+    .update({
+      nom:        fields.nom,
+      entreprise: fields.entreprise || null,
+      email:      fields.email || null,
+      tel:        fields.tel || null,
+      statut:     fields.statut,
+      source:     fields.source || 'Manuel',
+      valeur:     fields.valeur ? parseFloat(fields.valeur) : null,
+      relance:    fields.relance || null,
+      note:       fields.note || null
+    })
+    .eq('id', id)
+    .eq('user_id', currentUser.id);
+  if (error) throw error;
+}
+
+async function dbDeleteProspect(id) {
+  const { error } = await supabaseClient
+    .from('prospects')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', currentUser.id);
+  if (error) throw error;
+}
+
+async function dbSetPlan(plan) {
+  const { error } = await supabaseClient
+    .from('user_plans')
+    .upsert({ user_id: currentUser.id, plan, date_activation: new Date().toISOString() }, { onConflict: 'user_id' });
+  if (error) throw error;
+  _plan = plan;
+}
+
+// ─── MIGRATION DEPUIS LOCALSTORAGE ────────────────────────────
+// Exécutée une seule fois au premier chargement si des données locales existent.
+async function migrateFromLocalStorage() {
+  const migKey = 'pylotia_migrated_' + currentUser.id;
+  if (localStorage.getItem(migKey)) return; // Déjà migré
+
+  const lsContacts  = JSON.parse(localStorage.getItem('pylotia_contacts')  || '[]');
+  const lsProspects = JSON.parse(localStorage.getItem('pylotia_prospects') || '[]');
+  const lsPlan      = localStorage.getItem('pylotia_plan') || 'free';
+
+  // Rien à migrer → on marque comme fait et on sort
+  if (!lsContacts.length && !lsProspects.length && lsPlan === 'free') {
+    localStorage.setItem(migKey, '1');
+    return;
+  }
+
+  showToast('Migration de vos données en cours…');
+
+  // Contacts — seulement si la table est vide pour cet utilisateur
+  if (lsContacts.length > 0 && _contacts.length === 0) {
+    const rows = lsContacts
+      .filter(c => (c.nom || '').trim())
+      .map(c => ({
+        user_id:    currentUser.id,
+        nom:        c.nom,
+        entreprise: c.entreprise || null,
+        email:      c.email || null,
+        tel:        c.tel || null,
+        statut:     c.statut || 'Lead',
+        note:       c.note || null,
+        date_ajout: c.date || new Date().toISOString()
+      }));
+    if (rows.length) {
+      const { data } = await supabaseClient.from('contacts').insert(rows).select();
+      if (data) _contacts = data.map(normalizeContact);
+    }
+  }
+
+  // Prospects — seulement si la table est vide pour cet utilisateur
+  if (lsProspects.length > 0 && _prospects.length === 0) {
+    const OLD_STATUT_MAP = {
+      nouveau: 'nouveau_lead', contacte: 'lead_contacte',
+      demo: 'prospect_qualifie', nego: 'proposition_envoyee', gagne: 'lead_converti'
+    };
+    const rows = lsProspects
+      .filter(p => (p.nom || '').trim())
+      .map(p => ({
+        user_id:    currentUser.id,
+        nom:        p.nom,
+        entreprise: p.entreprise || null,
+        email:      p.email || null,
+        tel:        p.tel || null,
+        statut:     OLD_STATUT_MAP[p.statut] || p.statut || 'nouveau_lead',
+        source:     p.source || 'Manuel',
+        valeur:     p.valeur ? parseFloat(p.valeur) : null,
+        relance:    p.relance || null,
+        note:       p.note || null,
+        date_ajout: p.date || new Date().toISOString()
+      }));
+    if (rows.length) {
+      const { data } = await supabaseClient.from('prospects').insert(rows).select();
+      if (data) _prospects = data.map(normalizeProspect);
+    }
+  }
+
+  // Plan
+  if (lsPlan !== 'free' && _plan === 'free') {
+    await dbSetPlan(lsPlan).catch(() => {});
+  }
+
+  // Nettoyage localStorage métier (activité et messages restent en local)
+  localStorage.removeItem('pylotia_contacts');
+  localStorage.removeItem('pylotia_prospects');
+  localStorage.removeItem('pylotia_plan');
+  localStorage.setItem(migKey, '1');
+
+  showToast('Données migrées avec succès ✓');
+}
+
+// ─── AUTH + INITIALISATION ASYNC ──────────────────────────────
+async function initApp() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) { window.location.href = 'login.html'; return; }
   currentUser = session.user;
-  const name = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'vous';
-  document.getElementById('user-name').textContent = name;
-  document.getElementById('user-email').textContent = currentUser.email || '';
-  document.getElementById('greeting-name').textContent = name.split(' ')[0];
-  document.getElementById('settings-name').value = name;
-  document.getElementById('settings-email').value = currentUser.email;
+
+  // Infos UI de base (nom, email)
+  const name = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name
+             || currentUser.email?.split('@')[0] || 'vous';
+  document.getElementById('user-name').textContent        = name;
+  document.getElementById('user-email').textContent       = currentUser.email || '';
+  document.getElementById('greeting-name').textContent    = name.split(' ')[0];
+  document.getElementById('settings-name').value          = name;
+  document.getElementById('settings-email').value         = currentUser.email;
+
+  // Chargement parallèle : contacts + prospects + plan + agenda badges
+  await Promise.all([
+    loadContactsFromDB(),
+    loadProspectsFromDB(),
+    loadPlanFromDB()
+  ]);
+
+  // Migration one-shot depuis localStorage si des données existent
+  await migrateFromLocalStorage();
+
+  // Rendu initial
   updateDashStats();
   renderContacts();
   renderMessages();
   renderActivity();
   updatePlanBadges();
-});
+  checkProspLocks();
+
+  // Badge agenda (chargement léger séparé pour ne pas bloquer le rendu)
+  supabaseClient.from('appointments').select('id,date').eq('user_id', currentUser.id)
+    .then(({ data }) => {
+      allAppointments = data || [];
+      updateAgendaBadge();
+      updateDashboardRdvWidget();
+    }).catch(() => {});
+
+  // Masquer l'overlay de chargement
+  document.getElementById('app-loader').style.display = 'none';
+}
+
+initApp();
 
 document.getElementById('logout-btn').addEventListener('click', async () => {
   await supabaseClient.auth.signOut();
@@ -1194,11 +1470,14 @@ function showSection(name) {
 }
 
 // ─── STORAGE HELPERS ──────────────────────────────────
-function getContacts() { return JSON.parse(localStorage.getItem('pylotia_contacts') || '[]'); }
-function saveContacts(data) { localStorage.setItem('pylotia_contacts', JSON.stringify(data)); }
-function getActivity() { return JSON.parse(localStorage.getItem('pylotia_activity') || '[]'); }
+// contacts et prospects → lecture depuis le cache mémoire (_contacts, _prospects)
+// activité et messages → localStorage (données non critiques, haute fréquence d'écriture)
+function getContacts()  { return _contacts; }
+function getProspects() { return _prospects; }
+function getPlan()      { return _plan; }
+function getActivity()  { return JSON.parse(localStorage.getItem('pylotia_activity') || '[]'); }
 function saveActivity(data) { localStorage.setItem('pylotia_activity', JSON.stringify(data)); }
-function getMessages() { return JSON.parse(localStorage.getItem('pylotia_messages') || '{}'); }
+function getMessages()  { return JSON.parse(localStorage.getItem('pylotia_messages') || '{}'); }
 function saveMessages(data) { localStorage.setItem('pylotia_messages', JSON.stringify(data)); }
 
 function addActivity(type, text) {
@@ -1263,37 +1542,58 @@ function openModal(id) {
 
 function closeModal() { document.getElementById('modal').classList.remove('open'); editingId = null; }
 
-function saveContact() {
+async function saveContact() {
   const nom = document.getElementById('c-nom').value.trim();
   if (!nom) { showToast('Le nom est obligatoire'); return; }
-  const contacts = getContacts();
-  if (editingId) {
-    const idx = contacts.findIndex(x => x.id === editingId);
-    contacts[idx] = { ...contacts[idx], nom, entreprise: document.getElementById('c-entreprise').value, email: document.getElementById('c-email').value, tel: document.getElementById('c-tel').value, statut: document.getElementById('c-statut').value, note: document.getElementById('c-note').value };
-    addActivity('edit', 'Contact modifié : ' + nom);
-    showToast('Contact mis à jour ✓');
-  } else {
-    contacts.unshift({ id: Date.now().toString(), nom, entreprise: document.getElementById('c-entreprise').value, email: document.getElementById('c-email').value, tel: document.getElementById('c-tel').value, statut: document.getElementById('c-statut').value, note: document.getElementById('c-note').value, date: new Date().toISOString() });
-    addActivity('add', 'Nouveau contact : ' + nom);
-    showToast('Contact ajouté ✓');
+  const fields = {
+    nom,
+    entreprise: document.getElementById('c-entreprise').value,
+    email:      document.getElementById('c-email').value,
+    tel:        document.getElementById('c-tel').value,
+    statut:     document.getElementById('c-statut').value,
+    note:       document.getElementById('c-note').value
+  };
+  try {
+    if (editingId) {
+      // Mise à jour optimiste en mémoire immédiate
+      const idx = _contacts.findIndex(x => x.id === editingId);
+      if (idx !== -1) _contacts[idx] = { ..._contacts[idx], ...fields };
+      closeModal(); renderContacts(); updateDashStats();
+      // Écriture Supabase en arrière-plan
+      await dbUpdateContact(editingId, fields);
+      addActivity('edit', 'Contact modifié : ' + nom);
+      showToast('Contact mis à jour ✓');
+    } else {
+      closeModal();
+      const saved = await dbAddContact({ ...fields, date: new Date().toISOString() });
+      _contacts.unshift(normalizeContact(saved));
+      addActivity('add', 'Nouveau contact : ' + nom);
+      showToast('Contact ajouté ✓');
+      renderContacts(); updateDashStats();
+    }
+  } catch(e) {
+    showToast('Erreur : ' + e.message);
+    // Rechargement depuis Supabase en cas d'erreur pour re-synchroniser
+    await loadContactsFromDB(); renderContacts(); updateDashStats();
   }
-  saveContacts(contacts);
-  closeModal();
-  renderContacts();
-  updateDashStats();
 }
 
 function editContact(id) { openModal(id); }
 
-function deleteContact(id) {
-  const contacts = getContacts();
-  const c = contacts.find(x => x.id === id);
-  if (!confirm('Supprimer ' + c.nom + ' ?')) return;
-  saveContacts(contacts.filter(x => x.id !== id));
-  addActivity('delete', 'Contact supprimé : ' + c.nom);
-  renderContacts();
-  updateDashStats();
-  showToast('Contact supprimé');
+async function deleteContact(id) {
+  const c = _contacts.find(x => x.id === id);
+  if (!c || !confirm('Supprimer ' + c.nom + ' ?')) return;
+  // Mise à jour optimiste
+  _contacts = _contacts.filter(x => x.id !== id);
+  renderContacts(); updateDashStats();
+  try {
+    await dbDeleteContact(id);
+    addActivity('delete', 'Contact supprimé : ' + c.nom);
+    showToast('Contact supprimé');
+  } catch(e) {
+    showToast('Erreur suppression : ' + e.message);
+    await loadContactsFromDB(); renderContacts(); updateDashStats();
+  }
 }
 
 // ─── DASHBOARD STATS ──────────────────────────────────
@@ -1475,13 +1775,19 @@ function exportContacts() {
   addActivity('edit', 'Contacts exportés en Excel');
 }
 
-function confirmDeleteData() {
+async function confirmDeleteData() {
   if (!confirm('Supprimer TOUS les contacts ? Cette action est irréversible.')) return;
-  saveContacts([]);
-  renderContacts();
-  updateDashStats();
-  showToast('Tous les contacts supprimés');
-  addActivity('delete', 'Tous les contacts ont été supprimés');
+  _contacts = [];
+  renderContacts(); updateDashStats();
+  try {
+    const { error } = await supabaseClient.from('contacts').delete().eq('user_id', currentUser.id);
+    if (error) throw error;
+    addActivity('delete', 'Tous les contacts ont été supprimés');
+    showToast('Tous les contacts supprimés');
+  } catch(e) {
+    showToast('Erreur : ' + e.message);
+    await loadContactsFromDB(); renderContacts(); updateDashStats();
+  }
 }
 
 // ─── UTILS ────────────────────────────────────────────
@@ -1592,41 +1898,59 @@ function detectColumns(headers) {
   return map;
 }
 
-function doImport() {
+async function doImport() {
   if (!importedRows.length) return;
-  const mode = document.querySelector('input[name="import-mode"]:checked').value;
-  const headers = Object.keys(importedRows[0]);
-  const colMap = detectColumns(headers);
-  const existing = mode === 'replace' ? [] : getContacts();
-  const existingEmails = new Set(existing.map(c => (c.email||'').toLowerCase()));
-  let added = 0, skipped = 0;
+  const mode       = document.querySelector('input[name="import-mode"]:checked').value;
+  const headers    = Object.keys(importedRows[0]);
+  const colMap     = detectColumns(headers);
+  const keepBase   = mode === 'replace' ? [] : _contacts;
+  const existEmails = new Set(keepBase.map(c => (c.email||'').toLowerCase()).filter(Boolean));
+
+  const toInsert = [];
+  let skipped = 0;
+
   importedRows.forEach(r => {
-    const nom = r[colMap['Nom']] || '';
-    if (!nom.trim()) return;
-    const email = r[colMap['Email']] || '';
-    if (email && existingEmails.has(email.toLowerCase())) { skipped++; return; }
-    existing.unshift({
-      id: Date.now().toString() + Math.random(),
-      nom: nom.trim(),
-      entreprise: (r[colMap['Entreprise']] || '').trim(),
-      email: email.trim(),
-      tel: (r[colMap['Téléphone']] || '').trim(),
-      statut: normalizeStatut(r[colMap['Statut']] || ''),
-      note: '',
-      date: new Date().toISOString()
+    const nom   = (r[colMap['Nom']] || '').trim();
+    if (!nom) return;
+    const email = (r[colMap['Email']] || '').trim();
+    if (email && existEmails.has(email.toLowerCase())) { skipped++; return; }
+    toInsert.push({
+      user_id:    currentUser.id,
+      nom,
+      entreprise: (r[colMap['Entreprise']] || '').trim() || null,
+      email:      email || null,
+      tel:        (r[colMap['Téléphone']] || '').trim() || null,
+      statut:     normalizeStatut(r[colMap['Statut']] || ''),
+      note:       null,
+      date_ajout: new Date().toISOString()
     });
-    if (email) existingEmails.add(email.toLowerCase());
-    added++;
+    if (email) existEmails.add(email.toLowerCase());
   });
-  saveContacts(existing);
-  addActivity('add', `Import : ${added} contacts ajoutés (${skipped} doublons ignorés)`);
-  updateDashStats();
-  // Afficher résultat
-  document.getElementById('result-total').textContent = added + skipped;
-  document.getElementById('result-new').textContent = added;
-  document.getElementById('result-skip').textContent = skipped;
-  document.getElementById('import-result-sub').textContent = mode === 'replace' ? 'Vos contacts ont été remplacés.' : 'Contacts ajoutés à votre CRM.';
-  showImportStep(2);
+
+  try {
+    if (mode === 'replace') {
+      const { error } = await supabaseClient.from('contacts').delete().eq('user_id', currentUser.id);
+      if (error) throw error;
+      _contacts = [];
+    }
+    let added = 0;
+    if (toInsert.length > 0) {
+      const { data, error } = await supabaseClient.from('contacts').insert(toInsert).select();
+      if (error) throw error;
+      const newC = (data || []).map(normalizeContact);
+      _contacts  = [...newC, ..._contacts];
+      added      = newC.length;
+    }
+    addActivity('add', `Import : ${added} contacts ajoutés (${skipped} doublons ignorés)`);
+    updateDashStats();
+    document.getElementById('result-total').textContent     = added + skipped;
+    document.getElementById('result-new').textContent       = added;
+    document.getElementById('result-skip').textContent      = skipped;
+    document.getElementById('import-result-sub').textContent = mode === 'replace' ? 'Vos contacts ont été remplacés.' : 'Contacts ajoutés à votre CRM.';
+    showImportStep(2);
+  } catch(e) {
+    showToast('Erreur import : ' + e.message);
+  }
 }
 
 function normalizeStatut(s) {
@@ -1875,17 +2199,7 @@ function updateAgendaBadge() {
 // Close RDV modal on outside click
 document.getElementById('modal-rdv').addEventListener('click', function(e) { if (e.target === this) closeRdvModal(); });
 
-// Load agenda badge on startup
-supabaseClient.auth.getSession().then(({ data: { session } }) => {
-  if (session) {
-    supabaseClient.from('appointments').select('id,date').eq('user_id', session.user.id)
-      .then(({ data }) => {
-        allAppointments = data || [];
-        updateAgendaBadge();
-        updateDashboardRdvWidget();
-      }).catch(() => {});
-  }
-});
+// Le badge agenda est chargé dans initApp() ci-dessus — aucun second appel nécessaire.
 
 // Dashboard widget: prochains RDV + stat semaine
 function updateDashboardRdvWidget() {
@@ -1914,18 +2228,8 @@ const KB_COLS = [
   { id: 'non_retenu',         label: 'Non retenu',          color: '#f87171' },
 ];
 
-// Migration auto : anciens statuts → nouveaux (localStorage)
-(function migrateOldStatuts() {
-  const map = { nouveau:'nouveau_lead', contacte:'lead_contacte', demo:'prospect_qualifie', nego:'proposition_envoyee', gagne:'lead_converti' };
-  const prospects = JSON.parse(localStorage.getItem('pylotia_prospects') || '[]');
-  let changed = false;
-  prospects.forEach(p => { if (map[p.statut]) { p.statut = map[p.statut]; changed = true; } });
-  if (changed) localStorage.setItem('pylotia_prospects', JSON.stringify(prospects));
-})();
-
-function getProspects() { return JSON.parse(localStorage.getItem('pylotia_prospects') || '[]'); }
-function saveProspects(d) { localStorage.setItem('pylotia_prospects', JSON.stringify(d)); }
-function getPlan() { return localStorage.getItem('pylotia_plan') || 'free'; }
+// getProspects() / getPlan() sont définis dans la section STORAGE HELPERS ci-dessus.
+// La migration des anciens statuts localStorage est gérée dans migrateFromLocalStorage().
 
 let editingProspId = null;
 let dragProspId = null;
@@ -2030,17 +2334,23 @@ function kbDragStart(e, id) {
 function kbDragEnd(e) { e.target.classList.remove('dragging'); dragProspId = null; }
 function kbDragOver(e, colId) { e.preventDefault(); document.getElementById('kbc-' + colId).classList.add('drag-over'); }
 function kbDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
-function kbDrop(e, colId) {
+async function kbDrop(e, colId) {
   e.preventDefault();
   e.currentTarget.classList.remove('drag-over');
   if (!dragProspId) return;
-  const prospects = getProspects();
-  const p = prospects.find(x => x.id === dragProspId);
+  const p = _prospects.find(x => x.id === dragProspId);
   if (p) {
+    const oldStatut = p.statut;
     p.statut = colId;
-    saveProspects(prospects);
-    addActivity('edit', `Prospect déplacé : ${p.nom} → ${KB_COLS.find(c => c.id === colId)?.label}`);
-    renderKanban();
+    renderKanban(); // Mise à jour optimiste immédiate
+    try {
+      await dbUpdateProspect(p.id, { ...p, statut: colId });
+      addActivity('edit', `Prospect déplacé : ${p.nom} → ${KB_COLS.find(c => c.id === colId)?.label}`);
+    } catch(err) {
+      p.statut = oldStatut; // Rollback si erreur
+      renderKanban();
+      showToast('Erreur lors du déplacement');
+    }
   }
   dragProspId = null;
 }
@@ -2145,14 +2455,13 @@ function closeProspModal() {
   editingProspId = null;
 }
 
-function saveProspect() {
+async function saveProspect() {
   const nom = document.getElementById('p-nom').value.trim();
   if (!nom) { showToast('Le nom est obligatoire'); return; }
-  if (!editingProspId && getPlan() === 'free' && getProspects().length >= 20) {
+  if (!editingProspId && _plan === 'free' && _prospects.length >= 20) {
     showToast('Limite atteinte (20 prospects)'); openUpgradeModal(); return;
   }
-  const prospects = getProspects();
-  const data = {
+  const fields = {
     nom,
     entreprise: document.getElementById('p-entreprise').value.trim(),
     email:      document.getElementById('p-email').value.trim(),
@@ -2160,48 +2469,64 @@ function saveProspect() {
     source:     document.getElementById('p-source').value,
     valeur:     document.getElementById('p-valeur').value,
     relance:    document.getElementById('p-relance').value,
-    note:       document.getElementById('p-note').value.trim(),
+    note:       document.getElementById('p-note').value.trim()
   };
-  if (editingProspId) {
-    const idx = prospects.findIndex(x => x.id === editingProspId);
-    prospects[idx] = { ...prospects[idx], ...data };
-    addActivity('edit', 'Prospect modifié : ' + nom);
-    showToast('Prospect mis à jour ✓');
-  } else {
-    prospects.unshift({ id: Date.now().toString(), statut: document.getElementById('modal-prospect').dataset.statut || 'nouveau_lead', date: new Date().toISOString(), ...data });
-    addActivity('add', 'Nouveau prospect : ' + nom);
-    showToast('Prospect ajouté ✓');
+  try {
+    if (editingProspId) {
+      const cur = _prospects.find(x => x.id === editingProspId);
+      const updated = { ...cur, ...fields };
+      const idx = _prospects.findIndex(x => x.id === editingProspId);
+      if (idx !== -1) _prospects[idx] = updated;
+      closeProspModal(); renderKanban(); renderProspStats(); checkProspLocks();
+      await dbUpdateProspect(editingProspId, updated);
+      addActivity('edit', 'Prospect modifié : ' + nom);
+      showToast('Prospect mis à jour ✓');
+    } else {
+      const statut = document.getElementById('modal-prospect').dataset.statut || 'nouveau_lead';
+      closeProspModal();
+      const saved = await dbAddProspect({ ...fields, statut, date: new Date().toISOString() });
+      _prospects.unshift(normalizeProspect(saved));
+      addActivity('add', 'Nouveau prospect : ' + nom);
+      showToast('Prospect ajouté ✓');
+      renderKanban(); renderProspStats(); checkProspLocks();
+    }
+  } catch(e) {
+    showToast('Erreur : ' + e.message);
+    await loadProspectsFromDB(); renderKanban(); renderProspStats();
   }
-  saveProspects(prospects);
-  closeProspModal();
-  renderKanban();
-  renderProspStats();
-  checkProspLocks();
 }
 
-function deleteProspect(id) {
+async function deleteProspect(id) {
   if (!id) return;
-  const prospects = getProspects();
-  const p = prospects.find(x => x.id === id);
-  if (!confirm('Supprimer ' + p.nom + ' ?')) return;
-  saveProspects(prospects.filter(x => x.id !== id));
-  addActivity('delete', 'Prospect supprimé : ' + p.nom);
-  closeProspModal();
-  renderKanban();
-  renderProspStats();
-  showToast('Prospect supprimé');
+  const p = _prospects.find(x => x.id === id);
+  if (!p || !confirm('Supprimer ' + p.nom + ' ?')) return;
+  _prospects = _prospects.filter(x => x.id !== id);
+  closeProspModal(); renderKanban(); renderProspStats();
+  try {
+    await dbDeleteProspect(id);
+    addActivity('delete', 'Prospect supprimé : ' + p.nom);
+    showToast('Prospect supprimé');
+  } catch(e) {
+    showToast('Erreur suppression : ' + e.message);
+    await loadProspectsFromDB(); renderKanban();
+  }
 }
 
-function clearAllProspects() {
-  const count = getProspects().length;
+async function clearAllProspects() {
+  const count = _prospects.length;
   if (!count) { showToast('Aucun prospect à supprimer'); return; }
   if (!confirm(`Supprimer les ${count} prospects ? Cette action est irréversible.`)) return;
-  saveProspects([]);
-  addActivity('delete', `Tous les prospects supprimés (${count})`);
-  renderKanban();
-  renderProspStats();
-  checkProspLocks();
-  showToast('Tous les prospects supprimés');
+  _prospects = [];
+  renderKanban(); renderProspStats(); checkProspLocks();
+  try {
+    const { error } = await supabaseClient.from('prospects').delete().eq('user_id', currentUser.id);
+    if (error) throw error;
+    addActivity('delete', `Tous les prospects supprimés (${count})`);
+    showToast('Tous les prospects supprimés');
+  } catch(e) {
+    showToast('Erreur : ' + e.message);
+    await loadProspectsFromDB(); renderKanban();
+  }
 }
 
 function aiDraftEmail(prospId) {
@@ -2215,15 +2540,19 @@ function aiDraftEmail(prospId) {
 function openUpgradeModal()  { document.getElementById('modal-upgrade').classList.add('open'); }
 function closeUpgradeModal() { document.getElementById('modal-upgrade').classList.remove('open'); }
 
-function activatePlan(plan) {
-  localStorage.setItem('pylotia_plan', plan);
-  closeUpgradeModal();
-  updatePlanBadges();
-  checkProspLocks();
+async function activatePlan(plan) {
   const labels = { free: 'Free', starter: 'Starter', pro: 'Pro' };
-  showToast('Plan ' + labels[plan] + ' activé ✓ (mode démo)');
-  addActivity('edit', 'Plan changé : ' + labels[plan]);
-  if (plan !== 'free') renderProspStats();
+  try {
+    await dbSetPlan(plan); // écrit en Supabase ET met à jour _plan
+    closeUpgradeModal();
+    updatePlanBadges();
+    checkProspLocks();
+    showToast('Plan ' + labels[plan] + ' activé ✓');
+    addActivity('edit', 'Plan changé : ' + labels[plan]);
+    if (plan !== 'free') renderProspStats();
+  } catch(e) {
+    showToast('Erreur activation plan : ' + e.message);
+  }
 }
 
 // ── IMPORT PROSPECTS ──
@@ -2302,49 +2631,55 @@ function importProspectsFromData(rows, fileName) {
   const noteCol    = findSmart(['observation','note','commentaire','remarque'], null);
   const valeurCol  = findSmart(['valeur estimee','valeur','deal value','deal size','montant devis','montant','budget','chiffre','deal','val'], null);
 
-  const prospects = getProspects();
-  const existing  = new Set(prospects.map(p => (p.email||'').toLowerCase()));
-  let added = 0;
+  const existEmails = new Set(_prospects.map(p => (p.email||'').toLowerCase()).filter(Boolean));
+  const toInsert = [];
 
   rows.forEach(r => {
-    let nom    = nomCol    ? (r[nomCol]    || '').toString().trim() : '';
+    let nom    = nomCol ? (r[nomCol] || '').toString().trim() : '';
     const prenom = (prenomCol && prenomCol !== nomCol) ? (r[prenomCol] || '').toString().trim() : '';
     if (prenom) nom = (prenom + ' ' + nom).trim();
     if (!nom) return;
-    // Extract email from "email / phone" mixed fields (e.g. "user@domain.fr / 06 12 34 56")
     let emailRaw = emailCol ? (r[emailCol] || '').toString().trim() : '';
     if (emailRaw.includes('@') && emailRaw.includes('/')) {
       emailRaw = emailRaw.split('/').find(p => p.includes('@'))?.trim() || emailRaw;
     }
     const email = emailRaw;
-    if (email && existing.has(email.toLowerCase())) return;
-    prospects.unshift({
-      id: Date.now().toString() + Math.random(),
+    if (email && existEmails.has(email.toLowerCase())) return;
+    toInsert.push({
+      user_id:    currentUser.id,
       nom,
-      entreprise: coCol     ? (r[coCol]     || '').toString().trim() : '',
-      email,
-      tel:        telCol    ? (r[telCol]    || '').toString().trim() : '',
+      entreprise: coCol     ? (r[coCol]     || '').toString().trim() || null : null,
+      email:      email || null,
+      tel:        telCol    ? (r[telCol]    || '').toString().trim() || null : null,
       source:     sourceCol ? (r[sourceCol] || 'Import').toString().trim() : 'Import',
-      valeur:     valeurCol ? (r[valeurCol] || '').toString().replace(/[€$£\s\u00a0]/g,'') : '',
-      relance:    relanceCol ? prospRelanceDate(r[relanceCol])        : '',
-      note:       noteCol   ? (r[noteCol]   || '').toString().trim() : '',
+      valeur:     valeurCol ? parseFloat((r[valeurCol]||'').toString().replace(/[€$£\s\u00a0]/g,'')) || null : null,
+      relance:    relanceCol ? prospRelanceDate(r[relanceCol]) || null : null,
+      note:       noteCol   ? (r[noteCol]   || '').toString().trim() || null : null,
       statut:     normalizeProspStatut(statutCol ? r[statutCol] : ''),
-      date: new Date().toISOString()
+      date_ajout: new Date().toISOString()
     });
-    if (email) existing.add(email.toLowerCase());
-    added++;
+    if (email) existEmails.add(email.toLowerCase());
   });
 
-  saveProspects(prospects);
-  addActivity('add', `Import prospects : ${added} ajoutés`);
-  renderKanban();
-  renderProspStats();
-  checkProspLocks();
-  const res = document.getElementById('prosp-import-result');
-  res.style.display = 'block';
-  res.textContent = `✓ ${added} prospect(s) importé(s) dans le Kanban !${fileName ? ' — ' + fileName : ''}`;
-  document.getElementById('prosp-file-input').value = '';
-  showToast(`${added} prospects importés ✓`);
+  try {
+    let added = 0;
+    if (toInsert.length > 0) {
+      const { data, error } = await supabaseClient.from('prospects').insert(toInsert).select();
+      if (error) throw error;
+      const newP = (data || []).map(normalizeProspect);
+      _prospects = [...newP, ..._prospects];
+      added = newP.length;
+    }
+    addActivity('add', `Import prospects : ${added} ajoutés`);
+    renderKanban(); renderProspStats(); checkProspLocks();
+    const res = document.getElementById('prosp-import-result');
+    res.style.display = 'block';
+    res.textContent = `✓ ${added} prospect(s) importé(s) dans le Kanban !${fileName ? ' — ' + fileName : ''}`;
+    document.getElementById('prosp-file-input').value = '';
+    showToast(`${added} prospects importés ✓`);
+  } catch(e) {
+    showToast('Erreur import prospects : ' + e.message);
+  }
 }
 
 function normalizeProspStatut(val) {
@@ -2802,6 +3137,18 @@ function closeMobileMsg() {
     </button>
   </div>
 </div>
+
+<!-- LOADING OVERLAY — affiché pendant le chargement initial depuis Supabase -->
+<div id="app-loader" style="position:fixed;inset:0;background:var(--dark);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+  <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.5px">pylot<span style="color:#3b82f6">IA</span></div>
+  <div style="display:flex;gap:6px">
+    <div style="width:8px;height:8px;border-radius:50%;background:#3b82f6;animation:ld 1s ease-in-out infinite"></div>
+    <div style="width:8px;height:8px;border-radius:50%;background:#3b82f6;animation:ld 1s ease-in-out 0.2s infinite"></div>
+    <div style="width:8px;height:8px;border-radius:50%;background:#3b82f6;animation:ld 1s ease-in-out 0.4s infinite"></div>
+  </div>
+  <div style="font-size:13px;color:var(--text3)">Chargement de vos données…</div>
+</div>
+<style>@keyframes ld{0%,100%{opacity:0.2;transform:scale(0.8)}50%{opacity:1;transform:scale(1)}}</style>
 
 </body>
 </html>
