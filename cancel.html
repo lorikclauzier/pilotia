@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>pylotIA — Paiement annulé</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --dark:#080c14;
+  --dark2:#0e1420;
+  --dark3:#141c2e;
+  --blue:#3b82f6;
+  --blue2:#2563eb;
+  --orange:#f59e0b;
+  --text:#f0f4ff;
+  --text2:#8899bb;
+  --text3:#4a5a78;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.12);
+}
+body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(59,130,246,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.04) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%);pointer-events:none}
+body::after{content:'';position:fixed;top:10%;left:50%;transform:translateX(-50%);width:500px;height:300px;background:radial-gradient(ellipse,rgba(245,158,11,0.06) 0%,transparent 70%);pointer-events:none}
+
+.wrap{position:relative;z-index:1;width:100%;max-width:500px;text-align:center}
+
+.logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.5px;margin-bottom:40px;display:inline-block;text-decoration:none}
+.logo span{color:var(--blue)}
+
+.icon-wrap{width:72px;height:72px;background:rgba(245,158,11,0.1);border:1.5px solid rgba(245,158,11,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;animation:pop 0.5s cubic-bezier(0.34,1.56,0.64,1) both}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.icon-wrap svg{width:30px;height:30px;stroke:var(--orange)}
+
+.card{background:var(--dark2);border:1px solid var(--border2);border-radius:20px;padding:40px 36px;animation:rise 0.5s 0.1s cubic-bezier(0.34,1.56,0.64,1) both}
+@keyframes rise{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+h1{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;letter-spacing:-0.8px;margin-bottom:10px;line-height:1.3}
+.subtitle{font-size:15px;color:var(--text2);line-height:1.6;margin-bottom:28px}
+
+.missed{text-align:left;background:var(--dark3);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:28px}
+.missed-title{font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+.missed-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)}
+.missed-item:last-child{border-bottom:none}
+.missed-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);flex-shrink:0}
+.missed-text{font-size:13.5px;color:var(--text2)}
+.missed-text strong{color:var(--text);font-weight:500}
+
+.buttons{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.btn-primary{display:block;width:100%;padding:13px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.2s,transform 0.1s;text-decoration:none;text-align:center}
+.btn-primary:hover{background:var(--blue2);transform:translateY(-1px)}
+.btn-secondary{display:block;width:100%;padding:13px;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;text-decoration:none;text-align:center}
+.btn-secondary:hover{color:var(--text);border-color:rgba(255,255,255,0.2);background:rgba(255,255,255,0.03)}
+
+.divider{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.divider span{font-size:12px;color:var(--text3);white-space:nowrap}
+
+.free-plan{background:rgba(59,130,246,0.05);border:1px solid rgba(59,130,246,0.15);border-radius:12px;padding:18px;text-align:left}
+.free-plan-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.free-plan-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff}
+.free-plan-pill{font-size:11px;font-weight:600;color:var(--blue);background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:20px;padding:2px 10px}
+.free-plan-desc{font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px}
+.free-plan-features{display:flex;flex-wrap:wrap;gap:6px}
+.free-tag{font-size:11.5px;color:var(--text2);background:var(--dark3);border:1px solid var(--border);border-radius:6px;padding:3px 9px}
+
+.link-small{font-size:13px;color:var(--text3)}
+.link-small a{color:var(--text3);text-decoration:none;transition:color 0.2s}
+.link-small a:hover{color:var(--text2)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <a href="index.html" class="logo">pylot<span>IA</span></a>
+
+  <div class="icon-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+  </div>
+
+  <div class="card">
+    <h1>Pas de problème,<br>vous pouvez revenir.</h1>
+    <p class="subtitle">
+      Votre paiement a été annulé — aucun montant n'a été débité.<br>
+      Votre compte reste actif en plan gratuit.
+    </p>
+
+    <div class="missed" id="missed-block">
+      <div class="missed-title">Ce que vous ne débloquez pas encore</div>
+      <div class="missed-item"><div class="missed-dot"></div><div class="missed-text"><strong>Contacts illimités</strong> — actuellement limité à 5</div></div>
+      <div class="missed-item"><div class="missed-dot"></div><div class="missed-text"><strong>Pipeline prospects</strong> — suivi de vos opportunités</div></div>
+      <div class="missed-item"><div class="missed-dot"></div><div class="missed-text"><strong>Assistant IA</strong> — automatisez vos tâches répétitives</div></div>
+      <div class="missed-item"><div class="missed-dot"></div><div class="missed-text"><strong>Agenda intelligent</strong> — planning et rappels automatiques</div></div>
+      <div class="missed-item"><div class="missed-dot"></div><div class="missed-text"><strong>Export de vos données</strong> — accès total à vos infos</div></div>
+    </div>
+
+    <div class="buttons">
+      <a href="dashboard.html#pricing" class="btn-primary" id="retry-btn">Voir les plans et réessayer →</a>
+      <a href="dashboard.html" class="btn-secondary">Retour au dashboard</a>
+    </div>
+
+    <div class="divider"><span>ou continuez gratuitement</span></div>
+
+    <div class="free-plan">
+      <div class="free-plan-header">
+        <div class="free-plan-title">Plan Gratuit</div>
+        <div class="free-plan-pill">Votre plan actuel</div>
+      </div>
+      <p class="free-plan-desc">Continuez avec les fonctionnalités de base, sans limite de temps. Passez au niveau supérieur quand vous êtes prêt.</p>
+      <div class="free-plan-features">
+        <span class="free-tag">5 contacts</span>
+        <span class="free-tag">Messages basiques</span>
+        <span class="free-tag">Tableau de bord</span>
+        <span class="free-tag">Activité récente</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

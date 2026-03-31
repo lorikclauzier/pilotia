@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>pylotIA — Paiement réussi 🎉</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --dark:#080c14;
+  --dark2:#0e1420;
+  --dark3:#141c2e;
+  --blue:#3b82f6;
+  --blue2:#2563eb;
+  --green:#10b981;
+  --green2:#059669;
+  --text:#f0f4ff;
+  --text2:#8899bb;
+  --text3:#4a5a78;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.12);
+}
+body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(59,130,246,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.04) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%);pointer-events:none}
+body::after{content:'';position:fixed;top:0;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(16,185,129,0.08) 0%,transparent 70%);pointer-events:none}
+
+/* Confetti canvas */
+#confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:0}
+
+.wrap{position:relative;z-index:1;width:100%;max-width:500px;text-align:center}
+
+.logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.5px;margin-bottom:40px;display:inline-block;text-decoration:none}
+.logo span{color:var(--blue)}
+
+.icon-wrap{width:72px;height:72px;background:rgba(16,185,129,0.12);border:1.5px solid rgba(16,185,129,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;animation:pop 0.5s cubic-bezier(0.34,1.56,0.64,1) both}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.icon-wrap svg{width:32px;height:32px;stroke:var(--green)}
+
+.card{background:var(--dark2);border:1px solid var(--border2);border-radius:20px;padding:40px 36px;animation:rise 0.5s 0.1s cubic-bezier(0.34,1.56,0.64,1) both}
+@keyframes rise{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:20px;padding:4px 14px;font-size:12px;font-weight:600;color:var(--green);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:20px}
+.badge::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+h1{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#fff;letter-spacing:-0.8px;margin-bottom:10px;line-height:1.2}
+h1 span{color:var(--green)}
+.subtitle{font-size:15px;color:var(--text2);line-height:1.6;margin-bottom:32px}
+
+.plan-name{display:inline-block;font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:var(--blue);background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:8px;padding:3px 12px;margin:0 4px}
+
+.features{text-align:left;margin-bottom:32px}
+.features-title{font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+.feature-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.feature-item:last-child{border-bottom:none}
+.feature-check{width:22px;height:22px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.feature-check svg{width:11px;height:11px;stroke:var(--green)}
+.feature-text{font-size:14px;color:var(--text);font-weight:400}
+.feature-text strong{font-weight:600}
+
+.btn-primary{display:block;width:100%;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.2s,transform 0.1s;text-decoration:none;text-align:center;margin-bottom:12px}
+.btn-primary:hover{background:var(--blue2);transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+
+.link-small{font-size:13px;color:var(--text2)}
+.link-small a{color:var(--text2);text-decoration:none;transition:color 0.2s}
+.link-small a:hover{color:var(--text)}
+
+/* Starter features */
+.features-starter .feature-text::after{display:none}
+/* Pro glow */
+.plan-pro .icon-wrap{background:rgba(59,130,246,0.12);border-color:rgba(59,130,246,0.3)}
+.plan-pro .icon-wrap svg{stroke:var(--blue)}
+.plan-pro h1 span{color:var(--blue)}
+.plan-pro .badge{background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.25);color:var(--blue)}
+.plan-pro .badge::before{background:var(--blue)}
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<div class="wrap" id="main-wrap">
+  <a href="index.html" class="logo">pylot<span>IA</span></a>
+
+  <div class="icon-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  </div>
+
+  <div class="card">
+    <div class="badge" id="plan-badge">Plan activé</div>
+
+    <h1>Bienvenue dans<br>pylot<span>IA</span> <span id="plan-label"></span> !</h1>
+    <p class="subtitle" id="subtitle-text">
+      Votre abonnement est actif. Tout est prêt — vous pouvez commencer à utiliser toutes vos nouvelles fonctionnalités dès maintenant.
+    </p>
+
+    <div class="features" id="features-list">
+      <div class="features-title">Ce que vous venez de débloquer</div>
+      <!-- Rempli par JS -->
+    </div>
+
+    <a href="dashboard.html" class="btn-primary">Accéder à mon dashboard →</a>
+    <p class="link-small">Un problème ? <a href="mailto:support@pylotia.com">Contacter le support</a></p>
+  </div>
+</div>
+
+<script>
+// ── Plan features ────────────────────────────────────────────
+const PLANS = {
+  starter: {
+    label: 'Starter',
+    badge: 'Starter activé',
+    features: [
+      { icon: '👥', text: '<strong>Contacts illimités</strong> — gérez tous vos clients sans restriction' },
+      { icon: '📊', text: '<strong>Pipeline prospects</strong> — suivi complet de vos opportunités commerciales' },
+      { icon: '🤖', text: '<strong>Assistant IA</strong> — 100 messages/mois pour automatiser votre activité' },
+      { icon: '📅', text: '<strong>Agenda intelligent</strong> — planification et rappels automatiques' },
+      { icon: '📤', text: '<strong>Export CSV</strong> — exportez vos données à tout moment' },
+    ]
+  },
+  pro: {
+    label: 'Pro',
+    badge: 'Plan Pro activé',
+    glow: true,
+    features: [
+      { icon: '🚀', text: '<strong>Tout Starter</strong> inclus, sans limite' },
+      { icon: '🤖', text: '<strong>IA illimitée</strong> — messages et automatisations sans restriction' },
+      { icon: '🔗', text: '<strong>Intégrations avancées</strong> — connectez vos outils métier' },
+      { icon: '📈', text: '<strong>Rapports & analyses</strong> — tableaux de bord complets' },
+      { icon: '⚡', text: '<strong>Automatisations IA</strong> — votre CRM travaille pendant que vous dormez' },
+      { icon: '🎯', text: '<strong>Priorité support</strong> — réponse garantie sous 4h' },
+    ]
+  }
+};
+
+// ── Detect plan from URL ──────────────────────────────────────
+const params = new URLSearchParams(window.location.search);
+const planKey = (params.get('plan') || 'starter').toLowerCase();
+const plan = PLANS[planKey] || PLANS.starter;
+
+// ── Populate UI ───────────────────────────────────────────────
+document.getElementById('plan-badge').textContent = plan.badge;
+document.getElementById('plan-label').textContent = plan.label;
+
+if (plan.glow) {
+  document.getElementById('main-wrap').closest('body').style.setProperty('--active', 'blue');
+  document.querySelector('body::after') && (document.querySelector('body').classList.add('plan-pro'));
+}
+
+const featuresList = document.getElementById('features-list');
+featuresList.innerHTML = '<div class="features-title">Ce que vous venez de débloquer</div>' +
+  plan.features.map(f => `
+    <div class="feature-item">
+      <div class="feature-check">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <div class="feature-text">${f.text}</div>
+    </div>
+  `).join('');
+
+// ── Confetti ──────────────────────────────────────────────────
+const canvas = document.getElementById('confetti-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const COLORS = ['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#ffffff'];
+
+function createParticle() {
+  return {
+    x: Math.random() * W,
+    y: -10,
+    r: Math.random() * 5 + 3,
+    color: COLORS[Math.floor(Math.random() * COLORS.length)],
+    vx: (Math.random() - 0.5) * 3,
+    vy: Math.random() * 3 + 2,
+    spin: (Math.random() - 0.5) * 0.2,
+    angle: Math.random() * Math.PI * 2,
+    shape: Math.random() > 0.5 ? 'rect' : 'circle',
+    w: Math.random() * 8 + 4,
+    h: Math.random() * 4 + 2,
+    alpha: 1,
+    decay: Math.random() * 0.005 + 0.003
+  };
+}
+
+// Burst of particles
+for (let i = 0; i < 120; i++) {
+  const p = createParticle();
+  p.y = Math.random() * H * 0.5; // spread vertically at start
+  particles.push(p);
+}
+
+let frame = 0;
+function animate() {
+  ctx.clearRect(0, 0, W, H);
+  frame++;
+
+  // Add trickle
+  if (frame < 180 && frame % 3 === 0) {
+    particles.push(createParticle());
+  }
+
+  particles.forEach((p, i) => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.angle += p.spin;
+    p.vy += 0.05; // gravity
+    p.alpha -= p.decay;
+
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, p.alpha);
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.angle);
+    ctx.fillStyle = p.color;
+
+    if (p.shape === 'rect') {
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+    } else {
+      ctx.beginPath();
+      ctx.arc(0, 0, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  });
+
+  // Clean dead particles
+  particles = particles.filter(p => p.alpha > 0 && p.y < H + 20);
+
+  if (particles.length > 0) {
+    requestAnimationFrame(animate);
+  }
+}
+animate();
+</script>
+</body>
+</html>
