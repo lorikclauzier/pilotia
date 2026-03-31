@@ -1447,7 +1447,11 @@ async function initApp() {
   document.getElementById('app-loader').style.display = 'none';
 }
 
-initApp();
+initApp().catch(err => {
+  console.error('initApp fatal:', err);
+  const loader = document.getElementById('app-loader');
+  if (loader) loader.innerHTML = '<div style="color:#f87171;font-family:Inter,sans-serif;text-align:center;padding:24px"><div style="font-size:20px;margin-bottom:8px">⚠️ Erreur de chargement</div><div style="font-size:13px;color:#94a3b8;margin-bottom:16px">' + (err.message || 'Erreur inconnue') + '</div><button onclick="location.reload()" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:14px;cursor:pointer">Réessayer</button></div>';
+});
 
 document.getElementById('logout-btn').addEventListener('click', async () => {
   await supabaseClient.auth.signOut();
@@ -2601,7 +2605,7 @@ function parseProspCSV(text) {
   }).filter(r => Object.values(r).some(v => v));
 }
 
-function importProspectsFromData(rows, fileName) {
+async function importProspectsFromData(rows, fileName) {
   if (!rows.length) { showToast('Aucune donnée trouvée'); return; }
   const headers = Object.keys(rows[0]);
 
