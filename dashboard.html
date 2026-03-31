@@ -2345,7 +2345,7 @@ function kbDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
 async function kbDrop(e, colId) {
   e.preventDefault();
   e.currentTarget.classList.remove('drag-over');
-  if (!dragProspId) return;
+  if (!dragProspId || dragProspId === 'null' || dragProspId === 'undefined') return;
   const p = _prospects.find(x => x.id === dragProspId);
   if (p) {
     const oldStatut = p.statut;
@@ -2460,8 +2460,8 @@ function selectProspStatut(val) {
 }
 
 function openProspModal(id, defaultStatut) {
-  editingProspId = id || null;
-  const isEdit = !!id;
+  editingProspId = (id && id !== 'null' && id !== 'undefined') ? id : null;
+  const isEdit = !!editingProspId;
   document.getElementById('prosp-modal-title').textContent  = isEdit ? 'Modifier le prospect' : 'Nouveau prospect';
   document.getElementById('prosp-modal-submit').textContent = isEdit ? 'Enregistrer' : 'Ajouter';
   document.getElementById('prosp-delete-btn').style.display  = isEdit ? 'block' : 'none';
@@ -2513,6 +2513,7 @@ async function saveProspect() {
   try {
     if (editingProspId) {
       const cur = _prospects.find(x => x.id === editingProspId);
+      if (!cur) { showToast('Prospect introuvable'); closeProspModal(); return; }
       const updated = { ...cur, ...fields };
       const idx = _prospects.findIndex(x => x.id === editingProspId);
       if (idx !== -1) _prospects[idx] = updated;
