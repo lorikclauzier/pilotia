@@ -322,6 +322,8 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 .step-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);transition:background 0.2s}
 .step-dot.done{background:var(--blue)}
 
+.rdv-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
 /* ═══ BOTTOM NAV BAR (mobile only) ═══ */
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--dark2);border-top:1px solid var(--border);z-index:500;justify-content:space-around;align-items:center;padding:0 4px}
 .bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--text3);font-size:9px;font-family:'Inter',sans-serif;text-decoration:none;cursor:pointer;border:none;background:none;padding:6px 8px;transition:color 0.15s;-webkit-tap-highlight-color:transparent}
@@ -399,10 +401,15 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
   /* AI */
   .ai-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap}
   .ai-tab{white-space:nowrap;flex-shrink:0;font-size:12px;padding:10px 12px;min-height:44px}
-  .ai-chat-wrap{height:calc(100svh - 220px);min-height:300px}
+  .ai-chat-wrap{height:auto;display:flex;flex-direction:column}
+  .ai-messages{height:calc(100svh - 340px);min-height:220px;flex:none}
+  .ai-input-row{position:sticky;bottom:0;z-index:5;border-radius:0 0 12px 12px}
   .ai-input{font-size:16px;min-height:44px}
   .ai-send{min-height:44px;padding:10px 14px}
   .ai-generate-btn{min-height:44px;width:100%}
+
+  /* RDV form — date/heure en colonne */
+  .rdv-form-grid{grid-template-columns:1fr}
 
   /* MODALS → bottom sheet */
   .modal-overlay{align-items:flex-end}
@@ -505,19 +512,19 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
     </div>
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-label">Contacts</div>
+        <div class="stat-label">Clients actifs</div>
         <div class="stat-val" id="dash-contacts">0</div>
-        <div class="stat-delta">dans votre CRM</div>
+        <div class="stat-delta" id="dash-contacts-delta">dans votre CRM</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Prospects</div>
+        <div class="stat-val" id="dash-prospects">0</div>
+        <div class="stat-delta" id="dash-prospects-delta">dans le pipeline</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Messages envoyés</div>
         <div class="stat-val" id="dash-messages">0</div>
         <div class="stat-delta">au total</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Activités</div>
-        <div class="stat-val" id="dash-activities">0</div>
-        <div class="stat-delta">enregistrées</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Compte</div>
@@ -1108,7 +1115,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
       <label class="form-label">Titre *</label>
       <input class="form-input" id="rdv-titre" placeholder="Ex: RDV découverte, Appel de suivi...">
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="rdv-form-grid">
       <div class="form-group" style="margin-bottom:0">
         <label class="form-label">Contact associé</label>
         <select class="form-select" id="rdv-contact">
@@ -1654,11 +1661,50 @@ function updateDashStats() {
   const prospects = getProspects();
   const msgs = getMessages();
   const acts = getActivity();
+
+  // Contacts this month
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const newThisMonth = contacts.filter(c => {
+    try { return new Date(c.date) >= startOfMonth; } catch(e) { return false; }
+  }).length;
+
+  // Prospects à relancer (date relance <= aujourd'hui)
+  const today = new Date(); today.setHours(23,59,59,999);
+  const toRelance = prospects.filter(p => {
+    if (!p.relance) return false;
+    try { return new Date(p.relance) <= today; } catch(e) { return false; }
+  }).length;
+
   document.getElementById('dash-contacts').textContent = contacts.length;
   document.getElementById('contacts-count').textContent = contacts.length;
+
+  const contactsDelta = document.getElementById('dash-contacts-delta');
+  if (contactsDelta) {
+    if (newThisMonth > 0) {
+      contactsDelta.textContent = '+' + newThisMonth + ' ce mois';
+      contactsDelta.style.color = '#34d399';
+    } else {
+      contactsDelta.textContent = 'dans votre CRM';
+      contactsDelta.style.color = '';
+    }
+  }
+
+  const dashProspects = document.getElementById('dash-prospects');
+  const prospectsDelta = document.getElementById('dash-prospects-delta');
+  if (dashProspects) dashProspects.textContent = prospects.length;
+  if (prospectsDelta) {
+    if (toRelance > 0) {
+      prospectsDelta.textContent = toRelance + ' à relancer';
+      prospectsDelta.style.color = '#34d399';
+    } else {
+      prospectsDelta.textContent = 'dans le pipeline';
+      prospectsDelta.style.color = '';
+    }
+  }
+
   const totalMsgs = Object.values(msgs).reduce((s, arr) => s + arr.filter(m => m.me).length, 0);
   document.getElementById('dash-messages').textContent = totalMsgs;
-  document.getElementById('dash-activities').textContent = acts.length;
 
   // Onboarding : affiché seulement si aucun contact ET aucun prospect
   const isEmpty = contacts.length === 0 && prospects.length === 0;
@@ -3220,6 +3266,10 @@ function closeMobileMsg() {
       Paramètres
     </button>
   </div>
+  <button onclick="closeMobileMore();document.getElementById('logout-btn').click()" style="width:100%;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;color:#f87171;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    Se déconnecter
+  </button>
 </div>
 
 <!-- LOADING OVERLAY — affiché pendant le chargement initial depuis Supabase -->
