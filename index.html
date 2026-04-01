@@ -318,10 +318,10 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
   .hamburger{display:flex}
   /* HERO */
   .hero{padding:80px 16px 40px}
-  h1{font-size:32px}
+  h1{font-size:32px;letter-spacing:-0.5px}
   .hero-sub{font-size:15px;max-width:100%}
   .hero-actions{flex-direction:column;gap:10px;align-items:center;width:100%}
-  .hero-actions .btn-main,.hero-actions .btn-ghost{width:100%;max-width:320px;text-align:center}
+  .hero-actions .btn-main,.hero-actions .btn-ghost{width:100%;max-width:340px;text-align:center;min-height:48px;display:flex;align-items:center;justify-content:center}
   .hero-stats{flex-direction:column;gap:16px;align-items:center}
   /* PREVIEW */
   .preview-section{padding:40px 16px}
@@ -332,12 +332,13 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
   /* DEMO */
   .app-section{padding:40px 16px}
   .app-tabs{overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;gap:6px;-webkit-overflow-scrolling:touch;padding-bottom:4px}
-  .app-tab{white-space:nowrap;flex-shrink:0;font-size:12px;padding:8px 14px}
+  .app-tab{white-space:nowrap;flex-shrink:0;font-size:12px;padding:8px 14px;min-height:44px;display:inline-flex;align-items:center}
   .crm-app,.chat-section-inner,.agenda-section{height:360px}
   .crm-sidebar,.chat-contacts,.ag-cal-col{display:none}
-  .app-frame{border-radius:10px}
-  .kanban-section{height:360px;overflow-x:auto}
-  .kb-grid{grid-template-columns:repeat(3,minmax(180px,1fr));overflow-x:auto}
+  .app-frame{border-radius:10px;overflow:hidden}
+  .kanban-section{height:360px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .kb-grid{display:flex;gap:10px;width:max-content}
+  .kb-col{min-width:180px;flex-shrink:0}
   /* FEATURES */
   .features-section{padding:40px 16px}
   .features-grid{grid-template-columns:1fr}
@@ -347,17 +348,27 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
   .pricing-grid{grid-template-columns:1fr}
   .plan-card.featured{order:-1}
   .plan-card{padding:24px}
+  .plan-cta{min-height:44px}
   /* FAQ */
-  .faq-q{font-size:14px;padding:14px 16px}
+  .faq-q{font-size:14px;padding:14px 16px;min-height:44px;display:flex;align-items:center;justify-content:space-between}
   .faq-a{padding:0 16px 14px;font-size:13px}
-  /* FAQ */
   .faq-section{padding:40px 16px !important}
   /* CTA */
   .cta-section{padding:60px 16px}
-  .cta-title{font-size:28px}
+  .cta-title{font-size:28px;letter-spacing:-0.5px}
+  .cta-sub{font-size:15px}
   /* FOOTER */
   footer{flex-direction:column;text-align:center;padding:20px 16px;gap:14px}
   .footer-links{flex-wrap:wrap;justify-content:center;gap:14px}
+}
+
+@media(max-width:390px){
+  h1{font-size:28px}
+  .hero{padding:72px 14px 36px}
+  .hero-sub{font-size:14px}
+  .btn-main,.btn-ghost{font-size:14px;padding:13px 22px}
+  .hero-stats{gap:12px}
+  .stat-num{font-size:24px}
 }
 </style>
 </head>
