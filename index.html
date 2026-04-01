@@ -336,6 +336,16 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
   .crm-app,.chat-section-inner,.agenda-section{height:360px}
   .crm-sidebar,.chat-contacts,.ag-cal-col{display:none}
   .app-frame{border-radius:10px;overflow:hidden}
+  /* Tableau clients — masquer colonne Contact sur mobile */
+  .crm-content table th:nth-child(2),
+  .crm-content table td:nth-child(2){display:none}
+  /* Réduire padding cellules + taille police pour que tout rentre */
+  .crm-content table th,.crm-content table td{padding:7px 8px;font-size:11px}
+  .crm-content .cell-flex{gap:5px}
+  .crm-content .av{width:22px;height:22px;font-size:9px;flex-shrink:0}
+  /* Topbar boutons réduits */
+  .crm-topbar{padding:10px 12px}
+  .btn-sm{padding:5px 8px;font-size:10px}
   .kanban-section{height:360px;overflow-x:auto;-webkit-overflow-scrolling:touch}
   .kb-grid{display:flex;gap:10px;width:max-content}
   .kb-col{min-width:180px;flex-shrink:0}
