@@ -454,7 +454,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 <!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-logo">pylot<span>IA</span></div>
-  <div class="plan-badge plan-free" id="plan-badge-sidebar" style="margin:0 10px 16px;cursor:pointer;transition:opacity 0.2s" onclick="openUpgradeModal()" onmouseover="this.style.opacity='0.75'" onmouseout="this.style.opacity='1'" title="Changer de plan">● Free</div>
+  <div class="plan-badge plan-free" id="plan-badge-sidebar" style="margin:0 10px 16px">● Free</div>
 
   <button class="nav-item active" id="nav-dashboard" onclick="showSection('dashboard')">
     <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -663,7 +663,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
     <!-- TAB: KANBAN -->
     <div id="prosp-tab-kanban">
       <div id="free-prospect-warning" style="display:none;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#fbbf24;align-items:center;gap:10px">
-        ⚠️ Plan Free : limité à 20 prospects. <a href="#" onclick="event.preventDefault();openUpgradeModal()" style="color:#fbbf24;text-decoration:underline;margin-left:4px">Passer au Starter →</a>
+        ⚠️ Plan Free : limité à 20 prospects. Les plans Starter et Pro arrivent prochainement.
       </div>
       <div class="kanban-board" id="kanban-board"></div>
     </div>
@@ -674,7 +674,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
         <div class="lock-icon">🔒</div>
         <div class="lock-title">Statistiques — Plan Starter requis</div>
         <div class="lock-sub">Visualisez votre taux de conversion, vos sources et relances urgentes.</div>
-        <button class="btn btn-blue" onclick="openUpgradeModal()" style="margin-top:8px">Voir les offres →</button>
+        <div style="display:inline-block;background:rgba(74,90,120,0.15);color:#4a5a78;border:1px solid rgba(74,90,120,0.25);border-radius:8px;padding:8px 16px;font-size:13px;font-family:'Inter',sans-serif;margin-top:8px;cursor:default">Disponible prochainement</div>
       </div>
       <div id="prosp-stats-wrap">
         <div class="prosp-stats" id="prosp-stats-cards"></div>
@@ -700,7 +700,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
         <div class="lock-icon">🔒</div>
         <div class="lock-title">Import prospects — Plan Starter requis</div>
         <div class="lock-sub">Importez vos prospects en masse depuis Excel ou CSV.</div>
-        <button class="btn btn-blue" onclick="openUpgradeModal()" style="margin-top:8px">Voir les offres →</button>
+        <div style="display:inline-block;background:rgba(74,90,120,0.15);color:#4a5a78;border:1px solid rgba(74,90,120,0.25);border-radius:8px;padding:8px 16px;font-size:13px;font-family:'Inter',sans-serif;margin-top:8px;cursor:default">Disponible prochainement</div>
       </div>
       <div id="prosp-import-wrap" style="max-width:600px">
         <p style="font-size:13px;color:var(--text2);margin-bottom:20px">Importez vos prospects depuis un fichier CSV ou Excel. Les colonnes <strong>Nom, Entreprise, Email, Téléphone</strong> sont reconnues automatiquement.</p>
@@ -925,7 +925,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
         <div style="background:var(--dark3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--text2)">💬 "Quel est mon CA potentiel ce mois ?"</div>
         <div style="background:var(--dark3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--text2)">💬 "Génère un résumé de mon activité"</div>
       </div>
-      <button class="btn btn-blue" style="font-size:14px;padding:12px 32px" onclick="openUpgradeModal()">Passer à Pro — 30 jours gratuits</button>
+      <div style="display:inline-block;background:rgba(74,90,120,0.15);color:#4a5a78;border:1px solid rgba(74,90,120,0.25);border-radius:8px;padding:12px 32px;font-size:14px;font-family:'Inter',sans-serif;cursor:default">Disponible prochainement</div>
     </div>
 
     <!-- Contenu IA (Pro uniquement) -->
@@ -1177,9 +1177,9 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
           ✓ Import Excel/CSV illimité<br>
           ✓ Pipeline prospection complet<br>
           ✓ Alertes relances automatiques<br>
-          ✓ 30 jours d'essai offerts
+          ✓ 14 jours d'essai offerts
         </div>
-        <button class="btn btn-blue" style="width:100%;margin-top:16px" onclick="activatePlan('starter')">Activer Starter</button>
+        <div style="width:100%;margin-top:16px;background:rgba(74,90,120,0.15);color:#4a5a78;border:1px solid rgba(74,90,120,0.25);border-radius:8px;padding:9px;font-size:13px;font-family:'Inter',sans-serif;text-align:center;cursor:default">Prochainement</div>
       </div>
       <div style="background:var(--dark3);border:1px solid rgba(245,158,11,0.3);border-radius:12px;padding:20px">
         <div style="font-size:11px;color:#fbbf24;font-weight:700;letter-spacing:1px;margin-bottom:10px">PRO ★</div>
@@ -1190,9 +1190,9 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
           ✓ Rapports hebdomadaires automatiques<br>
           ✓ Analyse prospects et CA potentiel<br>
           ✓ Onboarding personnalisé inclus<br>
-          ✓ 30 jours d'essai offerts
+          ✓ 14 jours d'essai offerts
         </div>
-        <button class="btn" style="width:100%;margin-top:16px;background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:9px;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif" onclick="activatePlan('pro')">Activer Pro</button>
+        <div style="width:100%;margin-top:16px;background:rgba(74,90,120,0.15);color:#4a5a78;border:1px solid rgba(74,90,120,0.25);border-radius:8px;padding:9px;font-size:13px;font-family:'Inter',sans-serif;text-align:center;cursor:default">Prochainement</div>
       </div>
     </div>
     <div style="text-align:center">
@@ -2672,6 +2672,9 @@ function openUpgradeModal()  { document.getElementById('modal-upgrade').classLis
 function closeUpgradeModal() { document.getElementById('modal-upgrade').classList.remove('open'); }
 
 async function activatePlan(plan) {
+  if (plan === 'starter' || plan === 'pro') {
+    showToast('Plans payants disponibles prochainement'); return;
+  }
   const labels = { free: 'Free', starter: 'Starter', pro: 'Pro' };
   try {
     await dbSetPlan(plan); // écrit en Supabase ET met à jour _plan
