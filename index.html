@@ -544,12 +544,12 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
     <!-- AGENDA -->
     <div id="tab-agenda" class="agenda-section" style="display:none">
       <div class="ag-cal-col">
-        <div class="ag-cal-hd"><div class="ag-nav">‹</div><div class="ag-month">Mars 2026</div><div class="ag-nav">›</div></div>
+        <div class="ag-cal-hd"><div class="ag-nav">‹</div><div class="ag-month" id="ag-month-label"></div><div class="ag-nav">›</div></div>
         <div class="cal-grid-hd"><div class="cgh">L</div><div class="cgh">M</div><div class="cgh">M</div><div class="cgh">J</div><div class="cgh">V</div><div class="cgh">S</div><div class="cgh">D</div></div>
         <div class="cal-grid" id="cal2"></div>
       </div>
       <div class="ag-main">
-        <div class="ag-day-title">Lundi 23 mars — Aujourd'hui</div>
+        <div class="ag-day-title" id="ag-day-title"></div>
         <div class="rdv-card"><div class="rdv-time">09h00</div><div class="rdv-bar" style="background:#3b82f6"></div><div class="rdv-info"><div class="rdv-name">Boulangerie Lenoir</div><div class="rdv-type">Présentation offre Starter</div></div><div class="rdv-dot" style="background:#3b82f6"></div></div>
         <div class="rdv-card"><div class="rdv-time">14h30</div><div class="rdv-bar" style="background:#10b981"></div><div class="rdv-info"><div class="rdv-name">Cabinet Perrin</div><div class="rdv-type">Suivi démo chatbot IA</div></div><div class="rdv-dot" style="background:#10b981"></div></div>
         <div class="rdv-card" style="border:1px dashed rgba(255,255,255,0.08);background:transparent;cursor:pointer" onclick="window.location.href='signup.html'"><div class="rdv-time" style="color:#4a5a78">+</div><div class="rdv-bar" style="background:rgba(255,255,255,0.06)"></div><div class="rdv-info"><div class="rdv-name" style="color:#4a5a78;font-weight:400">Nouveau rendez-vous</div></div><button class="btn-sm btn-sm-blue" onclick="window.location.href='signup.html'">Planifier</button></div>
@@ -820,14 +820,26 @@ function showTab(name, btn) {
   if(btn) btn.classList.add('active');
 }
 
+const _MOIS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const _JOURS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+const _today = new Date();
+const _td = _today.getDate(), _tm = _today.getMonth(), _ty = _today.getFullYear();
+
+const agMonthLabel = document.getElementById('ag-month-label');
+if(agMonthLabel) agMonthLabel.textContent = _MOIS[_tm] + ' ' + _ty;
+
+const agDayTitle = document.getElementById('ag-day-title');
+if(agDayTitle) agDayTitle.textContent = _JOURS[_today.getDay()] + ' ' + _td + ' ' + _MOIS[_tm].toLowerCase() + ' — Aujourd\'hui';
+
 const cal2 = document.getElementById('cal2');
 if(cal2){
-  [0,1].forEach(()=>{const d=document.createElement('div');d.className='cd empty';d.textContent='.';cal2.appendChild(d)});
-  [5,10,14,18,23,25].forEach(()=>{});
-  const evDays=[5,10,14,18,23,25];
-  for(let i=1;i<=31;i++){
+  const firstDayMon = (new Date(_ty, _tm, 1).getDay() + 6) % 7;
+  const daysInMonth = new Date(_ty, _tm + 1, 0).getDate();
+  const evDays = [_td-3, _td-1, _td, _td+2, _td+5].filter(d => d>=1 && d<=daysInMonth);
+  for(let i=0;i<firstDayMon;i++){const d=document.createElement('div');d.className='cd empty';d.textContent='.';cal2.appendChild(d);}
+  for(let i=1;i<=daysInMonth;i++){
     const d=document.createElement('div');
-    d.className='cd'+(i===23?' today':'')+(evDays.includes(i)?' has-ev':'');
+    d.className='cd'+(i===_td?' today':'')+(evDays.includes(i)?' has-ev':'');
     d.textContent=i;
     cal2.appendChild(d);
   }
