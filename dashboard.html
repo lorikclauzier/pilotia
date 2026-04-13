@@ -2276,6 +2276,9 @@ async function doImport() {
   const colMap     = detectColumns(headers);
   const keepBase   = mode === 'replace' ? [] : _contacts;
   const existEmails = new Set(keepBase.map(c => (c.email||'').toLowerCase()).filter(Boolean));
+  // Déduplication des contacts sans email : par nom normalisé
+  const normName = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  const existNames = new Set(keepBase.filter(c => !c.email).map(c => normName(c.nom)));
 
   const toInsert = [];
   let skipped = 0;
@@ -2288,6 +2291,12 @@ async function doImport() {
     if (!nom) return;
     const email = (r[colMap['Email']] || '').trim();
     if (email && existEmails.has(email.toLowerCase())) { skipped++; return; }
+    // Sans email : déduplique par nom normalisé
+    if (!email) {
+      const nn = normName(nom);
+      if (existNames.has(nn)) { skipped++; return; }
+      existNames.add(nn);
+    }
     toInsert.push({
       user_id:    currentUser.id,
       nom,
