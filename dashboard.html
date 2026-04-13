@@ -1820,7 +1820,7 @@ async function loadContactDocuments(contactId) {
   const list = document.getElementById('drawer-docs-list');
   if (!list) return;
   list.innerHTML = '<div style="font-size:13px;color:var(--text2);padding:8px 0">Chargement...</div>';
-  const { data, error } = await _sb.from('contact_documents')
+  const { data, error } = await supabaseClient.from('contact_documents')
     .select('*').eq('contact_id', contactId).order('created_at', { ascending: false });
   if (error || !data || data.length === 0) {
     list.innerHTML = '<div style="font-size:13px;color:var(--text2);padding:8px 0">Aucun document joint</div>';
@@ -1845,10 +1845,10 @@ async function uploadContactDocument(input) {
   showToast('Upload en cours...');
   const ext = file.name.split('.').pop();
   const path = `${currentUser.id}/${currentDrawerContactId}/${Date.now()}.${ext}`;
-  const { error: upErr } = await _sb.storage.from('contact-documents').upload(path, file, { upsert: false });
+  const { error: upErr } = await supabaseClient.storage.from('contact-documents').upload(path, file, { upsert: false });
   if (upErr) { showToast('Erreur upload : ' + upErr.message); input.value=''; return; }
-  const { data: urlData } = _sb.storage.from('contact-documents').getPublicUrl(path);
-  const { error: dbErr } = await _sb.from('contact_documents').insert({
+  const { data: urlData } = supabaseClient.storage.from('contact-documents').getPublicUrl(path);
+  const { error: dbErr } = await supabaseClient.from('contact_documents').insert({
     contact_id: currentDrawerContactId,
     user_id: currentUser.id,
     nom_fichier: file.name,
@@ -1864,9 +1864,9 @@ async function uploadContactDocument(input) {
 
 async function deleteContactDocument(docId, contactId) {
   if (!confirm('Supprimer ce document ?')) return;
-  const { data } = await _sb.from('contact_documents').select('chemin').eq('id', docId).single();
-  if (data?.chemin) await _sb.storage.from('contact-documents').remove([data.chemin]);
-  await _sb.from('contact_documents').delete().eq('id', docId);
+  const { data } = await supabaseClient.from('contact_documents').select('chemin').eq('id', docId).single();
+  if (data?.chemin) await supabaseClient.storage.from('contact-documents').remove([data.chemin]);
+  await supabaseClient.from('contact_documents').delete().eq('id', docId);
   showToast('Document supprimé');
   loadContactDocuments(contactId);
 }
