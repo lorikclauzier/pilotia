@@ -2206,25 +2206,66 @@ function parseXLSX(buffer, filename) {
 function showPreview(filename, headers, rows) {
   document.getElementById('preview-filename').textContent = filename;
   document.getElementById('preview-info').textContent = rows.length + ' lignes détectées';
-  // Mapping auto des colonnes
   const colMap = detectColumns(headers);
   const table = document.getElementById('preview-table');
   const displayCols = ['Nom','Entreprise','Email','Téléphone','Statut'];
+  // Helper : assemble Prénom + Nom quand colonnes séparées
+  const getFullNom = r => {
+    const prenom = (colMap['_Prénom'] && colMap['_Prénom'] !== colMap['Nom']) ? (r[colMap['_Prénom']]||'').trim() : '';
+    const nom    = (r[colMap['Nom']]||'').trim();
+    if (prenom && nom)  return prenom + ' ' + nom;
+    return prenom || nom || '—';
+  };
   table.innerHTML = `<thead><tr>${displayCols.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
-  <tbody>${rows.slice(0,8).map(r=>`<tr>${displayCols.map(c=>`<td>${r[colMap[c]]||'—'}</td>`).join('')}</tr>`).join('')}
+  <tbody>${rows.slice(0,8).map(r=>`<tr>
+    <td>${getFullNom(r)}</td>
+    <td>${r[colMap['Entreprise']]||'—'}</td>
+    <td>${r[colMap['Email']]||'—'}</td>
+    <td>${r[colMap['Téléphone']]||'—'}</td>
+    <td>${r[colMap['Statut']]||'—'}</td>
+  </tr>`).join('')}
   ${rows.length > 8 ? `<tr><td colspan="5" style="color:var(--text3);text-align:center">... et ${rows.length-8} autres lignes</td></tr>` : ''}</tbody>`;
   document.getElementById('drop-zone').style.display = 'none';
   document.getElementById('import-preview-zone').style.display = 'block';
 }
 
 function detectColumns(headers) {
+  const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  const normH = headers.map(norm);
   const map = {};
-  const find = (keys) => headers.find(h => keys.some(k => h.toLowerCase().includes(k))) || '';
-  map['Nom'] = find(['nom','name','prénom','prenom','contact']);
-  map['Entreprise'] = find(['entreprise','company','société','societe','org']);
-  map['Email'] = find(['email','mail','courriel']);
-  map['Téléphone'] = find(['tel','téléphone','telephone','phone','mobile','portable']);
-  map['Statut'] = find(['statut','status','état','etat']);
+
+  // 3-pass smart matcher: exact match > startsWith > includes
+  const findSmart = (keys, excludeIdx = -1) => {
+    for (const pass of ['exact','starts','includes']) {
+      for (let i = 0; i < normH.length; i++) {
+        if (i === excludeIdx) continue;
+        const h = normH[i];
+        for (const k of keys) {
+          if (pass === 'exact'    && h === k)          return { col: headers[i], idx: i };
+          if (pass === 'starts'   && h.startsWith(k))  return { col: headers[i], idx: i };
+          if (pass === 'includes' && h.includes(k))    return { col: headers[i], idx: i };
+        }
+      }
+    }
+    return { col: '', idx: -1 };
+  };
+
+  // Détecte Prénom EN PREMIER pour l'exclure du matching Nom
+  const pRes = findSmart(['prenom','firstname','first name','given name','prenom usuel']);
+  map['_Prénom'] = pRes.col; // clé interne
+
+  // Nom : préfère les formes composées, exclut la colonne Prénom
+  const nRes = findSmart(
+    ['nom complet','full name','nom & prenom','nom &','interlocuteur','nom','name','contact'],
+    pRes.idx
+  );
+  map['Nom'] = nRes.col || pRes.col; // fallback: utilise Prénom si pas de Nom séparé
+
+  map['Entreprise'] = findSmart(['raison sociale','entreprise','societe','organisation','company','org']).col;
+  map['Email']      = findSmart(['adresse electronique','email professionnel','email','mail','courriel']).col;
+  map['Téléphone']  = findSmart(['tel portable','mobile','portable','tel','telephone','phone']).col;
+  map['Statut']     = findSmart(['statut client','statut','status','etat']).col;
+
   return map;
 }
 
@@ -2240,7 +2281,10 @@ async function doImport() {
   let skipped = 0;
 
   importedRows.forEach(r => {
-    const nom   = (r[colMap['Nom']] || '').trim();
+    // Assemble Prénom + Nom si colonnes séparées
+    const prenom = (colMap['_Prénom'] && colMap['_Prénom'] !== colMap['Nom']) ? (r[colMap['_Prénom']]||'').trim() : '';
+    const nomRaw = (r[colMap['Nom']]||'').trim();
+    const nom    = (prenom && nomRaw) ? prenom + ' ' + nomRaw : (prenom || nomRaw);
     if (!nom) return;
     const email = (r[colMap['Email']] || '').trim();
     if (email && existEmails.has(email.toLowerCase())) { skipped++; return; }
