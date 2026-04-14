@@ -185,7 +185,8 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 .pv-row:hover{background:rgba(255,255,255,0.02)}
 .pv-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
 .pv-info{flex:1;min-width:0}
-.pv-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.pv-name:hover{color:#93c5fd;text-decoration:underline}
 .pv-sub{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
 .pv-actions{display:flex;gap:6px;flex-shrink:0}
 .pv-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all 0.15s;color:var(--text2)}
@@ -562,11 +563,11 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
   </button>
   <button class="nav-item" id="nav-messages" onclick="showSection('messages')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-    Relances
+    Campagnes
   </button>
   <button class="nav-item" id="nav-prospection" onclick="showSection('prospection')">
     <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-    Prospection
+    Relances
   </button>
   <button class="nav-item" id="nav-assistant" onclick="showSection('assistant')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09z"/><path d="M18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/></svg>
@@ -731,7 +732,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
   <div class="section" id="section-messages">
     <div class="page-header">
       <div>
-        <div class="page-title">Relances &amp; Campagnes</div>
+        <div class="page-title">Campagnes</div>
         <div class="page-sub">Organisez vos séquences de relance par campagne</div>
       </div>
       <button class="btn btn-blue" onclick="openNewCampaignModal()">+ Nouvelle campagne</button>
@@ -782,7 +783,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
   <div class="section" id="section-prospection">
     <div class="page-header">
       <div>
-        <div class="page-title">Prospection</div>
+        <div class="page-title">Relances</div>
         <div class="page-sub">Gérez votre pipeline commercial</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
@@ -2321,7 +2322,7 @@ function renderCampaignContacts() {
     <div class="campaign-contact-row">
       <div class="contact-avatar" style="width:36px;height:36px;font-size:13px;flex-shrink:0">${initials}</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:600;color:var(--text1)">${contact.nom}</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text1);cursor:pointer" onclick="openContactDrawer('${contact.id}')" onmouseover="this.style.color='#93c5fd'" onmouseout="this.style.color='var(--text1)'">${contact.nom}</div>
         <div style="font-size:11px;color:var(--text3)">${contact.entreprise||contact.email||'—'}</div>
       </div>
       <select onchange="updateCampaignContactStatus('${item.id}',this.value)"
@@ -3962,7 +3963,7 @@ function renderPostVente() {
     <div class="pv-row">
       <div class="pv-avatar" style="background:${col}">${ini}</div>
       <div class="pv-info">
-        <div class="pv-name">${c.nom}</div>
+        <div class="pv-name" onclick="openContactDrawer('${c.id}')">${c.nom}</div>
         ${sub ? `<div class="pv-sub">${sub}</div>` : ''}
       </div>
       ${badges}
@@ -3989,7 +3990,7 @@ function renderPostVente() {
   };
 
   const bloc3 = inCamp.length === 0
-    ? `<div class="pv-empty">Aucun contact assigné à une campagne.<br>Allez dans <a href="#" onclick="event.preventDefault();showSection('messages')" style="color:var(--blue);text-decoration:none">Relances</a> pour assigner des contacts.</div>`
+    ? `<div class="pv-empty">Aucun contact assigné à une campagne.<br>Allez dans <a href="#" onclick="event.preventDefault();showSection('messages')" style="color:var(--blue);text-decoration:none">Campagnes</a> pour assigner des contacts.</div>`
     : `<div class="pv-table">${inCamp.map(item => {
         const c   = item.contact;
         const col = avatarColor(c.nom || '?');
@@ -3999,7 +4000,7 @@ function renderPostVente() {
         <div class="pv-row">
           <div class="pv-avatar" style="background:${col}">${ini}</div>
           <div class="pv-info">
-            <div class="pv-name">${c.nom}</div>
+            <div class="pv-name" onclick="openContactDrawer('${c.id}')">${c.nom}</div>
             ${sub ? `<div class="pv-sub">${sub}</div>` : ''}
           </div>
           ${statutTag(item.statut)}
