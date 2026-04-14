@@ -137,6 +137,28 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 /* TOAST */
 #toast{display:none;position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid rgba(255,255,255,0.12);color:#f0f4ff;padding:10px 20px;border-radius:10px;font-size:13px;z-index:9999;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.4)}
 
+/* RECHERCHE GLOBALE */
+.gsearch-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(6px);z-index:9000;display:flex;align-items:flex-start;justify-content:center;padding-top:80px}
+.gsearch-box{background:var(--dark2);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:600px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.6)}
+.gsearch-input-wrap{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border)}
+.gsearch-input{background:none;border:none;outline:none;font-size:15px;color:var(--text);font-family:'Inter',sans-serif;flex:1}
+.gsearch-input::placeholder{color:var(--text3)}
+.gsearch-kbd{font-size:11px;color:var(--text3);background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:5px;padding:2px 7px;white-space:nowrap;cursor:pointer}
+.gsearch-results{max-height:400px;overflow-y:auto}
+.gsearch-section-title{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;padding:10px 20px 4px}
+.gsearch-item{display:flex;align-items:center;gap:12px;padding:10px 20px;cursor:pointer;transition:background 0.1s}
+.gsearch-item:hover,.gsearch-item.focused{background:rgba(59,130,246,0.08)}
+.gsearch-avatar{width:32px;height:32px;border-radius:50%;background:rgba(59,130,246,0.15);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#93c5fd;flex-shrink:0}
+.gsearch-item-info{flex:1;min-width:0}
+.gsearch-item-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gsearch-item-sub{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gsearch-item-tag{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500;flex-shrink:0}
+.gsearch-empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:13px}
+.gsearch-footer{padding:10px 20px;border-top:1px solid var(--border);display:flex;gap:20px;font-size:11px;color:var(--text3)}
+
+/* SEARCH BTN SIDEBAR */
+.nav-search{background:rgba(255,255,255,0.03)!important;border:1px solid var(--border)!important;margin-bottom:12px}
+
 /* CONTACT DRAWER */
 .contact-drawer{position:fixed;top:0;right:-500px;width:480px;max-width:100vw;height:100vh;background:var(--dark2);border-left:1px solid var(--border2);z-index:900;transition:right 0.3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden}
 .contact-drawer.open{right:0;box-shadow:-8px 0 40px rgba(0,0,0,0.5)}
@@ -465,6 +487,12 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
   <div class="sidebar-logo">pylot<span>IA</span></div>
   <div class="plan-badge plan-free" id="plan-badge-sidebar" style="margin:0 10px 16px">● Free</div>
 
+  <button class="nav-item nav-search" onclick="openGlobalSearch()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    Recherche
+    <span style="margin-left:auto;font-size:10px;background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:4px;padding:1px 6px;color:var(--text3);font-family:monospace">⌘K</span>
+  </button>
+
   <button class="nav-item active" id="nav-dashboard" onclick="showSection('dashboard')">
     <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     Dashboard
@@ -640,6 +668,9 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 
     <!-- Vue liste campagnes -->
     <div id="campaigns-view">
+      <div class="search-bar" style="margin-bottom:16px" id="campaigns-search-bar">
+        <input class="search-input" id="search-campaigns" placeholder="Rechercher une campagne..." oninput="renderCampaigns()">
+      </div>
       <div id="campaigns-empty" style="display:none" class="campaign-empty">
         <div style="font-size:40px;margin-bottom:12px">📣</div>
         <div style="font-size:16px;font-weight:600;color:var(--text2);margin-bottom:6px">Aucune campagne pour l'instant</div>
@@ -699,6 +730,9 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 
     <!-- TAB: KANBAN -->
     <div id="prosp-tab-kanban">
+      <div class="search-bar" style="margin-bottom:16px">
+        <input class="search-input" id="search-prospects" placeholder="Rechercher un prospect (nom, entreprise, email)..." oninput="renderKanban()">
+      </div>
       <div id="free-prospect-warning" style="display:none;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#fbbf24;align-items:center;gap:10px">
         ⚠️ Plan Free : limité à 20 prospects. Les plans Starter et Pro arrivent prochainement.
       </div>
@@ -1045,6 +1079,25 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
   </div>
 
 </main>
+
+<!-- RECHERCHE GLOBALE -->
+<div id="gsearch-overlay" style="display:none" class="gsearch-overlay" onclick="if(event.target===this)closeGlobalSearch()">
+  <div class="gsearch-box">
+    <div class="gsearch-input-wrap">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="gsearch-input" id="gsearch-input" placeholder="Rechercher contacts, prospects, campagnes..." oninput="renderGlobalSearch(this.value)" onkeydown="handleGsearchKey(event)" autocomplete="off">
+      <span class="gsearch-kbd" onclick="closeGlobalSearch()">Échap</span>
+    </div>
+    <div class="gsearch-results" id="gsearch-results">
+      <div class="gsearch-empty">Tapez pour rechercher dans tout le CRM…</div>
+    </div>
+    <div class="gsearch-footer">
+      <span>↑↓ naviguer</span>
+      <span>↵ ouvrir</span>
+      <span>Échap fermer</span>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL CONTACT -->
 <div class="modal-overlay" id="modal">
@@ -2080,13 +2133,18 @@ function renderCampaigns() {
   const grid = document.getElementById('campaigns-grid');
   const empty = document.getElementById('campaigns-empty');
   if (!grid) return;
-  if (!_campaigns.length) {
-    if (empty) empty.style.display = 'block';
-    grid.innerHTML = '';
+  const search = (document.getElementById('search-campaigns')?.value || '').toLowerCase().trim();
+  const toShow = search ? _campaigns.filter(c =>
+    c.nom.toLowerCase().includes(search) ||
+    (c.description||'').toLowerCase().includes(search)
+  ) : _campaigns;
+  if (!toShow.length) {
+    if (empty) empty.style.display = search ? 'none' : 'block';
+    grid.innerHTML = search ? `<div style="text-align:center;padding:48px 20px;color:var(--text3);font-size:13px">🔍 Aucune campagne pour "<strong>${search}</strong>"</div>` : '';
     return;
   }
   if (empty) empty.style.display = 'none';
-  grid.innerHTML = _campaigns.map(c => {
+  grid.innerHTML = toShow.map(c => {
     const cc = _campaignContacts[c.id] || [];
     const total = cc.length;
     const aRelancer = cc.filter(x => x.statut === 'à relancer').length;
@@ -2950,8 +3008,14 @@ function renderKanban() {
   const plan = getPlan();
   const board = document.getElementById('kanban-board');
   if (!board) return;
+  const search = (document.getElementById('search-prospects')?.value || '').toLowerCase().trim();
+  const filtered = search ? prospects.filter(p =>
+    p.nom.toLowerCase().includes(search) ||
+    (p.entreprise||'').toLowerCase().includes(search) ||
+    (p.email||'').toLowerCase().includes(search)
+  ) : prospects;
   board.innerHTML = KB_COLS.map(col => {
-    const cards = prospects.filter(p => p.statut === col.id);
+    const cards = filtered.filter(p => p.statut === col.id);
     return `<div class="kb-col" id="kbc-${col.id}"
       ondragover="kbDragOver(event,'${col.id}')"
       ondrop="kbDrop(event,'${col.id}')"
@@ -3785,6 +3849,155 @@ openConversation = function(id) {
 function closeMobileMsg() {
   document.getElementById('msg-main').classList.remove('mobile-open');
 }
+
+// ─── RECHERCHE GLOBALE ─────────────────────────────────
+let _gsearchFocusIdx = -1;
+
+function openGlobalSearch() {
+  document.getElementById('gsearch-overlay').style.display = 'flex';
+  _gsearchFocusIdx = -1;
+  setTimeout(() => {
+    const inp = document.getElementById('gsearch-input');
+    inp.value = '';
+    inp.focus();
+    renderGlobalSearch('');
+  }, 30);
+}
+
+function closeGlobalSearch() {
+  document.getElementById('gsearch-overlay').style.display = 'none';
+  document.getElementById('gsearch-input').value = '';
+  _gsearchFocusIdx = -1;
+}
+
+function renderGlobalSearch(query) {
+  const q = query.toLowerCase().trim();
+  const results = document.getElementById('gsearch-results');
+  if (!q) {
+    results.innerHTML = '<div class="gsearch-empty">Tapez pour rechercher dans tout le CRM…</div>';
+    return;
+  }
+  const contacts  = (_contacts||[]).filter(c =>
+    c.nom.toLowerCase().includes(q) ||
+    (c.entreprise||'').toLowerCase().includes(q) ||
+    (c.email||'').toLowerCase().includes(q)
+  ).slice(0,5);
+  const prospects = (_prospects||[]).filter(p =>
+    p.nom.toLowerCase().includes(q) ||
+    (p.entreprise||'').toLowerCase().includes(q) ||
+    (p.email||'').toLowerCase().includes(q)
+  ).slice(0,5);
+  const campaigns = (_campaigns||[]).filter(c =>
+    c.nom.toLowerCase().includes(q) ||
+    (c.description||'').toLowerCase().includes(q)
+  ).slice(0,3);
+
+  if (!contacts.length && !prospects.length && !campaigns.length) {
+    results.innerHTML = `<div class="gsearch-empty">Aucun résultat pour "<strong>${query}</strong>"</div>`;
+    return;
+  }
+
+  const KB_COLOR = {
+    'nouveau':'#60a5fa','contacté':'#a78bfa','rdv fixé':'#34d399',
+    'proposition':'#fbbf24','négociation':'#fb923c','gagné':'#4ade80','perdu':'#f87171'
+  };
+
+  let html = '';
+
+  if (contacts.length) {
+    html += `<div><div class="gsearch-section-title">Contacts (${contacts.length})</div>`;
+    contacts.forEach(c => {
+      const ini = c.nom.split(' ').map(w=>w[0]||'').join('').substring(0,2).toUpperCase();
+      html += `<div class="gsearch-item" data-action="contact" data-id="${c.id}">
+        <div class="gsearch-avatar">${ini}</div>
+        <div class="gsearch-item-info">
+          <div class="gsearch-item-name">${c.nom}</div>
+          <div class="gsearch-item-sub">${c.entreprise||c.email||'—'}</div>
+        </div>
+        <span class="gsearch-item-tag" style="background:rgba(59,130,246,0.12);color:#93c5fd">${c.statut||'Contact'}</span>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  if (prospects.length) {
+    html += `<div><div class="gsearch-section-title">Prospects (${prospects.length})</div>`;
+    prospects.forEach(p => {
+      const ini = p.nom.split(' ').map(w=>w[0]||'').join('').substring(0,2).toUpperCase();
+      const col = KB_COLOR[p.statut]||'#8899bb';
+      html += `<div class="gsearch-item" data-action="prospect" data-id="${p.id}">
+        <div class="gsearch-avatar" style="background:${col}20;color:${col}">${ini}</div>
+        <div class="gsearch-item-info">
+          <div class="gsearch-item-name">${p.nom}</div>
+          <div class="gsearch-item-sub">${p.entreprise||'—'}${p.valeur?' · '+Number(p.valeur).toLocaleString('fr-FR')+'€':''}</div>
+        </div>
+        <span class="gsearch-item-tag" style="background:${col}20;color:${col}">${p.statut}</span>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  if (campaigns.length) {
+    html += `<div><div class="gsearch-section-title">Campagnes (${campaigns.length})</div>`;
+    campaigns.forEach(c => {
+      const isActive = c.statut === 'active';
+      const col = isActive ? '#4ade80' : '#9ca3af';
+      html += `<div class="gsearch-item" data-action="campaign" data-id="${c.id}">
+        <div class="gsearch-avatar" style="background:${col}20;color:${col}">📣</div>
+        <div class="gsearch-item-info">
+          <div class="gsearch-item-name">${c.nom}</div>
+          <div class="gsearch-item-sub">${(_campaignContacts[c.id]||[]).length} contact(s)</div>
+        </div>
+        <span class="gsearch-item-tag" style="background:${col}20;color:${col}">${isActive?'Active':'Archivée'}</span>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  results.innerHTML = html;
+  _gsearchFocusIdx = -1;
+  // Ajouter les listeners de clic
+  results.querySelectorAll('.gsearch-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const action = el.dataset.action;
+      const id = el.dataset.id;
+      closeGlobalSearch();
+      if (action === 'contact') { showSection('contacts'); setTimeout(()=>openContactDrawer(id),120); }
+      else if (action === 'prospect') { showSection('prospection'); setTimeout(()=>openProspModal(id),120); }
+      else if (action === 'campaign') { showSection('messages'); setTimeout(()=>openCampaignDetail(id),120); }
+    });
+  });
+}
+
+function handleGsearchKey(e) {
+  if (e.key === 'Escape') { closeGlobalSearch(); return; }
+  const items = document.querySelectorAll('#gsearch-results .gsearch-item');
+  if (!items.length) return;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    _gsearchFocusIdx = Math.min(_gsearchFocusIdx + 1, items.length - 1);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    _gsearchFocusIdx = Math.max(_gsearchFocusIdx - 1, 0);
+  } else if (e.key === 'Enter' && _gsearchFocusIdx >= 0) {
+    e.preventDefault();
+    items[_gsearchFocusIdx].click();
+    return;
+  } else { return; }
+  items.forEach((el, i) => el.classList.toggle('focused', i === _gsearchFocusIdx));
+  if (_gsearchFocusIdx >= 0) items[_gsearchFocusIdx].scrollIntoView({ block:'nearest' });
+}
+
+// Raccourci clavier ⌘K / Ctrl+K
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    openGlobalSearch();
+  } else if (e.key === 'Escape') {
+    const ov = document.getElementById('gsearch-overlay');
+    if (ov && ov.style.display !== 'none') closeGlobalSearch();
+  }
+});
 </script>
 
 <!-- BOTTOM NAV BAR -->
