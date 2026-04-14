@@ -3838,16 +3838,8 @@ showSection = function(name) {
   updateBottomNav(name);
 };
 
-// Mobile messages: open/close conversation
-const _origOpenConv = openConversation;
-openConversation = function(id) {
-  _origOpenConv(id);
-  if (window.innerWidth <= 768) {
-    document.getElementById('msg-main').classList.add('mobile-open');
-  }
-};
 function closeMobileMsg() {
-  document.getElementById('msg-main').classList.remove('mobile-open');
+  // kept for mobile nav compatibility
 }
 
 // ─── RECHERCHE GLOBALE ─────────────────────────────────
