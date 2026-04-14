@@ -3952,7 +3952,6 @@ function renderPostVente() {
       ${tel   ? `<button class="pv-btn" title="Appeler ${tel}" onclick="window.location='tel:${tel}'">📞</button>` : ''}
       ${email ? `<button class="pv-btn" title="Envoyer un email" onclick="window.location='mailto:${email}'">✉️</button>` : ''}
       <button class="pv-btn" title="Planifier un RDV" onclick="showSection('agenda');setTimeout(()=>document.getElementById('btn-new-rdv')?.click(),150)">📅</button>
-      <button class="pv-btn pv-btn-camp" title="Assigner à une campagne" onclick="showSection('contacts');setTimeout(()=>openContactDrawer('${c.id}'),150)">📣</button>
       ${extra}`;
   }
   function pvRow(c, badges='', extra='') {
