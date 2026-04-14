@@ -176,6 +176,30 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 .perf-divider{height:1px;background:var(--border);margin:14px 0}
 .perf-empty{text-align:center;padding:32px 0;color:var(--text3);font-size:13px}
 
+/* POST-VENTE */
+.pv-section-title{font-size:13px;font-weight:600;color:#fff;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.pv-section-count{font-size:11px;background:rgba(255,255,255,0.07);color:var(--text3);padding:2px 7px;border-radius:10px;font-weight:400}
+.pv-table{background:var(--dark2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px}
+.pv-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);transition:background 0.15s}
+.pv-row:last-child{border-bottom:none}
+.pv-row:hover{background:rgba(255,255,255,0.02)}
+.pv-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.pv-info{flex:1;min-width:0}
+.pv-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-sub{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.pv-actions{display:flex;gap:6px;flex-shrink:0}
+.pv-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all 0.15s;color:var(--text2)}
+.pv-btn:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.2);color:var(--text)}
+.pv-btn-camp{background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:#93c5fd}
+.pv-btn-camp:hover{background:rgba(59,130,246,0.2)}
+.pv-badge-inactif{font-size:10px;padding:2px 7px;border-radius:8px;background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2);flex-shrink:0}
+.pv-camp-tag{font-size:10px;padding:2px 8px;border-radius:8px;background:rgba(129,140,248,0.1);color:#a5b4fc;border:1px solid rgba(129,140,248,0.2);flex-shrink:0;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-statut-tag{font-size:10px;padding:2px 8px;border-radius:8px;flex-shrink:0}
+.pv-statut-converti{background:rgba(52,211,153,0.1);color:#34d399;border:1px solid rgba(52,211,153,0.2)}
+.pv-statut-relance{background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.2)}
+.pv-statut-arelancer{background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2)}
+.pv-empty{text-align:center;padding:32px;color:var(--text3);font-size:13px;background:var(--dark2);border:1px solid var(--border);border-radius:12px;margin-bottom:24px}
+
 /* CONTACT DRAWER */
 .contact-drawer{position:fixed;top:0;right:-500px;width:480px;max-width:100vw;height:100vh;background:var(--dark2);border-left:1px solid var(--border2);z-index:900;transition:right 0.3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden}
 .contact-drawer.open{right:0;box-shadow:-8px 0 40px rgba(0,0,0,0.5)}
@@ -532,6 +556,10 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
     Performance
   </button>
+  <button class="nav-item" id="nav-postvente" onclick="showSection('postvente')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    Post-vente
+  </button>
   <button class="nav-item" id="nav-messages" onclick="showSection('messages')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
     Relances
@@ -686,6 +714,17 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
       </div>
     </div>
     <div id="perf-content"></div>
+  </div>
+
+  <!-- POST-VENTE -->
+  <div class="section" id="section-postvente">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Post-vente</div>
+        <div class="page-sub">Suivi et fidélisation de vos clients après la vente</div>
+      </div>
+    </div>
+    <div id="pv-content"></div>
   </div>
 
   <!-- RELANCES & CAMPAGNES -->
@@ -1771,6 +1810,7 @@ function showSection(name) {
   if (name === 'contacts') renderContacts();
   if (name === 'activite') renderActivity();
   if (name === 'performance') renderPerformance();
+  if (name === 'postvente') renderPostVente();
   if (name === 'messages') { backToCampaigns(); renderCampaigns(); }
   if (name === 'import') { selectImportMethod('file'); showImportStep(1); resetImport(); }
   if (name === 'prospection') initProspection();
@@ -3873,6 +3913,119 @@ showSection = function(name) {
 
 function closeMobileMsg() {
   // kept for mobile nav compatibility
+}
+
+// ─── POST-VENTE ─────────────────────────────────────────
+function renderPostVente() {
+  const el = document.getElementById('pv-content');
+  if (!el) return;
+
+  const contacts = _contacts || [];
+  const clients  = contacts.filter(c => c.statut === 'Client');
+  const inactifs = contacts.filter(c => c.statut === 'Inactif');
+
+  // Contacts assignés à au moins une campagne
+  const inCamp = [];
+  (_campaigns || []).forEach(camp => {
+    const cc = _campaignContacts[camp.id] || [];
+    cc.forEach(item => {
+      if (item.contacts) {
+        inCamp.push({ contact: item.contacts, campagne: camp.nom, campagneId: camp.id, statut: item.statut });
+      }
+    });
+  });
+
+  function avatarColor(nom) {
+    const colors = ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4','#ec4899'];
+    let h = 0; for (let i=0; i<nom.length; i++) h += nom.charCodeAt(i);
+    return colors[h % colors.length];
+  }
+  function initials(nom) {
+    const parts = nom.trim().split(' ');
+    return parts.length >= 2 ? (parts[0][0]+parts[parts.length-1][0]).toUpperCase() : nom.slice(0,2).toUpperCase();
+  }
+  function pvActions(c, extra='') {
+    const tel   = c.tel   || c.tel   || '';
+    const email = c.email || '';
+    return `
+      ${tel   ? `<button class="pv-btn" title="Appeler ${tel}" onclick="window.location='tel:${tel}'">📞</button>` : ''}
+      ${email ? `<button class="pv-btn" title="Envoyer un email" onclick="window.location='mailto:${email}'">✉️</button>` : ''}
+      <button class="pv-btn" title="Planifier un RDV" onclick="showSection('agenda');setTimeout(()=>document.getElementById('btn-new-rdv')?.click(),150)">📅</button>
+      <button class="pv-btn pv-btn-camp" title="Assigner à une campagne" onclick="showSection('contacts');setTimeout(()=>openContactDrawer('${c.id}'),150)">📣</button>
+      ${extra}`;
+  }
+  function pvRow(c, badges='', extra='') {
+    const col = avatarColor(c.nom);
+    const ini = initials(c.nom);
+    const sub = [c.entreprise, c.email].filter(Boolean).join(' · ');
+    return `
+    <div class="pv-row">
+      <div class="pv-avatar" style="background:${col}">${ini}</div>
+      <div class="pv-info">
+        <div class="pv-name">${c.nom}</div>
+        ${sub ? `<div class="pv-sub">${sub}</div>` : ''}
+      </div>
+      ${badges}
+      <div class="pv-actions">${pvActions(c, extra)}</div>
+    </div>`;
+  }
+
+  // ── BLOC 1 : Clients actifs ────────────────────────────
+  const bloc1 = clients.length === 0
+    ? `<div class="pv-empty">Aucun contact avec le statut "Client".<br>Passez vos leads en "Client" pour les voir ici.</div>`
+    : `<div class="pv-table">${clients.map(c => pvRow(c)).join('')}</div>`;
+
+  // ── BLOC 2 : Clients inactifs ──────────────────────────
+  const bloc2 = inactifs.length === 0
+    ? `<div class="pv-empty">Aucun contact inactif. 🎉</div>`
+    : `<div class="pv-table">${inactifs.map(c => pvRow(c, `<span class="pv-badge-inactif">⚠️ Inactif</span>`)).join('')}</div>`;
+
+  // ── BLOC 3 : Contacts en campagne ──────────────────────
+  const statutTag = s => {
+    if (s==='converti')   return `<span class="pv-statut-tag pv-statut-converti">✓ Converti</span>`;
+    if (s==='relancé')    return `<span class="pv-statut-tag pv-statut-relance">↺ Relancé</span>`;
+    if (s==='à relancer') return `<span class="pv-statut-tag pv-statut-arelancer">! À relancer</span>`;
+    return `<span class="pv-statut-tag" style="background:rgba(255,255,255,0.05);color:var(--text3);border:1px solid var(--border)">${s}</span>`;
+  };
+
+  const bloc3 = inCamp.length === 0
+    ? `<div class="pv-empty">Aucun contact assigné à une campagne.<br>Allez dans <a href="#" onclick="event.preventDefault();showSection('messages')" style="color:var(--blue);text-decoration:none">Relances</a> pour assigner des contacts.</div>`
+    : `<div class="pv-table">${inCamp.map(item => {
+        const c   = item.contact;
+        const col = avatarColor(c.nom || '?');
+        const ini = initials(c.nom || '?');
+        const sub = [c.entreprise, c.email].filter(Boolean).join(' · ');
+        return `
+        <div class="pv-row">
+          <div class="pv-avatar" style="background:${col}">${ini}</div>
+          <div class="pv-info">
+            <div class="pv-name">${c.nom}</div>
+            ${sub ? `<div class="pv-sub">${sub}</div>` : ''}
+          </div>
+          ${statutTag(item.statut)}
+          <span class="pv-camp-tag" title="${item.campagne}" onclick="showSection('messages');setTimeout(()=>openCampaignDetail('${item.campagneId}'),150)" style="cursor:pointer">📣 ${item.campagne}</span>
+        </div>`;
+      }).join('')}</div>`;
+
+  el.innerHTML = `
+    <div class="pv-section-title">
+      ✅ Clients actifs
+      <span class="pv-section-count">${clients.length}</span>
+    </div>
+    ${bloc1}
+
+    <div class="pv-section-title">
+      ⚠️ Clients inactifs à réactiver
+      <span class="pv-section-count">${inactifs.length}</span>
+    </div>
+    ${bloc2}
+
+    <div class="pv-section-title">
+      📣 Contacts en campagne de relance
+      <span class="pv-section-count">${inCamp.length}</span>
+    </div>
+    ${bloc3}
+  `;
 }
 
 // ─── PERFORMANCE ────────────────────────────────────────
