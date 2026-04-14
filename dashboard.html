@@ -2205,9 +2205,11 @@ function renderCampaignContacts() {
 
 async function updateCampaignContactStatus(ccId, newStatus) {
   await supabaseClient.from('campaign_contacts').update({ statut: newStatus }).eq('id', ccId);
-  const arr = _campaignContacts[_currentCampaignId];
-  const item = arr.find(x => x.id === ccId);
-  if (item) item.statut = newStatus;
+  // Mettre à jour en mémoire dans tous les tableaux où cet ID existe
+  Object.values(_campaignContacts).forEach(arr => {
+    const item = arr.find(x => x.id === ccId);
+    if (item) item.statut = newStatus;
+  });
   renderCampaigns();
   updateDashStats();
 }
@@ -2318,15 +2320,17 @@ async function assignToCampaign(contactId) {
 
 async function addContactToCampaignFromDrawer(campaignId, contactId, el) {
   el.onclick = null; el.style.cursor = 'default'; el.style.opacity = '0.55';
-  const { error } = await supabaseClient.from('campaign_contacts').insert({
+  // .select().single() pour récupérer le vrai UUID Supabase
+  const { data, error } = await supabaseClient.from('campaign_contacts').insert({
     campaign_id: campaignId, contact_id: contactId, user_id: currentUser.id, statut: 'à relancer'
-  });
+  }).select('*, contacts(id,nom,entreprise,email,tel,statut)').single();
   if (error && error.code !== '23505') { showToast('Erreur', 'error'); return; }
   if (!_campaignContacts[campaignId]) _campaignContacts[campaignId] = [];
-  _campaignContacts[campaignId].push({
-    id: crypto.randomUUID(), campaign_id: campaignId, contact_id: contactId,
-    statut: 'à relancer', contacts: _contacts.find(c=>c.id===contactId)
-  });
+  if (data) {
+    // data.contacts vient du join — on remplace par l'objet _contacts complet si besoin
+    if (!data.contacts) data.contacts = _contacts.find(c => c.id === contactId);
+    _campaignContacts[campaignId].push(data);
+  }
   el.querySelector('div:last-child').innerHTML = `${(_campaignContacts[campaignId]||[]).length} contacts · <span style="color:#4ade80">✓ Assigné</span>`;
   renderCampaigns();
   updateDashStats();
