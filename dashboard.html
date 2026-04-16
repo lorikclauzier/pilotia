@@ -2240,7 +2240,11 @@ function renderCampaigns() {
       </div>
       <div class="campaign-card-ft">
         <span style="font-size:11px;color:var(--text3)">Créée le ${dateStr}</span>
-        <button class="btn btn-outline" style="font-size:11px;padding:4px 10px" onclick="event.stopPropagation();openCampaignDetail('${c.id}')">Voir →</button>
+        <div style="display:flex;gap:6px" onclick="event.stopPropagation()">
+          <button class="btn-sm btn-sm-ghost" onclick="renameCampaign('${c.id}','${c.nom.replace(/'/g,"\\'")}')">✏️ Renommer</button>
+          <button class="btn-sm btn-sm-red" onclick="deleteCampaign('${c.id}')">🗑</button>
+          <button class="btn-sm btn-sm-blue" onclick="openCampaignDetail('${c.id}')">Voir →</button>
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -2253,6 +2257,29 @@ function openNewCampaignModal() {
   setTimeout(() => document.getElementById('camp-nom').focus(), 50);
 }
 function closeCampaignModal() { document.getElementById('campaign-modal-overlay').style.display = 'none'; }
+
+async function renameCampaign(id, currentName) {
+  const newName = prompt('Nouveau nom de la campagne :', currentName);
+  if (!newName || !newName.trim() || newName.trim() === currentName) return;
+  const { error } = await supabaseClient.from('campaigns').update({ nom: newName.trim() }).eq('id', id);
+  if (error) { showToast('Erreur lors du renommage', 'error'); return; }
+  const c = _campaigns.find(x => x.id === id);
+  if (c) c.nom = newName.trim();
+  renderCampaigns();
+  showToast('Campagne renommée ✓');
+}
+
+async function deleteCampaign(id) {
+  if (!confirm('Supprimer cette campagne ? Cette action est irréversible.')) return;
+  await supabaseClient.from('campaign_contacts').delete().eq('campaign_id', id);
+  const { error } = await supabaseClient.from('campaigns').delete().eq('id', id);
+  if (error) { showToast('Erreur lors de la suppression', 'error'); return; }
+  _campaigns = _campaigns.filter(x => x.id !== id);
+  delete _campaignContacts[id];
+  renderCampaigns();
+  updateDashStats();
+  showToast('Campagne supprimée');
+}
 
 async function createCampaign() {
   const nom = document.getElementById('camp-nom').value.trim();
