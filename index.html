@@ -299,6 +299,50 @@ tr:last-child td{border-bottom:none}
 .cf-success-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:#34d399;margin-bottom:6px}
 .cf-success-sub{font-size:14px;color:var(--text2)}
 
+/* CHATBOT WIDGET */
+.chat-widget{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+.chat-bubble-btn{width:56px;height:56px;border-radius:50%;background:var(--blue);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(59,130,246,0.45);transition:transform 0.2s,background 0.2s}
+.chat-bubble-btn:hover{transform:scale(1.08);background:var(--blue2)}
+.chat-bubble-btn svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2}
+.chat-window{width:340px;max-height:480px;background:#0e1420;border:1px solid rgba(255,255,255,0.12);border-radius:16px;box-shadow:0 8px 48px rgba(0,0,0,0.5);display:none;flex-direction:column;overflow:hidden;animation:chatSlide 0.25s ease}
+.chat-window.open{display:flex}
+@keyframes chatSlide{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.chat-win-hd{padding:14px 16px;background:linear-gradient(135deg,#0d1829,#0e1420);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.chat-win-av{width:32px;height:32px;border-radius:50%;background:rgba(59,130,246,0.2);border:1px solid rgba(59,130,246,0.3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.chat-win-name{font-size:13px;font-weight:600;color:#fff}
+.chat-win-sub{font-size:11px;color:#4a5a78;display:flex;align-items:center;gap:4px;margin-top:1px}
+.chat-win-dot{width:6px;height:6px;background:#10b981;border-radius:50%}
+.chat-msgs-area{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:160px;max-height:260px}
+.chat-msg{display:flex;gap:8px;max-width:92%}
+.chat-msg.user{align-self:flex-end;flex-direction:row-reverse}
+.chat-msg-av{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;margin-top:2px}
+.chat-msg-av.bot{background:rgba(59,130,246,0.15);color:#93c5fd;border:1px solid rgba(59,130,246,0.25)}
+.chat-msg-av.usr{background:#3b82f6;color:#fff}
+.chat-msg-bubble{padding:9px 12px;border-radius:10px;font-size:13px;line-height:1.5}
+.chat-msg-bubble.bot{background:#141c2e;color:#c8d5ef;border:1px solid rgba(255,255,255,0.07);border-radius:3px 10px 10px 10px}
+.chat-msg-bubble.usr{background:#3b82f6;color:#fff;border-radius:10px 3px 10px 10px}
+.chat-typing{display:flex;align-items:center;gap:4px;padding:9px 12px;background:#141c2e;border:1px solid rgba(255,255,255,0.07);border-radius:3px 10px 10px 10px;width:fit-content}
+.chat-typing span{width:5px;height:5px;background:#4a5a78;border-radius:50%;animation:chatBounce 1.2s infinite}
+.chat-typing span:nth-child(2){animation-delay:.2s}
+.chat-typing span:nth-child(3){animation-delay:.4s}
+@keyframes chatBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
+.chat-input-area{padding:10px 12px;border-top:1px solid rgba(255,255,255,0.07);display:flex;gap:8px;align-items:center;flex-shrink:0}
+.chat-text-input{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:8px 14px;font-size:13px;color:#fff;font-family:'Inter',sans-serif;outline:none}
+.chat-text-input:focus{border-color:rgba(59,130,246,0.5)}
+.chat-text-input::placeholder{color:#4a5a78}
+.chat-send-btn{width:32px;height:32px;background:#3b82f6;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s}
+.chat-send-btn:hover{background:#2563eb}
+.chat-send-btn svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5}
+.chat-lead-form{padding:14px;border-top:1px solid rgba(255,255,255,0.07);background:#0a101a;flex-shrink:0}
+.chat-lead-title{font-size:12px;font-weight:600;color:#fff;margin-bottom:10px;text-align:center}
+.chat-lead-input{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;font-size:12px;color:#fff;font-family:'Inter',sans-serif;outline:none;margin-bottom:7px;box-sizing:border-box}
+.chat-lead-input:focus{border-color:rgba(59,130,246,0.5)}
+.chat-lead-input::placeholder{color:#4a5a78}
+.chat-lead-btn{width:100%;padding:9px;background:#3b82f6;border:none;border-radius:8px;font-size:13px;font-weight:500;color:#fff;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.2s}
+.chat-lead-btn:hover{background:#2563eb}
+.chat-lead-btn:disabled{opacity:0.6;cursor:not-allowed}
+@media(max-width:480px){.chat-window{width:calc(100vw - 32px)}}
+
 /* FOOTER */
 footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
 .footer-logo{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff}
@@ -858,6 +902,34 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
   <div class="footer-copy" data-i18n="footer.copy">© 2026 pylotIA — Tous droits réservés</div>
 </footer>
 
+<!-- CHATBOT WIDGET -->
+<div class="chat-widget" id="chat-widget">
+  <div class="chat-window" id="chat-window">
+    <div class="chat-win-hd">
+      <div class="chat-win-av">✦</div>
+      <div>
+        <div class="chat-win-name">Assistant pylotIA</div>
+        <div class="chat-win-sub"><div class="chat-win-dot"></div>En ligne</div>
+      </div>
+    </div>
+    <div class="chat-msgs-area" id="chat-msgs-area"></div>
+    <div class="chat-input-area" id="chat-input-area">
+      <input class="chat-text-input" id="chat-text-input" placeholder="Posez votre question..." onkeydown="if(event.key==='Enter')chatSend()">
+      <button class="chat-send-btn" onclick="chatSend()"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+    </div>
+    <div class="chat-lead-form" id="chat-lead-form" style="display:none">
+      <div class="chat-lead-title" id="chat-lead-title">Pour continuer, laissez votre contact 👇</div>
+      <input class="chat-lead-input" id="chat-lead-name" placeholder="Votre prénom">
+      <input class="chat-lead-input" id="chat-lead-email" type="email" placeholder="Votre email">
+      <button class="chat-lead-btn" id="chat-lead-btn" onclick="chatSubmitLead()">Recevoir plus d'infos →</button>
+    </div>
+  </div>
+  <button class="chat-bubble-btn" id="chat-bubble-btn" onclick="chatToggle()">
+    <svg class="chat-chat-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    <svg class="chat-close-icon" style="display:none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+  </button>
+</div>
+
 <script>
 function showTab(name, btn) {
   ['dashboard','clients','agenda','prospection','assistant'].forEach(t => {
@@ -1011,6 +1083,149 @@ async function submitContactForm(e) {
     btn.textContent = 'Envoyer le message →';
     alert('Une erreur est survenue. Écrivez-nous directement à pylotia.app@gmail.com');
   }
+}
+
+// ─── CHATBOT ───────────────────────────────────────────
+let _chatOpen = false;
+let _chatMsgCount = 0;
+const CHAT_LIMIT = 3;
+
+const CHAT_RESPONSES = {
+  fr: {
+    greeting: "Bonjour ! 👋 Je suis l'assistant pylotIA. Comment puis-je vous aider ?\n\n• Tarifs & plans\n• Fonctionnalités\n• Import de données\n• Démo & essai gratuit",
+    pricing:  "Nous avons 3 plans :\n\n• **Gratuit** — jusqu'à 10 clients, agenda, pipeline de base\n• **Starter** (199€/mois) — clients illimités, import Excel illimité, relances\n• **Pro** (449€/mois) — tout Starter + assistant IA, rapports automatiques\n\nTous les plans incluent 14 jours d'essai Pro offerts 🎁",
+    features: "pylotIA centralise tout :\n\n✅ Portefeuille clients\n✅ Agenda & RDV\n✅ Pipeline Kanban\n✅ Import Excel en 30 secondes\n✅ Assistant IA (Pro)\n✅ Campagnes de relance\n\nTout depuis un seul outil, sans installation.",
+    import:   "L'import est ultra simple :\n\n1. Glissez votre fichier .xlsx ou .csv\n2. pylotIA détecte automatiquement Nom, Email, Entreprise, Téléphone\n3. Tous vos contacts sont importés en moins de 30 secondes\n\nAucune mise en forme spéciale requise.",
+    demo:     "Vous pouvez tester pylotIA gratuitement dès maintenant !\n\n👉 Créez un compte gratuit en 2 minutes — aucune carte bancaire requise.\n\nOu regardez la démo interactive sur cette page (section Démo).",
+    default:  "Bonne question ! Je peux vous renseigner sur :\n\n• Les **tarifs** et plans disponibles\n• Les **fonctionnalités** de pylotIA\n• L'**import** de vos données existantes\n• La **démo** et l'essai gratuit\n\nQue souhaitez-vous savoir ?",
+    limitMsg: "J'espère avoir pu vous aider ! Pour continuer la conversation ou recevoir une démo personnalisée, laissez-nous vos coordonnées 👇",
+    leadTitle:"Pour continuer, laissez votre contact 👇",
+    leadName: "Votre prénom","leadEmail":"Votre email",
+    leadBtn:  "Recevoir plus d'infos →",
+    leadDone: "Parfait, merci ! 🎉 Florian ou Lorik vous contactera très prochainement.",
+  },
+  en: {
+    greeting: "Hello! 👋 I'm the pylotIA assistant. How can I help?\n\n• Pricing & plans\n• Features\n• Data import\n• Demo & free trial",
+    pricing:  "We have 3 plans:\n\n• **Free** — up to 10 clients, calendar, basic pipeline\n• **Starter** ($199/mo) — unlimited clients, Excel import, follow-ups\n• **Pro** ($449/mo) — everything + AI assistant, automated reports\n\nAll plans include a 14-day Pro trial 🎁",
+    features: "pylotIA centralizes everything:\n\n✅ Client portfolio\n✅ Calendar & appointments\n✅ Kanban pipeline\n✅ Excel import in 30 seconds\n✅ AI assistant (Pro)\n✅ Follow-up campaigns\n\nAll in one tool, no installation needed.",
+    import:   "Import is super simple:\n\n1. Drag your .xlsx or .csv file\n2. pylotIA auto-detects Name, Email, Company, Phone\n3. All contacts imported in under 30 seconds\n\nNo special formatting required.",
+    demo:     "You can try pylotIA for free right now!\n\n👉 Create a free account in 2 minutes — no credit card required.\n\nOr check out the interactive demo on this page.",
+    default:  "Great question! I can help with:\n\n• **Pricing** and available plans\n• pylotIA **features**\n• **Importing** your existing data\n• The **demo** and free trial\n\nWhat would you like to know?",
+    limitMsg: "Hope I was helpful! To continue or get a personalized demo, leave your details below 👇",
+    leadTitle:"To continue, leave your info 👇",
+    leadName: "Your first name","leadEmail":"Your email",
+    leadBtn:  "Get more info →",
+    leadDone: "Perfect, thank you! 🎉 Florian or Lorik will reach out very soon.",
+  }
+};
+
+function chatGetLang(){ return (typeof _currentLang !== 'undefined' ? _currentLang : 'fr'); }
+
+function chatToggle() {
+  _chatOpen = !_chatOpen;
+  document.getElementById('chat-window').classList.toggle('open', _chatOpen);
+  document.getElementById('chat-bubble-btn').classList.toggle('open', _chatOpen);
+  document.querySelector('.chat-chat-icon').style.display = _chatOpen ? 'none' : 'block';
+  document.querySelector('.chat-close-icon').style.display = _chatOpen ? 'block' : 'none';
+  if (_chatOpen && document.getElementById('chat-msgs-area').children.length === 0) {
+    setTimeout(() => chatAddMsg('bot', CHAT_RESPONSES[chatGetLang()].greeting), 300);
+  }
+}
+
+function chatAddMsg(role, text) {
+  const area = document.getElementById('chat-msgs-area');
+  const div = document.createElement('div');
+  div.className = 'chat-msg ' + (role === 'bot' ? '' : 'user');
+  const av = document.createElement('div');
+  av.className = 'chat-msg-av ' + (role === 'bot' ? 'bot' : 'usr');
+  av.textContent = role === 'bot' ? '✦' : '?';
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-msg-bubble ' + role;
+  bubble.textContent = text;
+  div.appendChild(av);
+  div.appendChild(bubble);
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+}
+
+function chatShowTyping() {
+  const area = document.getElementById('chat-msgs-area');
+  const typing = document.createElement('div');
+  typing.className = 'chat-msg';
+  typing.id = 'chat-typing';
+  const av = document.createElement('div');
+  av.className = 'chat-msg-av bot';
+  av.textContent = '✦';
+  const dots = document.createElement('div');
+  dots.className = 'chat-typing';
+  dots.innerHTML = '<span></span><span></span><span></span>';
+  typing.appendChild(av);
+  typing.appendChild(dots);
+  area.appendChild(typing);
+  area.scrollTop = area.scrollHeight;
+}
+
+function chatHideTyping() {
+  const t = document.getElementById('chat-typing');
+  if (t) t.remove();
+}
+
+function chatGetResponse(text) {
+  const t = text.toLowerCase();
+  const r = CHAT_RESPONSES[chatGetLang()];
+  if (t.match(/prix|tarif|plan|abonnement|coût|combien|pricing|cost|price|plan/)) return r.pricing;
+  if (t.match(/fonctionnalit|feature|outil|crm|agenda|kanban|prospect|relance/)) return r.features;
+  if (t.match(/import|excel|csv|données|data|fichier|file/)) return r.import;
+  if (t.match(/demo|démo|essai|trial|gratuit|free|tester|test/)) return r.demo;
+  return r.default;
+}
+
+async function chatSend() {
+  const input = document.getElementById('chat-text-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  chatAddMsg('user', text);
+  _chatMsgCount++;
+
+  chatShowTyping();
+  await new Promise(r => setTimeout(r, 700 + Math.random() * 500));
+  chatHideTyping();
+
+  if (_chatMsgCount >= CHAT_LIMIT) {
+    const r = CHAT_RESPONSES[chatGetLang()];
+    chatAddMsg('bot', chatGetResponse(text));
+    setTimeout(() => {
+      chatAddMsg('bot', r.limitMsg);
+      document.getElementById('chat-input-area').style.display = 'none';
+      const lf = document.getElementById('chat-lead-form');
+      lf.style.display = 'block';
+      document.getElementById('chat-lead-title').textContent = r.leadTitle;
+      document.getElementById('chat-lead-name').placeholder = r.leadName;
+      document.getElementById('chat-lead-email').placeholder = r.leadEmail;
+      document.getElementById('chat-lead-btn').textContent = r.leadBtn;
+    }, 400);
+  } else {
+    chatAddMsg('bot', chatGetResponse(text));
+  }
+}
+
+async function chatSubmitLead() {
+  const name  = document.getElementById('chat-lead-name').value.trim();
+  const email = document.getElementById('chat-lead-email').value.trim();
+  if (!name || !email) return;
+  const btn = document.getElementById('chat-lead-btn');
+  btn.disabled = true;
+  btn.textContent = '...';
+  try {
+    await emailjs.send('service_xql0hy1', 'template_dz1anao', {
+      name, email,
+      message: '[Lead chatbot] ' + name + ' a interagi avec le chatbot de la landing page.'
+    });
+  } catch(e) { console.warn('EmailJS chatbot lead:', e); }
+  document.getElementById('chat-lead-form').innerHTML =
+    '<div style="text-align:center;padding:8px 0;font-size:13px;color:#34d399">' +
+    CHAT_RESPONSES[chatGetLang()].leadDone + '</div>';
 }
 
 // ─── BILINGUAL FR/EN ───────────────────────────────────
