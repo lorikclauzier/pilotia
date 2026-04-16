@@ -1,7 +1,6 @@
 {
   "functions": {
-    "api/claude.js": {
-      "maxDuration": 30
-    }
+    "api/claude.js": { "maxDuration": 30 },
+    "api/contact.js": { "maxDuration": 10 }
   }
 }
