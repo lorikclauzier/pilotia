@@ -16,6 +16,7 @@
 <meta name="twitter:description" content="Fini les Excel perdus et les relances oubliées. pylotIA centralise vos clients et votre prospection.">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -986,7 +987,9 @@ function closeMobileMenu(){
   document.body.style.overflow = '';
 }
 
-// ── CONTACT FORM ─────────────────────────────────────────────────────
+// ── EMAILJS CONTACT FORM ─────────────────────────────────────────────
+emailjs.init({ publicKey: 'u3mve1BFOCwBPKRBc' });
+
 async function submitContactForm(e) {
   e.preventDefault();
   const btn = document.getElementById('cf-btn');
@@ -994,20 +997,15 @@ async function submitContactForm(e) {
   btn.textContent = 'Envoi en cours…';
 
   try {
-    const res = await fetch('/api/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        from_name:  document.getElementById('cf-nom').value.trim(),
-        from_email: document.getElementById('cf-email').value.trim(),
-        message:    document.getElementById('cf-msg').value.trim(),
-      }),
+    await emailjs.send('service_xql0hy1', 'template_dz1anao', {
+      name:    document.getElementById('cf-nom').value.trim(),
+      email:   document.getElementById('cf-email').value.trim(),
+      message: document.getElementById('cf-msg').value.trim(),
     });
-    if (!res.ok) throw new Error(await res.text());
     document.getElementById('contact-form').style.display = 'none';
     document.getElementById('cf-success').style.display = 'block';
   } catch (err) {
-    console.error('Contact error:', err);
+    console.error('EmailJS error:', err);
     btn.disabled = false;
     btn.textContent = 'Envoyer le message →';
     alert('Une erreur est survenue. Écrivez-nous directement à pylotia.app@gmail.com');
