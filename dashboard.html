@@ -1414,6 +1414,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
     </div>
     <div class="modal-actions">
       <button class="btn btn-danger" id="prosp-delete-btn" onclick="deleteProspect(editingProspId)" style="display:none;margin-right:auto">Supprimer</button>
+      <button class="btn btn-ghost" id="prosp-convert-btn" onclick="convertProspectToContact(editingProspId)" style="display:none">→ Créer contact</button>
       <button class="btn btn-ghost" onclick="closeProspModal()">Annuler</button>
       <button class="btn btn-blue" id="prosp-modal-submit" onclick="saveProspect()">Ajouter</button>
     </div>
@@ -3173,6 +3174,10 @@ function kbCardHtml(p, plan) {
   const soon     = p.relance && p.relance > today && p.relance <= new Date(Date.now() + 3*86400000).toISOString().split('T')[0];
   const relBadge = overdue ? `<span class="kb-relance">⚡ Relance</span>` : soon ? `<span class="kb-relance" style="color:#fbbf24">↻ Bientôt</span>` : '';
   const aiBtn    = plan === 'pro' ? `<button onclick="event.stopPropagation();aiDraftEmail('${p.id}')" style="background:rgba(245,158,11,0.12);color:#fbbf24;border:none;border-radius:5px;padding:2px 8px;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;margin-top:6px">✦ Rédigez email IA</button>` : '';
+  const already  = _contacts.some(c => c.email && c.email === p.email) || _contacts.some(c => c.nom === p.nom);
+  const convBtn  = already
+    ? `<button disabled style="background:rgba(16,185,129,0.08);color:#34d399;border:1px solid rgba(16,185,129,0.2);border-radius:5px;padding:2px 8px;font-size:10px;font-family:'Inter',sans-serif;margin-top:4px;cursor:default">✓ Déjà contact</button>`
+    : `<button onclick="event.stopPropagation();convertProspectToContact('${p.id}')" style="background:rgba(59,130,246,0.12);color:#93c5fd;border:1px solid rgba(59,130,246,0.2);border-radius:5px;padding:2px 8px;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;margin-top:4px">→ Créer contact</button>`;
   const valeur   = p.valeur ? `<div style="margin-top:6px;font-size:11px;color:#34d399">💶 ${Number(p.valeur).toLocaleString('fr-FR')} €</div>` : '';
   return `<div class="kb-card" draggable="true"
     ondragstart="kbDragStart(event,'${p.id}')"
@@ -3186,6 +3191,7 @@ function kbCardHtml(p, plan) {
     </div>
     ${valeur}
     ${aiBtn}
+    ${convBtn}
   </div>`;
 }
 
@@ -3321,6 +3327,16 @@ function openProspModal(id, defaultStatut) {
   document.getElementById('prosp-modal-submit').textContent = isEdit ? 'Enregistrer' : 'Ajouter';
   document.getElementById('prosp-delete-btn').style.display  = isEdit ? 'block' : 'none';
   if (isEdit) {
+    const alreadyContact = _contacts.some(c => {
+      const p = getProspects().find(x => x.id === id);
+      return p && ((c.email && c.email === p.email) || c.nom === p.nom);
+    });
+    document.getElementById('prosp-convert-btn').style.display = alreadyContact ? 'none' : 'block';
+    document.getElementById('prosp-convert-btn').textContent = '→ Créer contact';
+  } else {
+    document.getElementById('prosp-convert-btn').style.display = 'none';
+  }
+  if (isEdit) {
     const p = getProspects().find(x => x.id === id);
     document.getElementById('p-nom').value        = p.nom;
     document.getElementById('p-entreprise').value = p.entreprise || '';
@@ -3404,6 +3420,36 @@ async function deleteProspect(id) {
   } catch(e) {
     showToast('Erreur suppression : ' + e.message);
     await loadProspectsFromDB(); renderKanban();
+  }
+}
+
+async function convertProspectToContact(id) {
+  const p = _prospects.find(x => x.id === id);
+  if (!p) return;
+  const already = _contacts.some(c => (c.email && c.email === p.email) || c.nom === p.nom);
+  if (already) { showToast('Ce contact existe déjà', 'error'); return; }
+  try {
+    const fields = {
+      nom:        p.nom,
+      entreprise: p.entreprise || '',
+      email:      p.email || '',
+      tel:        p.tel || '',
+      poste:      '',
+      statut:     'Lead',
+      note:       p.note || '',
+      date:       new Date().toISOString()
+    };
+    const saved = await dbAddContact(fields);
+    _contacts.unshift(normalizeContact(saved));
+    addActivity('add', 'Contact créé depuis prospect : ' + p.nom);
+    showToast(p.nom + ' ajouté aux contacts ✓');
+    renderKanban();
+    updateDashStats();
+    // Fermer le modal si ouvert
+    document.getElementById('prosp-modal-overlay')?.classList.remove('open');
+    editingProspId = null;
+  } catch(e) {
+    showToast('Erreur : ' + e.message);
   }
 }
 
