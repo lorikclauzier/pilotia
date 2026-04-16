@@ -13,16 +13,25 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Champs manquants' });
   }
 
-  const user = process.env.GMAIL_USER;
-  const pass = process.env.GMAIL_APP_PASSWORD;
+  const user = (process.env.GMAIL_USER || '').trim();
+  const pass = (process.env.GMAIL_APP_PASSWORD || '').trim().replace(/\s+/g, '');
   if (!user || !pass) {
     return res.status(500).json({ error: 'Variables GMAIL non configurées' });
   }
 
+  console.log('SMTP user:', user, '| pass length:', pass.length);
+
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
     auth: { user, pass },
   });
+
+  try { await transporter.verify(); } catch(e) {
+    console.error('VERIFY error:', e.message);
+    return res.status(500).json({ error: 'Auth SMTP échouée: ' + e.message });
+  }
 
   await transporter.sendMail({
     from: `"${from_name}" <${user}>`,
