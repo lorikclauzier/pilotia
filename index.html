@@ -406,39 +406,40 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
 <nav>
   <div class="nav-logo">pylot<span>IA</span></div>
   <div class="nav-links">
-    <a href="#features">Fonctionnalités</a>
-    <a href="#pricing">Tarifs</a>
-    <a href="#demo">Démo</a>
-    <a href="#contact">Contact</a>
-    <a href="login.html">Se connecter</a>
+    <a href="#features" data-i18n="nav.features">Fonctionnalités</a>
+    <a href="#pricing" data-i18n="nav.pricing">Tarifs</a>
+    <a href="#demo" data-i18n="nav.demo">Démo</a>
+    <a href="#contact" data-i18n="nav.contact">Contact</a>
+    <a href="login.html" data-i18n="nav.login">Se connecter</a>
+    <button onclick="toggleLang()" id="lang-btn" style="background:transparent;border:1px solid var(--border2);border-radius:6px;padding:5px 10px;font-size:12px;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s">EN</button>
   </div>
-  <a href="signup.html" class="nav-cta" style="text-decoration:none">Essayer gratuitement</a>
+  <a href="signup.html" class="nav-cta" style="text-decoration:none" data-i18n="nav.cta">Essayer gratuitement</a>
   <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
 </nav>
 <div class="mobile-menu" id="mobile-menu">
-  <a href="#features" onclick="closeMobileMenu()">Fonctionnalités</a>
-  <a href="#pricing" onclick="closeMobileMenu()">Tarifs</a>
-  <a href="#demo" onclick="closeMobileMenu()">Démo</a>
-  <a href="#contact" onclick="closeMobileMenu()">Contact</a>
-  <a href="login.html">Se connecter</a>
-  <a href="signup.html" class="btn-main" style="text-decoration:none">Essayer gratuitement</a>
+  <a href="#features" onclick="closeMobileMenu()" data-i18n="nav.features">Fonctionnalités</a>
+  <a href="#pricing" onclick="closeMobileMenu()" data-i18n="nav.pricing">Tarifs</a>
+  <a href="#demo" onclick="closeMobileMenu()" data-i18n="nav.demo">Démo</a>
+  <a href="#contact" onclick="closeMobileMenu()" data-i18n="nav.contact">Contact</a>
+  <a href="login.html" data-i18n="nav.login">Se connecter</a>
+  <a href="signup.html" class="btn-main" style="text-decoration:none" data-i18n="nav.cta">Essayer gratuitement</a>
 </div>
 
 <!-- HERO -->
 <section class="hero">
   <div class="hero-grid"></div>
   <div class="hero-glow"></div>
-  <div class="hero-badge"><div class="badge-dot"></div>CRM intelligent pour TPE/PME</div>
-  <h1>Pilotez votre business<br>avec l'<span class="accent">intelligence</span> artificielle</h1>
-  <p class="hero-sub">Fini les Excel perdus et les relances oubliées. pylotIA centralise vos clients, vos RDV et votre prospection — et l'IA fait le reste.</p>
+  <div class="hero-badge"><div class="badge-dot"></div><span data-i18n="hero.badge">CRM intelligent pour TPE/PME</span></div>
+  <h1 data-i18n-html="hero.h1">Pilotez votre business<br>avec l'<span class="accent">intelligence</span> artificielle</h1>
+  <p class="hero-sub" data-i18n="hero.sub">Fini les Excel perdus et les relances oubliées. pylotIA centralise vos clients, vos RDV et votre prospection — et l'IA fait le reste.</p>
   <div class="hero-actions">
-    <a href="signup.html" class="btn-main" style="text-decoration:none">Démarrer gratuitement</a>
-    <a href="#pricing" class="btn-ghost">Voir les tarifs</a>
+    <a href="signup.html" class="btn-main" style="text-decoration:none" data-i18n="hero.cta1">Démarrer gratuitement</a>
+    <a href="#pricing" class="btn-ghost" data-i18n="hero.cta2">Voir les tarifs</a>
   </div>
   <div class="hero-stats">
-    <div class="stat"><div class="stat-num">2 min</div><div class="stat-label">Pour importer vos clients</div></div>
-    <div class="stat"><div class="stat-num">0 €</div><div class="stat-label">Pour commencer</div></div>
-    <div class="stat"><div class="stat-num">14j</div><div class="stat-label">D'essai Pro offert</div></div>
+    <div class="stat"><div class="stat-num">2 min</div><div class="stat-label" data-i18n="hero.stat1">Pour importer vos clients</div></div>
+    <div class="stat"><div class="stat-num">0 €</div><div class="stat-label" data-i18n="hero.stat2">Pour commencer</div></div>
+    <div class="stat"><div class="stat-num">14j</div><div class="stat-label" data-i18n="hero.stat3">D'essai Pro offert</div></div>
   </div>
 </section>
 
@@ -652,48 +653,48 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
 
 <!-- FEATURES -->
 <section class="features-section" id="features">
-  <div class="section-label">Fonctionnalités</div>
-  <h2 class="section-title">Tout ce dont votre PME a besoin</h2>
-  <p class="section-sub">Un seul outil pour remplacer vos fichiers Excel, votre agenda papier et vos relances manuelles.</p>
+  <div class="section-label" data-i18n="feat.label">Fonctionnalités</div>
+  <h2 class="section-title" data-i18n="feat.title">Tout ce dont votre PME a besoin</h2>
+  <p class="section-sub" data-i18n="feat.sub">Un seul outil pour remplacer vos fichiers Excel, votre agenda papier et vos relances manuelles.</p>
   <div class="features-grid">
     <div class="feature-card">
       <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75M21 21v-2a4 4 0 00-3-3.85"/></svg></div>
-      <div class="feature-title">Portefeuille clients</div>
-      <div class="feature-desc">Centralisez tous vos contacts. Importez votre Excel en 30 secondes. Suivez chaque client en un coup d'œil.</div>
+      <div class="feature-title" data-i18n="feat.f1.title">Portefeuille clients</div>
+      <div class="feature-desc" data-i18n="feat.f1.desc">Centralisez tous vos contacts. Importez votre Excel en 30 secondes. Suivez chaque client en un coup d'œil.</div>
     </div>
     <div class="feature-card">
       <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
-      <div class="feature-title">Agenda & RDV</div>
-      <div class="feature-desc">Planifiez vos rendez-vous directement dans l'outil. Plus aucun RDV oublié, tout est centralisé.</div>
+      <div class="feature-title" data-i18n="feat.f2.title">Agenda & RDV</div>
+      <div class="feature-desc" data-i18n="feat.f2.desc">Planifiez vos rendez-vous directement dans l'outil. Plus aucun RDV oublié, tout est centralisé.</div>
     </div>
     <div class="feature-card">
       <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
-      <div class="feature-title">Pipeline de prospection</div>
-      <div class="feature-desc">Visualisez vos prospects en kanban : à contacter, en discussion, à relancer. Priorisez en un regard.</div>
+      <div class="feature-title" data-i18n="feat.f3.title">Pipeline de prospection</div>
+      <div class="feature-desc" data-i18n="feat.f3.desc">Visualisez vos prospects en kanban : à contacter, en discussion, à relancer. Priorisez en un regard.</div>
     </div>
     <div class="feature-card">
       <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
-      <div class="feature-title">Assistant IA (Pro)</div>
-      <div class="feature-desc">Posez vos questions en langage naturel. L'IA analyse votre portefeuille et vous dit quoi faire en priorité.</div>
+      <div class="feature-title" data-i18n="feat.f4.title">Assistant IA (Pro)</div>
+      <div class="feature-desc" data-i18n="feat.f4.desc">Posez vos questions en langage naturel. L'IA analyse votre portefeuille et vous dit quoi faire en priorité.</div>
     </div>
     <div class="feature-card">
       <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg></div>
-      <div class="feature-title">Import Excel instantané</div>
-      <div class="feature-desc">Glissez-déposez votre fichier client existant. pylotIA importe tout automatiquement en 30 secondes.</div>
+      <div class="feature-title" data-i18n="feat.f5.title">Import Excel instantané</div>
+      <div class="feature-desc" data-i18n="feat.f5.desc">Glissez-déposez votre fichier client existant. pylotIA importe tout automatiquement en 30 secondes.</div>
     </div>
     <div class="feature-card">
       <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div>
-      <div class="feature-title">Rapports automatiques (Pro)</div>
-      <div class="feature-desc">Recevez chaque semaine un résumé de votre activité, des alertes relances et des opportunités à saisir.</div>
+      <div class="feature-title" data-i18n="feat.f6.title">Rapports automatiques (Pro)</div>
+      <div class="feature-desc" data-i18n="feat.f6.desc">Recevez chaque semaine un résumé de votre activité, des alertes relances et des opportunités à saisir.</div>
     </div>
   </div>
 </section>
 
 <!-- PRICING -->
 <section class="pricing-section" id="pricing">
-  <div class="section-label">Tarifs</div>
-  <h2 class="section-title">Simple, transparent, sans surprise</h2>
-  <p class="section-sub">Commencez gratuitement. Évoluez quand vous êtes prêt.</p>
+  <div class="section-label" data-i18n="pricing.label">Tarifs</div>
+  <h2 class="section-title" data-i18n="pricing.title">Simple, transparent, sans surprise</h2>
+  <p class="section-sub" data-i18n="pricing.sub">Commencez gratuitement. Évoluez quand vous êtes prêt.</p>
   <div class="pricing-grid">
 
     <!-- FREE -->
@@ -758,8 +759,8 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
 
 <!-- FAQ -->
 <section class="faq-section" style="padding:80px 40px;max-width:800px;margin:0 auto">
-  <div class="section-label">FAQ</div>
-  <h2 class="section-title">Questions fréquentes</h2>
+  <div class="section-label" data-i18n="faq.label">FAQ</div>
+  <h2 class="section-title" data-i18n="faq.title">Questions fréquentes</h2>
   <div style="margin-top:40px;display:flex;flex-direction:column;gap:12px" id="faq-list">
 
     <div class="faq-item" onclick="toggleFaq(this)">
@@ -809,38 +810,38 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
 <!-- CTA FINAL -->
 <section class="cta-section">
   <div class="cta-glow"></div>
-  <div class="hero-badge" style="margin-bottom:24px"><div class="badge-dot"></div>Démarrez en 2 minutes</div>
-  <h2 class="cta-title">Votre business mérite<br>mieux qu'un Excel</h2>
-  <p class="cta-sub">Rejoignez les PME qui ont remplacé leurs fichiers<br>par un CRM IA qui travaille à leur place.</p>
-  <a href="signup.html" class="btn-main" style="font-size:16px;padding:16px 36px;text-decoration:none">Créer mon compte gratuit</a>
-  <div class="cta-note">Aucune carte bancaire requise · 14 jours Pro offerts</div>
+  <div class="hero-badge" style="margin-bottom:24px"><div class="badge-dot"></div><span data-i18n="cta.badge">Démarrez en 2 minutes</span></div>
+  <h2 class="cta-title" data-i18n="cta.title">Votre business mérite<br>mieux qu'un Excel</h2>
+  <p class="cta-sub" data-i18n="cta.sub">Rejoignez les PME qui ont remplacé leurs fichiers<br>par un CRM IA qui travaille à leur place.</p>
+  <a href="signup.html" class="btn-main" style="font-size:16px;padding:16px 36px;text-decoration:none" data-i18n="cta.btn">Créer mon compte gratuit</a>
+  <div class="cta-note" data-i18n="cta.note">Aucune carte bancaire requise · 14 jours Pro offerts</div>
 </section>
 
 <!-- CONTACT FORM -->
 <section id="contact" class="contact-section">
-  <div class="section-label">Contact</div>
+  <div class="section-label" data-i18n="contact.label">Contact</div>
   <div class="contact-form">
-    <div class="contact-form-title">Une question ?<br>Écrivez-nous.</div>
-    <div class="contact-form-sub">Florian ou Lorik vous répond sous 24h.</div>
+    <div class="contact-form-title" data-i18n-html="contact.title">Une question ?<br>Écrivez-nous.</div>
+    <div class="contact-form-sub" data-i18n="contact.sub">Florian ou Lorik vous répond sous 24h.</div>
     <form id="contact-form" onsubmit="submitContactForm(event)">
       <div class="cf-field">
-        <label class="cf-label" for="cf-nom">Votre nom</label>
-        <input class="cf-input" id="cf-nom" name="from_name" type="text" placeholder="Jean Dupont" required>
+        <label class="cf-label" for="cf-nom" data-i18n="contact.name">Votre nom</label>
+        <input class="cf-input" id="cf-nom" name="from_name" type="text" placeholder="Jean Dupont" data-i18n-placeholder="contact.namePh" required>
       </div>
       <div class="cf-field">
-        <label class="cf-label" for="cf-email">Votre email</label>
-        <input class="cf-input" id="cf-email" name="from_email" type="email" placeholder="jean@entreprise.fr" required>
+        <label class="cf-label" for="cf-email" data-i18n="contact.email">Votre email</label>
+        <input class="cf-input" id="cf-email" name="from_email" type="email" placeholder="jean@entreprise.fr" data-i18n-placeholder="contact.emailPh" required>
       </div>
       <div class="cf-field">
-        <label class="cf-label" for="cf-msg">Votre message</label>
-        <textarea class="cf-input" id="cf-msg" name="message" rows="5" placeholder="Dites-nous comment on peut vous aider..." required></textarea>
+        <label class="cf-label" for="cf-msg" data-i18n="contact.msg">Votre message</label>
+        <textarea class="cf-input" id="cf-msg" name="message" rows="5" placeholder="Dites-nous comment on peut vous aider..." data-i18n-placeholder="contact.msgPh" required></textarea>
       </div>
-      <button class="cf-submit" id="cf-btn" type="submit">Envoyer le message →</button>
+      <button class="cf-submit" id="cf-btn" type="submit" data-i18n="contact.btn">Envoyer le message →</button>
     </form>
     <div class="cf-success" id="cf-success">
       <div class="cf-success-icon">✅</div>
-      <div class="cf-success-title">Message envoyé !</div>
-      <div class="cf-success-sub">Merci ! Florian ou Lorik vous recontactera très prochainement.</div>
+      <div class="cf-success-title" data-i18n="contact.successTitle">Message envoyé !</div>
+      <div class="cf-success-sub" data-i18n="contact.successSub">Merci ! Florian ou Lorik vous recontactera très prochainement.</div>
     </div>
   </div>
 </section>
@@ -848,13 +849,13 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
 <footer>
   <div class="footer-logo">pylot<span>IA</span></div>
   <div class="footer-links">
-    <a href="#features">Fonctionnalités</a>
-    <a href="#pricing">Tarifs</a>
-    <a href="mailto:pylotia.app@gmail.com">Contact</a>
-    <a href="cgu.html">CGU</a>
-    <a href="mentions-legales.html">Mentions légales</a>
+    <a href="#features" data-i18n="nav.features">Fonctionnalités</a>
+    <a href="#pricing" data-i18n="nav.pricing">Tarifs</a>
+    <a href="mailto:pylotia.app@gmail.com" data-i18n="nav.contact">Contact</a>
+    <a href="cgu.html" data-i18n="footer.cgu">CGU</a>
+    <a href="mentions-legales.html" data-i18n="footer.legal">Mentions légales</a>
   </div>
-  <div class="footer-copy">© 2026 pylotIA — Tous droits réservés</div>
+  <div class="footer-copy" data-i18n="footer.copy">© 2026 pylotIA — Tous droits réservés</div>
 </footer>
 
 <script>
@@ -1011,6 +1012,96 @@ async function submitContactForm(e) {
     alert('Une erreur est survenue. Écrivez-nous directement à pylotia.app@gmail.com');
   }
 }
+
+// ─── BILINGUAL FR/EN ───────────────────────────────────
+const TRANSLATIONS = {
+  fr: {
+    'nav.features':'Fonctionnalités','nav.pricing':'Tarifs','nav.demo':'Démo',
+    'nav.contact':'Contact','nav.login':'Se connecter','nav.cta':'Essayer gratuitement',
+    'hero.badge':'CRM intelligent pour TPE/PME',
+    'hero.h1':'Pilotez votre business<br>avec l\'<span class="accent">intelligence</span> artificielle',
+    'hero.sub':'Fini les Excel perdus et les relances oubliées. pylotIA centralise vos clients, vos RDV et votre prospection — et l\'IA fait le reste.',
+    'hero.cta1':'Démarrer gratuitement','hero.cta2':'Voir les tarifs',
+    'hero.stat1':'Pour importer vos clients','hero.stat2':'Pour commencer','hero.stat3':'D\'essai Pro offert',
+    'feat.label':'Fonctionnalités','feat.title':'Tout ce dont votre PME a besoin',
+    'feat.sub':'Un seul outil pour remplacer vos fichiers Excel, votre agenda papier et vos relances manuelles.',
+    'feat.f1.title':'Portefeuille clients','feat.f1.desc':'Centralisez tous vos contacts. Importez votre Excel en 30 secondes. Suivez chaque client en un coup d\'œil.',
+    'feat.f2.title':'Agenda & RDV','feat.f2.desc':'Planifiez vos rendez-vous directement dans l\'outil. Plus aucun RDV oublié, tout est centralisé.',
+    'feat.f3.title':'Pipeline de prospection','feat.f3.desc':'Visualisez vos prospects en kanban : à contacter, en discussion, à relancer. Priorisez en un regard.',
+    'feat.f4.title':'Assistant IA (Pro)','feat.f4.desc':'Posez vos questions en langage naturel. L\'IA analyse votre portefeuille et vous dit quoi faire en priorité.',
+    'feat.f5.title':'Import Excel instantané','feat.f5.desc':'Glissez-déposez votre fichier client existant. pylotIA importe tout automatiquement en 30 secondes.',
+    'feat.f6.title':'Rapports automatiques (Pro)','feat.f6.desc':'Recevez chaque semaine un résumé de votre activité, des alertes relances et des opportunités à saisir.',
+    'pricing.label':'Tarifs','pricing.title':'Simple, transparent, sans surprise','pricing.sub':'Commencez gratuitement. Évoluez quand vous êtes prêt.',
+    'faq.label':'FAQ','faq.title':'Questions fréquentes',
+    'cta.badge':'Démarrez en 2 minutes','cta.title':'Votre business mérite<br>mieux qu\'un Excel',
+    'cta.sub':'Rejoignez les PME qui ont remplacé leurs fichiers<br>par un CRM IA qui travaille à leur place.',
+    'cta.btn':'Créer mon compte gratuit','cta.note':'Aucune carte bancaire requise · 14 jours Pro offerts',
+    'contact.label':'Contact','contact.title':'Une question ?<br>Écrivez-nous.','contact.sub':'Florian ou Lorik vous répond sous 24h.',
+    'contact.name':'Votre nom','contact.namePh':'Jean Dupont',
+    'contact.email':'Votre email','contact.emailPh':'jean@entreprise.fr',
+    'contact.msg':'Votre message','contact.msgPh':'Dites-nous comment on peut vous aider...',
+    'contact.btn':'Envoyer le message →',
+    'contact.successTitle':'Message envoyé !','contact.successSub':'Merci ! Florian ou Lorik vous recontactera très prochainement.',
+    'footer.cgu':'CGU','footer.legal':'Mentions légales','footer.copy':'© 2026 pylotIA — Tous droits réservés',
+  },
+  en: {
+    'nav.features':'Features','nav.pricing':'Pricing','nav.demo':'Demo',
+    'nav.contact':'Contact','nav.login':'Sign in','nav.cta':'Try for free',
+    'hero.badge':'Intelligent CRM for SMBs',
+    'hero.h1':'Run your business<br>with <span class="accent">artificial</span> intelligence',
+    'hero.sub':'No more lost spreadsheets and forgotten follow-ups. pylotIA centralizes your clients, appointments and pipeline — AI does the rest.',
+    'hero.cta1':'Get started free','hero.cta2':'See pricing',
+    'hero.stat1':'To import your clients','hero.stat2':'To get started','hero.stat3':'Pro trial included',
+    'feat.label':'Features','feat.title':'Everything your business needs',
+    'feat.sub':'One tool to replace your Excel files, paper calendar and manual follow-ups.',
+    'feat.f1.title':'Client portfolio','feat.f1.desc':'Centralize all your contacts. Import your Excel in 30 seconds. Track every client at a glance.',
+    'feat.f2.title':'Calendar & appointments','feat.f2.desc':'Schedule your meetings directly in the tool. No more missed appointments — everything is centralized.',
+    'feat.f3.title':'Prospecting pipeline','feat.f3.desc':'Visualize your prospects in a kanban board: to contact, in discussion, to follow up. Prioritize instantly.',
+    'feat.f4.title':'AI Assistant (Pro)','feat.f4.desc':'Ask questions in plain language. AI analyzes your portfolio and tells you what to do next.',
+    'feat.f5.title':'Instant Excel import','feat.f5.desc':'Drag and drop your existing client file. pylotIA imports everything automatically in 30 seconds.',
+    'feat.f6.title':'Automated reports (Pro)','feat.f6.desc':'Receive a weekly summary of your activity, follow-up alerts and opportunities to seize.',
+    'pricing.label':'Pricing','pricing.title':'Simple, transparent, no surprises','pricing.sub':'Start for free. Scale when you\'re ready.',
+    'faq.label':'FAQ','faq.title':'Frequently asked questions',
+    'cta.badge':'Get started in 2 minutes','cta.title':'Your business deserves<br>better than a spreadsheet',
+    'cta.sub':'Join the businesses that replaced their files<br>with an AI CRM that works for them.',
+    'cta.btn':'Create my free account','cta.note':'No credit card required · 14-day Pro trial included',
+    'contact.label':'Contact','contact.title':'Have a question?<br>Write to us.','contact.sub':'Florian or Lorik will reply within 24h.',
+    'contact.name':'Your name','contact.namePh':'John Smith',
+    'contact.email':'Your email','contact.emailPh':'john@company.com',
+    'contact.msg':'Your message','contact.msgPh':'Tell us how we can help...',
+    'contact.btn':'Send message →',
+    'contact.successTitle':'Message sent!','contact.successSub':'Thank you! Florian or Lorik will get back to you shortly.',
+    'footer.cgu':'Terms','footer.legal':'Legal notice','footer.copy':'© 2026 pylotIA — All rights reserved',
+  }
+};
+
+let _currentLang = localStorage.getItem('pylotia-lang') || 'fr';
+
+function setLang(lang) {
+  _currentLang = lang;
+  localStorage.setItem('pylotia-lang', lang);
+  document.documentElement.lang = lang;
+  const t = TRANSLATIONS[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key] !== undefined) el.textContent = t[key];
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.getAttribute('data-i18n-html');
+    if (t[key] !== undefined) el.innerHTML = t[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (t[key] !== undefined) el.placeholder = t[key];
+  });
+  const btn = document.getElementById('lang-btn');
+  if (btn) btn.textContent = lang === 'fr' ? 'EN' : 'FR';
+}
+
+function toggleLang() { setLang(_currentLang === 'fr' ? 'en' : 'fr'); }
+
+// Apply on load
+setLang(_currentLang);
 </script>
 </body>
 </html>
