@@ -681,6 +681,12 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
         <option value="En cours">En cours</option>
         <option value="Inactif">Inactif</option>
       </select>
+      <select class="form-select" id="sort-contacts" onchange="renderContacts()" style="width:160px;background:var(--dark2);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;outline:none">
+        <option value="recent">Plus récents</option>
+        <option value="nom-az">Nom A → Z</option>
+        <option value="nom-za">Nom Z → A</option>
+        <option value="entreprise">Entreprise A → Z</option>
+      </select>
     </div>
     <div class="table-wrap">
       <div class="table-head" style="grid-template-columns:1fr 160px 100px 120px 90px">
@@ -725,6 +731,15 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
         <div class="page-sub">Suivi et fidélisation de vos clients après la vente</div>
       </div>
     </div>
+    <div class="search-bar" style="margin-bottom:16px">
+      <input class="search-input" id="search-postvente" placeholder="Rechercher un contact..." oninput="renderPostVente()">
+      <select class="form-select" id="filter-pv-section" onchange="renderPostVente()" style="width:180px;background:var(--dark2);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;outline:none">
+        <option value="">Toutes les sections</option>
+        <option value="clients">Clients actifs</option>
+        <option value="inactifs">Inactifs</option>
+        <option value="campagnes">En campagne</option>
+      </select>
+    </div>
     <div id="pv-content"></div>
   </div>
 
@@ -742,6 +757,17 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
     <div id="campaigns-view">
       <div class="search-bar" style="margin-bottom:16px" id="campaigns-search-bar">
         <input class="search-input" id="search-campaigns" placeholder="Rechercher une campagne..." oninput="renderCampaigns()">
+        <select class="form-select" id="filter-camp-statut" onchange="renderCampaigns()" style="width:160px;background:var(--dark2);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;outline:none">
+          <option value="">Tous les statuts</option>
+          <option value="active">Active</option>
+          <option value="archivée">Archivée</option>
+          <option value="terminée">Terminée</option>
+        </select>
+        <select class="form-select" id="sort-campaigns" onchange="renderCampaigns()" style="width:160px;background:var(--dark2);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;outline:none">
+          <option value="recent">Plus récentes</option>
+          <option value="nom-az">Nom A → Z</option>
+          <option value="active-first">Actives d'abord</option>
+        </select>
       </div>
       <div id="campaigns-empty" style="display:none" class="campaign-empty">
         <div style="font-size:40px;margin-bottom:12px">📣</div>
@@ -1840,10 +1866,15 @@ function renderContacts() {
   const contacts = getContacts();
   const search = document.getElementById('search-contacts')?.value.toLowerCase() || '';
   const filterStatut = document.getElementById('filter-statut')?.value || '';
+  const sortContacts = document.getElementById('sort-contacts')?.value || 'recent';
   let filtered = contacts.filter(c =>
     (!search || c.nom.toLowerCase().includes(search) || (c.entreprise||'').toLowerCase().includes(search) || (c.email||'').toLowerCase().includes(search)) &&
     (!filterStatut || c.statut === filterStatut)
   );
+  if (sortContacts === 'nom-az') filtered.sort((a,b) => a.nom.localeCompare(b.nom));
+  else if (sortContacts === 'nom-za') filtered.sort((a,b) => b.nom.localeCompare(a.nom));
+  else if (sortContacts === 'entreprise') filtered.sort((a,b) => (a.entreprise||'').localeCompare(b.entreprise||''));
+  // 'recent' = ordre par défaut (déjà trié par date d'ajout)
   document.getElementById('contacts-count').textContent = contacts.length;
   const list = document.getElementById('contacts-list');
   if (!list) return;
@@ -2208,10 +2239,15 @@ function renderCampaigns() {
   const empty = document.getElementById('campaigns-empty');
   if (!grid) return;
   const search = (document.getElementById('search-campaigns')?.value || '').toLowerCase().trim();
-  const toShow = search ? _campaigns.filter(c =>
-    c.nom.toLowerCase().includes(search) ||
-    (c.description||'').toLowerCase().includes(search)
-  ) : _campaigns;
+  const filterCampStatut = document.getElementById('filter-camp-statut')?.value || '';
+  const sortCamp = document.getElementById('sort-campaigns')?.value || 'recent';
+  let toShow = _campaigns.filter(c =>
+    (!search || c.nom.toLowerCase().includes(search) || (c.description||'').toLowerCase().includes(search)) &&
+    (!filterCampStatut || c.statut === filterCampStatut)
+  );
+  if (sortCamp === 'nom-az') toShow.sort((a,b) => a.nom.localeCompare(b.nom));
+  else if (sortCamp === 'active-first') toShow.sort((a,b) => (a.statut==='active'?0:1) - (b.statut==='active'?0:1));
+  // 'recent' = ordre par défaut
   if (!toShow.length) {
     if (empty) empty.style.display = search ? 'none' : 'block';
     grid.innerHTML = search ? `<div style="text-align:center;padding:48px 20px;color:var(--text3);font-size:13px">🔍 Aucune campagne pour "<strong>${search}</strong>"</div>` : '';
@@ -3948,16 +3984,25 @@ function renderPostVente() {
   const el = document.getElementById('pv-content');
   if (!el) return;
 
+  const pvSearch = (document.getElementById('search-postvente')?.value || '').toLowerCase().trim();
+  const pvSection = document.getElementById('filter-pv-section')?.value || '';
+  function pvMatch(c) {
+    if (!pvSearch) return true;
+    return c.nom.toLowerCase().includes(pvSearch) ||
+      (c.entreprise||'').toLowerCase().includes(pvSearch) ||
+      (c.email||'').toLowerCase().includes(pvSearch);
+  }
+
   const contacts = _contacts || [];
-  const clients  = contacts.filter(c => c.statut === 'Client');
-  const inactifs = contacts.filter(c => c.statut === 'Inactif');
+  const clients  = contacts.filter(c => c.statut === 'Client' && pvMatch(c));
+  const inactifs = contacts.filter(c => c.statut === 'Inactif' && pvMatch(c));
 
   // Contacts assignés à au moins une campagne
   const inCamp = [];
   (_campaigns || []).forEach(camp => {
     const cc = _campaignContacts[camp.id] || [];
     cc.forEach(item => {
-      if (item.contacts) {
+      if (item.contacts && pvMatch(item.contacts)) {
         inCamp.push({ contact: item.contacts, campagne: camp.nom, campagneId: camp.id, statut: item.statut });
       }
     });
@@ -4034,24 +4079,31 @@ function renderPostVente() {
         </div>`;
       }).join('')}</div>`;
 
+  const showClients  = !pvSection || pvSection === 'clients';
+  const showInactifs = !pvSection || pvSection === 'inactifs';
+  const showCamp     = !pvSection || pvSection === 'campagnes';
+
   el.innerHTML = `
+    ${showClients ? `
     <div class="pv-section-title">
       ✅ Clients actifs
       <span class="pv-section-count">${clients.length}</span>
     </div>
-    ${bloc1}
+    ${bloc1}` : ''}
 
+    ${showInactifs ? `
     <div class="pv-section-title">
       ⚠️ Clients inactifs à réactiver
       <span class="pv-section-count">${inactifs.length}</span>
     </div>
-    ${bloc2}
+    ${bloc2}` : ''}
 
+    ${showCamp ? `
     <div class="pv-section-title">
       📣 Contacts en campagne de relance
       <span class="pv-section-count">${inCamp.length}</span>
     </div>
-    ${bloc3}
+    ${bloc3}` : ''}
   `;
 }
 
