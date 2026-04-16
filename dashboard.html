@@ -3494,6 +3494,7 @@ async function convertProspectToContact(id) {
     _contacts.unshift(normalizeContact(saved));
     addActivity('add', 'Contact créé depuis prospect : ' + p.nom);
     showToast(p.nom + ' ajouté aux contacts ✓');
+    _prospects = _prospects.filter(x => x.id !== id);
     renderKanban();
     updateDashStats();
     // Fermer le modal si ouvert
