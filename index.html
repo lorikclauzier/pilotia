@@ -16,6 +16,7 @@
 <meta name="twitter:description" content="Fini les Excel perdus et les relances oubliées. pylotIA centralise vos clients et votre prospection.">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -280,6 +281,24 @@ tr:last-child td{border-bottom:none}
 .cta-sub{font-size:17px;color:var(--text2);margin-bottom:40px;line-height:1.7}
 .cta-note{font-size:13px;color:var(--text3);margin-top:16px}
 
+/* CONTACT FORM SECTION */
+.contact-section{padding:80px 40px;max-width:640px;margin:0 auto;text-align:center}
+.contact-form{background:var(--dark2);border:1px solid var(--border);border-radius:20px;padding:40px;text-align:left;margin-top:36px}
+.contact-form-title{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;letter-spacing:-1px;text-align:center;margin-bottom:8px}
+.contact-form-sub{font-size:15px;color:var(--text2);text-align:center;margin-bottom:32px}
+.cf-field{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
+.cf-label{font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;font-weight:500}
+.cf-input{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;transition:border-color 0.2s,background 0.2s;resize:none;outline:none}
+.cf-input:focus{border-color:var(--blue);background:rgba(59,130,246,0.05)}
+.cf-input::placeholder{color:var(--text3)}
+.cf-submit{width:100%;background:var(--blue);color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:500;font-family:'Syne',sans-serif;cursor:pointer;transition:background 0.2s,transform 0.15s;margin-top:8px}
+.cf-submit:hover{background:var(--blue2);transform:translateY(-1px)}
+.cf-submit:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+.cf-success{display:none;text-align:center;padding:20px;background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:12px;margin-top:20px}
+.cf-success-icon{font-size:32px;margin-bottom:10px}
+.cf-success-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:#34d399;margin-bottom:6px}
+.cf-success-sub{font-size:14px;color:var(--text2)}
+
 /* FOOTER */
 footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
 .footer-logo{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff}
@@ -390,6 +409,7 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
     <a href="#features">Fonctionnalités</a>
     <a href="#pricing">Tarifs</a>
     <a href="#demo">Démo</a>
+    <a href="#contact">Contact</a>
     <a href="login.html">Se connecter</a>
   </div>
   <a href="signup.html" class="nav-cta" style="text-decoration:none">Essayer gratuitement</a>
@@ -399,6 +419,7 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
   <a href="#features" onclick="closeMobileMenu()">Fonctionnalités</a>
   <a href="#pricing" onclick="closeMobileMenu()">Tarifs</a>
   <a href="#demo" onclick="closeMobileMenu()">Démo</a>
+  <a href="#contact" onclick="closeMobileMenu()">Contact</a>
   <a href="login.html">Se connecter</a>
   <a href="signup.html" class="btn-main" style="text-decoration:none">Essayer gratuitement</a>
 </div>
@@ -795,6 +816,35 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
   <div class="cta-note">Aucune carte bancaire requise · 14 jours Pro offerts</div>
 </section>
 
+<!-- CONTACT FORM -->
+<section id="contact" class="contact-section">
+  <div class="section-label">Contact</div>
+  <div class="contact-form">
+    <div class="contact-form-title">Une question ?<br>Écrivez-nous.</div>
+    <div class="contact-form-sub">Florian ou Lorik vous répond sous 24h.</div>
+    <form id="contact-form" onsubmit="submitContactForm(event)">
+      <div class="cf-field">
+        <label class="cf-label" for="cf-nom">Votre nom</label>
+        <input class="cf-input" id="cf-nom" name="from_name" type="text" placeholder="Jean Dupont" required>
+      </div>
+      <div class="cf-field">
+        <label class="cf-label" for="cf-email">Votre email</label>
+        <input class="cf-input" id="cf-email" name="from_email" type="email" placeholder="jean@entreprise.fr" required>
+      </div>
+      <div class="cf-field">
+        <label class="cf-label" for="cf-msg">Votre message</label>
+        <textarea class="cf-input" id="cf-msg" name="message" rows="5" placeholder="Dites-nous comment on peut vous aider..." required></textarea>
+      </div>
+      <button class="cf-submit" id="cf-btn" type="submit">Envoyer le message →</button>
+    </form>
+    <div class="cf-success" id="cf-success">
+      <div class="cf-success-icon">✅</div>
+      <div class="cf-success-title">Message envoyé !</div>
+      <div class="cf-success-sub">Merci ! Florian ou Lorik vous recontactera très prochainement.</div>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="footer-logo">pylot<span>IA</span></div>
   <div class="footer-links">
@@ -935,6 +985,43 @@ function closeMobileMenu(){
   document.getElementById('hamburger').classList.remove('open');
   document.getElementById('mobile-menu').classList.remove('open');
   document.body.style.overflow = '';
+}
+
+// ── EMAILJS CONTACT FORM ──────────────────────────────────────────────
+// Configurer ces 3 valeurs depuis emailjs.com > Account > API Keys + Services
+const EMAILJS_PUBLIC_KEY  = 'VOTRE_PUBLIC_KEY';   // ex: "abc123xyz"
+const EMAILJS_SERVICE_ID  = 'VOTRE_SERVICE_ID';   // ex: "service_pylotia"
+const EMAILJS_TEMPLATE_ID = 'VOTRE_TEMPLATE_ID';  // ex: "template_contact"
+
+(function initEmailJS() {
+  if (typeof emailjs !== 'undefined') {
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+  }
+})();
+
+async function submitContactForm(e) {
+  e.preventDefault();
+  const btn = document.getElementById('cf-btn');
+  btn.disabled = true;
+  btn.textContent = 'Envoi en cours…';
+
+  const params = {
+    from_name:  document.getElementById('cf-nom').value.trim(),
+    from_email: document.getElementById('cf-email').value.trim(),
+    message:    document.getElementById('cf-msg').value.trim(),
+    to_email:   'pylotia.app@gmail.com',
+  };
+
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
+    document.getElementById('contact-form').style.display = 'none';
+    document.getElementById('cf-success').style.display = 'block';
+  } catch (err) {
+    console.error('EmailJS error:', err);
+    btn.disabled = false;
+    btn.textContent = 'Envoyer le message →';
+    alert('Une erreur est survenue. Veuillez nous écrire directement à pylotia.app@gmail.com');
+  }
 }
 </script>
 </body>
