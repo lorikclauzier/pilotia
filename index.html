@@ -111,12 +111,16 @@ h1 .underline{position:relative;display:inline-block}
 .feature-desc{font-size:13px;color:var(--text2);line-height:1.6}
 
 /* PRICING */
-.pricing-section{padding:80px 40px;max-width:1000px;margin:0 auto}
-.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start;margin-top:0}
+.pricing-section{padding:80px 40px;max-width:1240px;margin:0 auto}
+.pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:start;margin-top:0}
 .plan-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;position:relative;transition:transform 0.2s}
 .plan-card:hover{transform:translateY(-3px)}
-.plan-card.featured{border-color:rgba(59,130,246,0.5);background:linear-gradient(135deg,#0e1420 0%,#0d1829 100%)}
-.featured-tag{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--blue);color:#fff;font-size:11px;font-weight:500;padding:4px 14px;border-radius:20px;white-space:nowrap}
+.plan-card.featured{border-color:rgba(59,130,246,0.55);background:linear-gradient(135deg,#0e1420 0%,#0d1829 100%);box-shadow:0 0 0 1px rgba(59,130,246,0.25),0 8px 40px rgba(59,130,246,0.18);transform:translateY(-6px)}
+.plan-card.featured:hover{transform:translateY(-9px)}
+.featured-tag{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--blue);color:#fff;font-size:11px;font-weight:600;padding:4px 14px;border-radius:20px;white-space:nowrap;letter-spacing:0.2px}
+.flat-banner{display:flex;align-items:flex-start;gap:10px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.14);border-radius:10px;padding:13px 18px;margin-bottom:32px;font-size:13px;color:var(--text2);line-height:1.5}
+.flat-banner strong{color:var(--text)}
+.plan-cta-coming{width:100%;padding:11px;border-radius:8px;font-size:14px;font-weight:500;margin-bottom:24px;background:rgba(74,90,120,0.12);color:#4a5a78;border:1px solid rgba(74,90,120,0.2);text-align:center;cursor:default;box-sizing:border-box}
 .plan-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#fff;margin-bottom:4px}
 .plan-desc{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.5}
 .plan-price{display:flex;align-items:baseline;gap:4px;margin-bottom:6px}
@@ -368,6 +372,7 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
 @media(max-width:1024px){
   .features-grid{grid-template-columns:repeat(2,1fr)}
   .pricing-grid{grid-template-columns:repeat(2,1fr)}
+  .plan-card.featured{transform:none}
   .hero-stats{gap:24px}
   .preview-section,.features-section,.pricing-section,.app-section,.cta-section{padding:60px 28px}
 }
@@ -419,7 +424,7 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
   /* PRICING */
   .pricing-section{padding:40px 16px}
   .pricing-grid{grid-template-columns:1fr}
-  .plan-card.featured{order:-1}
+  .plan-card.featured{order:-1;transform:none}
   .plan-card{padding:24px}
   .plan-cta{min-height:44px}
   /* FAQ */
@@ -492,27 +497,27 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
   <div class="preview-wrap">
     <div class="preview-bar">
       <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
-      <div class="preview-url">pilotia.vercel.app — Tableau de bord</div>
+      <div class="preview-url">pilotia.vercel.app — <span data-i18n="prev.bar">Tableau de bord</span></div>
     </div>
     <div class="mini-app">
       <div class="mini-sidebar">
         <div class="mini-logo">pylotIA</div>
-        <div class="mini-nav active"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
-        <div class="mini-nav"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>Clients</div>
-        <div class="mini-nav"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Agenda</div>
-        <div class="mini-nav"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Prospects</div>
+        <div class="mini-nav active"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span data-i18n="demo.nav1">Dashboard</span></div>
+        <div class="mini-nav"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg><span data-i18n="demo.nav2">Clients</span></div>
+        <div class="mini-nav"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span data-i18n="demo.nav3">Agenda</span></div>
+        <div class="mini-nav"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span data-i18n="demo.nav4">Prospects</span></div>
       </div>
       <div class="mini-main">
-        <div class="mini-title">Tableau de bord</div>
+        <div class="mini-title" data-i18n="demo.nav1">Tableau de bord</div>
         <div class="mini-grid">
-          <div class="mini-stat"><div class="mini-stat-label">Clients actifs</div><div class="mini-stat-val">12</div></div>
-          <div class="mini-stat"><div class="mini-stat-label">CA potentiel</div><div class="mini-stat-val">8 400€</div></div>
+          <div class="mini-stat"><div class="mini-stat-label" data-i18n="demo.stat1">Clients actifs</div><div class="mini-stat-val">12</div></div>
+          <div class="mini-stat"><div class="mini-stat-label" data-i18n="demo.stat2">CA potentiel</div><div class="mini-stat-val">8 400€</div></div>
         </div>
         <div class="mini-table">
-          <div class="mini-th"><span>Client</span><span>Offre</span><span>Statut</span></div>
-          <div class="mini-tr"><span>Martin & Co</span><span>Pro</span><span><span class="mini-badge mb-green">Actif</span></span></div>
-          <div class="mini-tr"><span>Boulangerie</span><span>Starter</span><span><span class="mini-badge mb-amber">Relancer</span></span></div>
-          <div class="mini-tr"><span>Cabinet P.</span><span>Pro</span><span><span class="mini-badge mb-blue">Essai</span></span></div>
+          <div class="mini-th"><span data-i18n="demo.th1">Client</span><span data-i18n="demo.th2">Offre</span><span data-i18n="demo.th3">Statut</span></div>
+          <div class="mini-tr"><span>Martin & Co</span><span>Pro</span><span><span class="mini-badge mb-green" data-i18n="demo.badge.active">Actif</span></span></div>
+          <div class="mini-tr"><span>Boulangerie</span><span>Starter</span><span><span class="mini-badge mb-amber" data-i18n="demo.badge.followup">Relancer</span></span></div>
+          <div class="mini-tr"><span>Cabinet P.</span><span>Pro</span><span><span class="mini-badge mb-blue" data-i18n="demo.badge.trial">Essai</span></span></div>
         </div>
       </div>
     </div>
@@ -520,16 +525,16 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
 </section>
 <!-- APP DEMO -->
 <section class="app-section" id="demo">
-  <div class="section-label">Démo interactive</div>
-  <h2 class="section-title">Testez l'outil en direct</h2>
-  <p class="section-sub">Explorez toutes les fonctionnalités de pylotIA sans créer de compte.</p>
+  <div class="section-label" data-i18n="demo.label">Démo interactive</div>
+  <h2 class="section-title" data-i18n="demo.title">Testez l'outil en direct</h2>
+  <p class="section-sub" data-i18n="demo.sub">Explorez toutes les fonctionnalités de pylotIA sans créer de compte.</p>
 
   <div class="app-tabs">
-    <button class="app-tab active" onclick="showTab('dashboard',this)">Tableau de bord</button>
-    <button class="app-tab" onclick="showTab('clients',this)">Clients</button>
-    <button class="app-tab" onclick="showTab('agenda',this)">Agenda</button>
-    <button class="app-tab" onclick="showTab('prospection',this)">Prospection</button>
-    <button class="app-tab" onclick="showTab('assistant',this)">Assistant IA ✦</button>
+    <button class="app-tab active" onclick="showTab('dashboard',this)" data-i18n="demo.nav1">Tableau de bord</button>
+    <button class="app-tab" onclick="showTab('clients',this)" data-i18n="demo.nav2">Clients</button>
+    <button class="app-tab" onclick="showTab('agenda',this)" data-i18n="demo.nav3">Agenda</button>
+    <button class="app-tab" onclick="showTab('prospection',this)" data-i18n="demo.nav4">Prospection</button>
+    <button class="app-tab" onclick="showTab('assistant',this)" data-i18n="demo.tab5">Assistant IA ✦</button>
   </div>
 
   <div class="app-frame">
@@ -739,61 +744,85 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
   <div class="section-label" data-i18n="pricing.label">Tarifs</div>
   <h2 class="section-title" data-i18n="pricing.title">Simple, transparent, sans surprise</h2>
   <p class="section-sub" data-i18n="pricing.sub">Commencez gratuitement. Évoluez quand vous êtes prêt.</p>
+
+  <!-- Flat-rate banner -->
+  <div class="flat-banner">
+    <span>💡</span>
+    <div><strong>Prix flat rate</strong> — pas par utilisateur. Avec nous, pas de mauvaise surprise quand ton équipe grandit.</div>
+  </div>
+
   <div class="pricing-grid">
 
-    <!-- FREE -->
+    <!-- GRATUIT -->
     <div class="plan-card">
-      <div class="plan-name">Gratuit</div>
-      <div class="plan-desc">Pour découvrir pylotIA et gérer vos premiers clients.</div>
-      <div class="plan-price"><span class="price-num">0€</span><span class="price-period">/mois</span></div>
-      <div class="price-note">Pour toujours gratuit</div>
-      <a href="signup.html" class="plan-cta cta-outline" style="text-decoration:none;display:block;text-align:center">Commencer gratuitement</a>
+      <div class="plan-name" data-i18n="plan.free.name">Gratuit</div>
+      <div class="plan-desc" data-i18n="plan.free.desc">Pour tester l'outil</div>
+      <div class="plan-price"><span class="price-num">0€</span></div>
+      <div class="price-note" data-i18n="plan.free.note">Pour toujours gratuit</div>
+      <a href="signup.html" class="plan-cta cta-outline" style="text-decoration:none;display:block;text-align:center" data-i18n="plan.free.cta">Commencer gratuitement</a>
       <div class="plan-features">
-        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Jusqu'à 10 clients</div>
-        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Agenda & RDV</div>
-        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Import Excel (1 fois)</div>
-        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Pipeline de base (3 colonnes)</div>
-        <div class="divider"></div>
-        <div class="pf-item disabled"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-no"><path d="M18 6L6 18M6 6l12 12"/></svg>Assistant IA</div>
-        <div class="pf-item disabled"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-no"><path d="M18 6L6 18M6 6l12 12"/></svg>Rapports automatiques</div>
-        <div class="pf-item disabled"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-no"><path d="M18 6L6 18M6 6l12 12"/></svg>Relances automatisées</div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.free.f1">Jusqu'à 10 contacts</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.free.f2">1 campagne de relance</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.free.f3">Agenda de base</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.free.f4">Import CSV limité (20 contacts max)</span></div>
       </div>
     </div>
 
     <!-- STARTER -->
-    <div class="plan-card featured">
-      <div class="featured-tag">Le plus populaire</div>
-      <div class="plan-name">Starter</div>
-      <div class="plan-desc">Pour les PME qui veulent structurer leur suivi client efficacement.</div>
-      <div class="plan-price"><span class="price-num">199€</span><span class="price-period">/mois</span></div>
-      <div class="price-note">Sans engagement · 14 jours offerts</div>
-      <div style="width:100%;padding:11px;border-radius:8px;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;margin-bottom:24px;background:rgba(74,90,120,0.15);color:#4a5a78;border:1px solid rgba(74,90,120,0.25);text-align:center;cursor:default">Prochainement</div>
+    <div class="plan-card">
+      <div class="plan-name" data-i18n="plan.starter.name">Starter</div>
+      <div class="plan-desc" data-i18n="plan.starter.desc">Pour l'indépendant qui veut remplacer Excel</div>
+      <div class="plan-price"><span class="price-num">29€</span><span class="price-period">/mois</span></div>
+      <div class="price-note" data-i18n="plan.coming.note">Sans engagement</div>
+      <div class="plan-cta-coming" data-i18n="plan.coming.btn">Prochainement</div>
       <div class="plan-features">
-        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Clients illimités</div>
-        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Agenda & RDV avancé</div>
-        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Import Excel illimité</div>
-        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Pipeline complet + relances</div>
-        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Alertes relances automatiques</div>
-        <div class="divider"></div>
-        <div class="pf-item disabled"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-no"><path d="M18 6L6 18M6 6l12 12"/></svg>Assistant IA</div>
-        <div class="pf-item disabled"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-no"><path d="M18 6L6 18M6 6l12 12"/></svg>Rapports automatiques</div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.starter.f1">Contacts illimités</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.starter.f2">Prospects et Kanban illimités</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.starter.f3">Campagnes de relance illimitées</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.starter.f4">Agenda complet</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.starter.f5">Import Excel/CSV illimité</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.starter.f6">Fiche contact avec documents joints</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.starter.f7">Stats basiques</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.starter.f8">Filtres et recherche globale</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.starter.f9">Support par email</span></div>
       </div>
     </div>
 
     <!-- PRO -->
-    <div class="plan-card">
-      <div class="plan-name">Pro</div>
-      <div class="plan-desc">Pour les entreprises qui veulent que l'IA pilote leur activité à leur place.</div>
-      <div class="plan-price"><span class="price-num">449€</span><span class="price-period">/mois</span></div>
-      <div class="price-note">Sans engagement · 14 jours offerts</div>
-      <div style="width:100%;padding:11px;border-radius:8px;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;margin-bottom:24px;background:rgba(74,90,120,0.15);color:#4a5a78;border:1px solid rgba(74,90,120,0.25);text-align:center;cursor:default">Prochainement</div>
+    <div class="plan-card featured">
+      <div class="featured-tag" data-i18n="plan.pro.badge">⭐ Le plus populaire</div>
+      <div class="plan-name" data-i18n="plan.pro.name">Pro</div>
+      <div class="plan-desc" data-i18n="plan.pro.desc">Pour celui qui veut accélérer sa prospection</div>
+      <div class="plan-price"><span class="price-num">89€</span><span class="price-period">/mois</span></div>
+      <div class="price-note" data-i18n="plan.coming.note">Sans engagement</div>
+      <div class="plan-cta-coming" data-i18n="plan.coming.btn">Prochainement</div>
       <div class="plan-features">
-        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Tout Starter inclus</div>
-        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><strong>Assistant IA</strong> — questions en langage naturel</div>
-        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Rapport hebdomadaire automatique</div>
-        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Analyse des prospects chauds</div>
-        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>CA potentiel en temps réel</div>
-        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg>Onboarding personnalisé inclus</div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.pro.f1">Tout le Starter</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><strong data-i18n="plan.pro.f2">Assistant IA</strong> <span data-i18n="plan.pro.f2b"> connecté à tes données</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.pro.f3">Onglet Post-vente complet</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.pro.f4">Dashboard Performance avancé</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.pro.f5">Relances automatiques</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.pro.f6">Export PDF et Excel</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.pro.f7">Support prioritaire (&lt; 24h)</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.pro.f8">Accès anticipé aux nouvelles fonctionnalités</span></div>
+      </div>
+    </div>
+
+    <!-- BUSINESS -->
+    <div class="plan-card">
+      <div class="plan-name" data-i18n="plan.biz.name">Business</div>
+      <div class="plan-desc" data-i18n="plan.biz.desc">Pour les équipes commerciales</div>
+      <div class="plan-price"><span class="price-num" style="font-size:26px" data-i18n="plan.biz.price">Sur devis</span></div>
+      <div class="price-note">&nbsp;</div>
+      <button class="plan-cta cta-blue" onclick="openDevisModal()" data-i18n="plan.biz.cta">Demander un devis</button>
+      <div class="plan-features">
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.biz.f1">Tout le Pro</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.biz.f2">Multi-comptes commerciaux</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.biz.f3">Vue consolidée direction</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.biz.f4">Agent IA de prospection</span> <span style="font-size:10px;color:var(--text3)" data-i18n="plan.soon">(bientôt)</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.biz.f5">Agent IA de closing</span> <span style="font-size:10px;color:var(--text3)" data-i18n="plan.soon">(bientôt)</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.biz.f6">Formation et onboarding inclus</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.biz.f7">Support dédié</span></div>
       </div>
     </div>
 
@@ -1247,6 +1276,24 @@ const TRANSLATIONS = {
     'feat.f5.title':'Import Excel instantané','feat.f5.desc':'Glissez-déposez votre fichier client existant. pylotIA importe tout automatiquement en 30 secondes.',
     'feat.f6.title':'Rapports automatiques (Pro)','feat.f6.desc':'Recevez chaque semaine un résumé de votre activité, des alertes relances et des opportunités à saisir.',
     'pricing.label':'Tarifs','pricing.title':'Simple, transparent, sans surprise','pricing.sub':'Commencez gratuitement. Évoluez quand vous êtes prêt.',
+    'pricing.banner':'<strong>Prix flat rate</strong> — pas par utilisateur. Avec nous, pas de mauvaise surprise quand ton équipe grandit.',
+    'plan.free.name':'Gratuit','plan.free.desc':'Pour tester l\'outil','plan.free.note':'Pour toujours gratuit','plan.free.cta':'Commencer gratuitement',
+    'plan.free.f1':'Jusqu\'à 10 contacts','plan.free.f2':'1 campagne de relance','plan.free.f3':'Agenda de base','plan.free.f4':'Import CSV limité (20 contacts max)',
+    'plan.starter.name':'Starter','plan.starter.desc':'Pour l\'indépendant qui veut remplacer Excel',
+    'plan.starter.f1':'Contacts illimités','plan.starter.f2':'Prospects et Kanban illimités','plan.starter.f3':'Campagnes de relance illimitées',
+    'plan.starter.f4':'Agenda complet','plan.starter.f5':'Import Excel/CSV illimité','plan.starter.f6':'Fiche contact avec documents joints',
+    'plan.starter.f7':'Stats basiques','plan.starter.f8':'Filtres et recherche globale','plan.starter.f9':'Support par email',
+    'plan.pro.name':'Pro','plan.pro.desc':'Pour celui qui veut accélérer sa prospection','plan.pro.badge':'⭐ Le plus populaire',
+    'plan.pro.f1':'Tout le Starter','plan.pro.f2':'Assistant IA','plan.pro.f2b':' connecté à tes données',
+    'plan.pro.f3':'Onglet Post-vente complet','plan.pro.f4':'Dashboard Performance avancé','plan.pro.f5':'Relances automatiques',
+    'plan.pro.f6':'Export PDF et Excel','plan.pro.f7':'Support prioritaire (< 24h)','plan.pro.f8':'Accès anticipé aux nouvelles fonctionnalités',
+    'plan.biz.name':'Business','plan.biz.desc':'Pour les équipes commerciales','plan.biz.price':'Sur devis','plan.biz.cta':'Demander un devis',
+    'plan.biz.f1':'Tout le Pro','plan.biz.f2':'Multi-comptes commerciaux','plan.biz.f3':'Vue consolidée direction',
+    'plan.biz.f4':'Agent IA de prospection','plan.biz.f5':'Agent IA de closing','plan.biz.f6':'Formation et onboarding inclus','plan.biz.f7':'Support dédié',
+    'plan.coming.note':'Sans engagement','plan.coming.btn':'Prochainement','plan.soon':'(bientôt)',
+    'devis.title':'Demander un devis Business','devis.firstname':'Nom et prénom','devis.company':'Entreprise','devis.email':'Email','devis.phone':'Téléphone (optionnel)',
+    'devis.size':'Nombre de commerciaux envisagés','devis.sector':'Secteur d\'activité','devis.msg':'Message libre',
+    'devis.submit':'Envoyer la demande','devis.success':'Merci ! Florian vous recontactera sous 48h.',
     'faq.label':'FAQ','faq.title':'Questions fréquentes',
     'cta.badge':'Démarrez en 2 minutes','cta.title':'Votre business mérite<br>mieux qu\'un Excel',
     'cta.sub':'Rejoignez les PME qui ont remplacé leurs fichiers<br>par un CRM IA qui travaille à leur place.',
@@ -1276,6 +1323,24 @@ const TRANSLATIONS = {
     'feat.f5.title':'Instant Excel import','feat.f5.desc':'Drag and drop your existing client file. pylotIA imports everything automatically in 30 seconds.',
     'feat.f6.title':'Automated reports (Pro)','feat.f6.desc':'Receive a weekly summary of your activity, follow-up alerts and opportunities to seize.',
     'pricing.label':'Pricing','pricing.title':'Simple, transparent, no surprises','pricing.sub':'Start for free. Scale when you\'re ready.',
+    'pricing.banner':'<strong>Flat rate pricing</strong> — not per user. No nasty surprises as your team grows.',
+    'plan.free.name':'Free','plan.free.desc':'To try the tool','plan.free.note':'Free forever','plan.free.cta':'Get started free',
+    'plan.free.f1':'Up to 10 contacts','plan.free.f2':'1 follow-up campaign','plan.free.f3':'Basic calendar','plan.free.f4':'Limited CSV import (20 contacts max)',
+    'plan.starter.name':'Starter','plan.starter.desc':'For freelancers who want to ditch Excel',
+    'plan.starter.f1':'Unlimited contacts','plan.starter.f2':'Unlimited prospects & Kanban','plan.starter.f3':'Unlimited follow-up campaigns',
+    'plan.starter.f4':'Full calendar','plan.starter.f5':'Unlimited Excel/CSV import','plan.starter.f6':'Contact sheet with attachments',
+    'plan.starter.f7':'Basic stats','plan.starter.f8':'Filters & global search','plan.starter.f9':'Email support',
+    'plan.pro.name':'Pro','plan.pro.desc':'For those who want to accelerate their pipeline','plan.pro.badge':'⭐ Most popular',
+    'plan.pro.f1':'Everything in Starter','plan.pro.f2':'AI Assistant','plan.pro.f2b':' connected to your data',
+    'plan.pro.f3':'Full after-sales tab','plan.pro.f4':'Advanced Performance dashboard','plan.pro.f5':'Automatic follow-ups',
+    'plan.pro.f6':'PDF & Excel export','plan.pro.f7':'Priority support (< 24h)','plan.pro.f8':'Early access to new features',
+    'plan.biz.name':'Business','plan.biz.desc':'For sales teams','plan.biz.price':'Custom pricing','plan.biz.cta':'Request a quote',
+    'plan.biz.f1':'Everything in Pro','plan.biz.f2':'Multi-user sales accounts','plan.biz.f3':'Consolidated management view',
+    'plan.biz.f4':'AI prospecting agent','plan.biz.f5':'AI closing agent','plan.biz.f6':'Training & onboarding included','plan.biz.f7':'Dedicated support',
+    'plan.coming.note':'No commitment','plan.coming.btn':'Coming soon','plan.soon':'(soon)',
+    'devis.title':'Request a Business Quote','devis.firstname':'Full name','devis.company':'Company','devis.email':'Email','devis.phone':'Phone (optional)',
+    'devis.size':'Number of sales reps','devis.sector':'Industry','devis.msg':'Additional message',
+    'devis.submit':'Send request','devis.success':'Thank you! Florian will get back to you within 48h.',
     'faq.label':'FAQ','faq.title':'Frequently asked questions',
     'cta.badge':'Get started in 2 minutes','cta.title':'Your business deserves<br>better than a spreadsheet',
     'cta.sub':'Join the businesses that replaced their files<br>with an AI CRM that works for them.',
@@ -1317,6 +1382,100 @@ function toggleLang() { setLang(_currentLang === 'fr' ? 'en' : 'fr'); }
 
 // Apply on load
 setLang(_currentLang);
+
+// ─── DEVIS MODAL ───────────────────────────────────────
+function openDevisModal() {
+  document.getElementById('devis-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeDevisModal() {
+  document.getElementById('devis-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+async function submitDevisForm(e) {
+  e.preventDefault();
+  const btn = document.getElementById('devis-btn');
+  btn.disabled = true;
+  btn.textContent = _currentLang === 'fr' ? 'Envoi en cours…' : 'Sending…';
+  try {
+    await emailjs.send('service_xql0hy1', 'template_dz1anao', {
+      name:    document.getElementById('dv-name').value.trim(),
+      email:   document.getElementById('dv-email').value.trim(),
+      message: `[DEVIS BUSINESS]\nEntreprise: ${document.getElementById('dv-company').value.trim()}\nTél: ${document.getElementById('dv-phone').value.trim()}\nCommerciaux: ${document.getElementById('dv-size').value}\nSecteur: ${document.getElementById('dv-sector').value.trim()}\n\n${document.getElementById('dv-msg').value.trim()}`,
+    });
+    document.getElementById('devis-form').style.display = 'none';
+    document.getElementById('devis-success').style.display = 'block';
+    setTimeout(closeDevisModal, 3500);
+  } catch(err) {
+    btn.disabled = false;
+    btn.textContent = _currentLang === 'fr' ? 'Envoyer la demande' : 'Send request';
+    alert(_currentLang === 'fr' ? 'Erreur. Écrivez-nous à pylotia.app@gmail.com' : 'Error. Email us at pylotia.app@gmail.com');
+  }
+}
+
+document.getElementById('devis-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeDevisModal();
+});
 </script>
+
+<!-- MODAL DEVIS BUSINESS -->
+<div class="modal-overlay" id="devis-modal">
+  <div class="modal" style="width:520px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div class="modal-title" style="margin-bottom:0" data-i18n="devis.title">Demander un devis Business</div>
+      <button onclick="closeDevisModal()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px;line-height:1">✕</button>
+    </div>
+    <form id="devis-form" onsubmit="submitDevisForm(event)">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label" data-i18n="devis.firstname">Nom et prénom *</label>
+          <input id="dv-name" class="form-input" required placeholder="Jean Dupont">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label" data-i18n="devis.company">Entreprise *</label>
+          <input id="dv-company" class="form-input" required placeholder="Ma société">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label" data-i18n="devis.email">Email *</label>
+          <input id="dv-email" class="form-input" type="email" required placeholder="jean@masociete.fr">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label" data-i18n="devis.phone">Téléphone (optionnel)</label>
+          <input id="dv-phone" class="form-input" type="tel" placeholder="+33 6 …">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label" data-i18n="devis.size">Nombre de commerciaux</label>
+          <select id="dv-size" class="form-select">
+            <option value="2-5">2 – 5</option>
+            <option value="6-10">6 – 10</option>
+            <option value="11-20">11 – 20</option>
+            <option value="20+">20+</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label" data-i18n="devis.sector">Secteur d'activité</label>
+          <input id="dv-sector" class="form-input" placeholder="Ex: Immobilier, BTP…">
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:12px">
+        <label class="form-label" data-i18n="devis.msg">Message libre</label>
+        <textarea id="dv-msg" class="form-input" rows="3" style="resize:vertical" placeholder="Dites-nous ce que vous cherchez…"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeDevisModal()">Annuler</button>
+        <button type="submit" id="devis-btn" class="btn btn-blue" data-i18n="devis.submit">Envoyer la demande</button>
+      </div>
+    </form>
+    <div id="devis-success" style="display:none;text-align:center;padding:32px 20px">
+      <div style="font-size:40px;margin-bottom:16px">✅</div>
+      <div style="font-size:16px;font-weight:600;color:#fff;margin-bottom:8px" data-i18n="devis.success">Merci ! Florian vous recontactera sous 48h.</div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
