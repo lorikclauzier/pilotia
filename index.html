@@ -878,6 +878,21 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
 .faq-item.open .faq-icon{transform:rotate(45deg);color:var(--blue)}
 .faq-a{display:none;padding:0 20px 18px;font-size:14px;color:var(--text2);line-height:1.7}
 .faq-item.open .faq-a{display:block}
+
+/* MODAL DEVIS */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--dark2);border:1px solid var(--border2);border-radius:14px;padding:28px;width:520px;max-width:100%;max-height:90vh;overflow-y:auto}
+.modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:#fff}
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;color:var(--text2);margin-bottom:6px;display:block}
+.form-input,.form-select{width:100%;box-sizing:border-box;background:#141c2e;border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;outline:none}
+.form-input:focus,.form-select:focus{border-color:var(--blue)}
+.form-input::placeholder{color:var(--text3)}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.btn{padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;border:none;transition:all 0.2s}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:#2563eb}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}.btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.25)}
 </style>
 
 <!-- CTA FINAL -->
