@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS user_plans (
   id                UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id           UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL UNIQUE,
   plan              TEXT DEFAULT 'free'
-                      CHECK (plan IN ('free','starter','pro')),
+                      CHECK (plan IN ('free','starter','pro','business')),
   date_activation   TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   stripe_customer_id TEXT,
   created_at        TIMESTAMP WITH TIME ZONE DEFAULT NOW()

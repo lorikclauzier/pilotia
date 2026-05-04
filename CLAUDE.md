@@ -39,13 +39,16 @@ Développé en duo : **Lorik** (DG, dev) + **Flo** (Président, commercial).
 Plus aucune donnée métier en localStorage — tout est en Supabase.
 
 ## Plans tarifaires
-- **Gratuit** : 0€, 10 contacts max, pas de carte requise
-- **Starter** : 199€/mois, 14 jours d'essai, carte requise
-- **Pro** : 449€/mois, 14 jours d'essai, carte requise
+- **Gratuit** : 0€/mois — jusqu'à 10 contacts, 1 campagne, agenda de base, import CSV limité
+- **Starter** : 29€/mois — contacts illimités, kanban illimité, campagnes illimitées, import Excel/CSV illimité, fiche contact + documents, stats basiques, support email
+- **Pro** : 89€/mois — tout Starter + Assistant IA connecté aux données, onglet Post-vente, dashboard performance avancé, relances auto, export PDF/Excel, support < 24h
+- **Business** : sur devis — tout Pro + multi-comptes commerciaux, vue consolidée direction, agents IA prospection/closing (à venir), formation, support dédié
 
 ## Stripe
 Pas encore intégré — en attente configuration micro-entreprise Flo.
 Pages success.html et cancel.html prêtes.
+Boutons Starter/Pro affichent "Prochainement" (non cliquables) en attendant.
+Le plan Business utilise un formulaire de demande de devis (modal landing → email).
 
 ## Assistant IA
 Fonctionne via /api/claude.js sur Vercel.

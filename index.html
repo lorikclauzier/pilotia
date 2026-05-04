@@ -445,9 +445,79 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
   .hero{padding:72px 14px 36px}
   .hero-sub{font-size:14px}
   .btn-main,.btn-ghost{font-size:14px;padding:13px 22px}
-  .hero-stats{gap:12px}
-  .stat-num{font-size:24px}
+  .prob-grid{grid-template-columns:1fr 1fr}
+  .before-after{flex-direction:column;gap:16px}
+  .ba-col{width:100%}
+  .simplicity-grid{grid-template-columns:1fr}
+  .results-grid{grid-template-columns:1fr}
+  .terrain-grid{grid-template-columns:1fr}
 }
+
+/* SECTION PROBLÈME */
+.prob-section{padding:80px 40px;text-align:center}
+.prob-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;max-width:960px;margin:0 auto}
+.prob-card{background:var(--card);border:1px solid var(--border2);border-radius:14px;padding:28px 20px;transition:border-color 0.2s}
+.prob-card:hover{border-color:rgba(59,130,246,0.3)}
+.prob-emoji{font-size:28px;margin-bottom:12px}
+.prob-text{font-size:14px;color:var(--text2);line-height:1.6}
+
+/* SECTION SOLUTION */
+.solution-section{padding:80px 40px;text-align:center;background:linear-gradient(180deg,transparent,rgba(59,130,246,0.04),transparent)}
+.solution-benefits{display:flex;justify-content:center;gap:32px;flex-wrap:wrap;margin-top:40px}
+.sol-item{display:flex;align-items:flex-start;gap:14px;max-width:260px;text-align:left}
+.sol-icon{font-size:24px;flex-shrink:0;margin-top:2px}
+.sol-content h3{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px}
+.sol-content p{font-size:13px;color:var(--text2);line-height:1.6}
+
+/* SECTION RÉSULTATS */
+.results-section{padding:80px 40px;text-align:center}
+.results-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:900px;margin:32px auto 0}
+.result-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:32px 24px}
+.result-icon{font-size:32px;margin-bottom:14px}
+.result-label{font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px}
+.result-note{font-size:13px;color:var(--text3);line-height:1.5}
+.results-quote{max-width:620px;margin:40px auto 0;font-size:14px;color:var(--text3);line-height:1.7;font-style:italic;border-left:3px solid var(--blue);padding-left:16px;text-align:left}
+
+/* SECTION AVANT/APRÈS */
+.ba-section{padding:80px 40px;text-align:center}
+.before-after{display:flex;gap:24px;max-width:800px;margin:40px auto 0}
+.ba-col{flex:1;border-radius:14px;padding:32px 28px;text-align:left}
+.ba-before{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2)}
+.ba-after{background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2)}
+.ba-title{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:20px;opacity:0.7}
+.ba-before .ba-title{color:#f87171}
+.ba-after .ba-title{color:#34d399}
+.ba-item{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);margin-bottom:12px;line-height:1.4}
+.ba-item:last-child{margin-bottom:0}
+
+/* SECTION SIMPLICITÉ */
+.simplicity-section{padding:80px 40px;text-align:center;background:linear-gradient(180deg,transparent,rgba(59,130,246,0.03),transparent)}
+.simplicity-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:760px;margin:36px auto 0}
+.simp-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px}
+.simp-icon{font-size:26px;margin-bottom:10px}
+.simp-text{font-size:14px;color:var(--text2);line-height:1.6}
+
+/* SECTION CRÉDIBILITÉ */
+.cred-section{padding:60px 40px;text-align:center}
+.cred-inner{max-width:640px;margin:0 auto;background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:36px 40px}
+.cred-quote{font-size:16px;color:var(--text2);line-height:1.8;font-style:italic;margin-bottom:16px}
+.cred-quote:last-child{margin-bottom:0}
+
+/* SECTION TERRAIN */
+.terrain-section{padding:80px 40px;text-align:center}
+.terrain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:960px;margin:36px auto 0}
+.terrain-card{background:var(--card);border:1px solid var(--border2);border-radius:14px;padding:28px 24px;text-align:left}
+.terrain-text{font-size:14px;color:var(--text2);line-height:1.7;font-style:italic;margin-bottom:16px}
+.terrain-author{font-size:12px;color:var(--text3);font-weight:500;letter-spacing:0.3px}
+
+/* ANNOTATIONS DÉMO */
+.demo-annot{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);color:#93c5fd;white-space:nowrap}
+body.light .demo-annot{background:rgba(59,130,246,0.08);color:#2563eb;border-color:rgba(59,130,246,0.3)}
+
+/* LIGHT MODE — nouvelles sections */
+body.light .prob-card,body.light .result-card,body.light .simp-card,body.light .cred-inner,body.light .terrain-card{background:#f8faff;border-color:rgba(0,0,0,0.1)}
+body.light .ba-before{background:rgba(239,68,68,0.05);border-color:rgba(239,68,68,0.25)}
+body.light .ba-after{background:rgba(16,185,129,0.05);border-color:rgba(16,185,129,0.25)}
 </style>
 </head>
 <body>
@@ -478,17 +548,111 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
 <section class="hero">
   <div class="hero-grid"></div>
   <div class="hero-glow"></div>
-  <div class="hero-badge"><div class="badge-dot"></div><span data-i18n="hero.badge">CRM intelligent pour TPE/PME</span></div>
-  <h1 data-i18n-html="hero.h1">Pilotez votre business<br>avec l'<span class="accent">intelligence</span> artificielle</h1>
-  <p class="hero-sub" data-i18n="hero.sub">Fini les Excel perdus et les relances oubliées. pylotIA centralise vos clients, vos RDV et votre prospection — et l'IA fait le reste.</p>
+  <h1 data-i18n-html="hero.h1">Vous <span class="accent">perdez des clients</span><br>chaque semaine sans vous en rendre compte.</h1>
+  <p class="hero-sub" data-i18n="hero.sub">Entre les post-it, Excel et les relances oubliées, des prospects passent à la trappe. pylotIA centralise vos clients et automatise vos relances pour ne plus jamais perdre une opportunité.</p>
   <div class="hero-actions">
-    <a href="signup.html" class="btn-main" style="text-decoration:none" data-i18n="hero.cta1">Démarrer gratuitement</a>
-    <a href="#pricing" class="btn-ghost" data-i18n="hero.cta2">Voir les tarifs</a>
+    <a href="signup.html" class="btn-main" style="text-decoration:none" data-i18n="hero.cta1">Tester gratuitement</a>
+    <button onclick="openDevisModal()" class="btn-ghost" style="font-family:'Inter',sans-serif" data-i18n="hero.cta2">Demander une démo</button>
   </div>
-  <div class="hero-stats">
-    <div class="stat"><div class="stat-num">2 min</div><div class="stat-label" data-i18n="hero.stat1">Pour importer vos clients</div></div>
-    <div class="stat"><div class="stat-num">0 €</div><div class="stat-label" data-i18n="hero.stat2">Pour commencer</div></div>
-    <div class="stat"><div class="stat-num">14j</div><div class="stat-label" data-i18n="hero.stat3">D'essai Pro offert</div></div>
+</section>
+
+<!-- SECTION PROBLÈME -->
+<section class="prob-section">
+  <div class="section-label" data-i18n="prob.label">Le vrai problème</div>
+  <h2 class="section-title" data-i18n="prob.title">Vous reconnaissez ces situations ?</h2>
+  <div class="prob-grid">
+    <div class="prob-card">
+      <div class="prob-emoji">📞</div>
+      <div class="prob-text" data-i18n="prob.c1">Vous oubliez de relancer des prospects</div>
+    </div>
+    <div class="prob-card">
+      <div class="prob-emoji">📋</div>
+      <div class="prob-text" data-i18n="prob.c2">Vous perdez des informations clients</div>
+    </div>
+    <div class="prob-card">
+      <div class="prob-emoji">📊</div>
+      <div class="prob-text" data-i18n="prob.c3">Vous utilisez encore Excel ou des post-it</div>
+    </div>
+    <div class="prob-card">
+      <div class="prob-emoji">📅</div>
+      <div class="prob-text" data-i18n="prob.c4">Vous ratez des rendez-vous</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION SOLUTION -->
+<section class="solution-section">
+  <div class="section-label" data-i18n="sol.label">La solution</div>
+  <h2 class="section-title" data-i18n="sol.title">pylotIA centralise tout, simplement.</h2>
+  <p class="section-sub" data-i18n="sol.sub">pylotIA remplace vos post-it et fichiers Excel par un système simple qui centralise tout et relance automatiquement vos clients.</p>
+  <div class="solution-benefits">
+    <div class="sol-item">
+      <div class="sol-icon">🎯</div>
+      <div class="sol-content">
+        <h3 data-i18n="sol.b1.title">Tous vos clients au même endroit</h3>
+        <p data-i18n="sol.b1.desc">Contacts, documents, historique — tout centralisé, accessible en un clic.</p>
+      </div>
+    </div>
+    <div class="sol-item">
+      <div class="sol-icon">🔔</div>
+      <div class="sol-content">
+        <h3 data-i18n="sol.b2.title">Relances automatiques</h3>
+        <p data-i18n="sol.b2.desc">Plus besoin de se souvenir : pylotIA relance vos prospects au bon moment.</p>
+      </div>
+    </div>
+    <div class="sol-item">
+      <div class="sol-icon">📈</div>
+      <div class="sol-content">
+        <h3 data-i18n="sol.b3.title">Suivi simple des prospects</h3>
+        <p data-i18n="sol.b3.desc">Un kanban clair pour voir où en est chaque opportunité, sans effort.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION RÉSULTATS -->
+<section class="results-section">
+  <div class="section-label" data-i18n="res.label">Ce que ça change</div>
+  <h2 class="section-title" data-i18n="res.title">Ce que ça change concrètement</h2>
+  <div class="results-grid">
+    <div class="result-card">
+      <div class="result-icon">📅</div>
+      <div class="result-label" data-i18n="res.r1">Plus de rendez-vous fixés</div>
+      <div class="result-note" data-i18n="res.r1.note">Vos prospects sont relancés au bon moment, pas quand vous y pensez.</div>
+    </div>
+    <div class="result-card">
+      <div class="result-icon">💰</div>
+      <div class="result-label" data-i18n="res.r2">Plus de clients convertis</div>
+      <div class="result-note" data-i18n="res.r2.note">Un suivi structuré, c'est moins de prospects perdus par manque de relance.</div>
+    </div>
+    <div class="result-card">
+      <div class="result-icon">⏱</div>
+      <div class="result-label" data-i18n="res.r3">Moins de temps perdu en gestion</div>
+      <div class="result-note" data-i18n="res.r3.note">Finis les heures passées à chercher dans des fichiers Excel et des post-it.</div>
+    </div>
+  </div>
+  <p class="results-quote" data-i18n="res.quote">Les entreprises qui structurent leur prospection convertissent jusqu'à 3× plus que celles qui l'improvisent — sans forcément prospecter plus.</p>
+</section>
+
+<!-- SECTION AVANT / APRÈS -->
+<section class="ba-section">
+  <div class="section-label" data-i18n="ba.label">La différence</div>
+  <h2 class="section-title" data-i18n="ba.title">Avant / Après pylotIA</h2>
+  <div class="before-after">
+    <div class="ba-col ba-before">
+      <div class="ba-title" data-i18n="ba.before">AVANT</div>
+      <div class="ba-item">❌ <span data-i18n="ba.b1">Excel et post-it partout</span></div>
+      <div class="ba-item">❌ <span data-i18n="ba.b2">Relances oubliées</span></div>
+      <div class="ba-item">❌ <span data-i18n="ba.b3">Clients perdus en chemin</span></div>
+      <div class="ba-item">❌ <span data-i18n="ba.b4">Suivi flou, stressant</span></div>
+    </div>
+    <div class="ba-col ba-after">
+      <div class="ba-title" data-i18n="ba.after">APRÈS</div>
+      <div class="ba-item">✅ <span data-i18n="ba.a1">Tout centralisé, en ordre</span></div>
+      <div class="ba-item">✅ <span data-i18n="ba.a2">Relances automatiques</span></div>
+      <div class="ba-item">✅ <span data-i18n="ba.a3">Suivi clair en temps réel</span></div>
+      <div class="ba-item">✅ <span data-i18n="ba.a4">Plus aucun client oublié</span></div>
+    </div>
   </div>
 </section>
 
@@ -526,8 +690,8 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
 <!-- APP DEMO -->
 <section class="app-section" id="demo">
   <div class="section-label" data-i18n="demo.label">Démo interactive</div>
-  <h2 class="section-title" data-i18n="demo.title">Testez l'outil en direct</h2>
-  <p class="section-sub" data-i18n="demo.sub">Explorez toutes les fonctionnalités de pylotIA sans créer de compte.</p>
+  <h2 class="section-title" data-i18n="demo.title">Un outil simple que vous pouvez utiliser en quelques minutes</h2>
+  <p class="section-sub" data-i18n="demo.sub">Voici à quoi ressemble votre suivi client avec pylotIA — explorez sans créer de compte.</p>
 
   <div class="app-tabs">
     <button class="app-tab active" onclick="showTab('dashboard',this)" data-i18n="demo.nav1">Tableau de bord</button>
@@ -537,6 +701,12 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
     <button class="app-tab" onclick="showTab('assistant',this)" data-i18n="demo.tab5">Assistant IA ✦</button>
   </div>
 
+  <div class="demo-annotations-wrap" style="position:relative">
+    <div style="position:absolute;top:-14px;right:24px;z-index:10;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+      <span class="demo-annot" data-i18n="demo.annot1">🔔 Relances automatiques</span>
+      <span class="demo-annot" data-i18n="demo.annot2">📊 Suivi des prospects</span>
+      <span class="demo-annot" data-i18n="demo.annot3">📅 Rendez-vous centralisés</span>
+    </div>
   <div class="app-frame">
 
     <!-- DASHBOARD -->
@@ -698,6 +868,7 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
     </div>
 
   </div>
+  </div><!-- /demo-annotations-wrap -->
 </section>
 
 <!-- FEATURES -->
@@ -896,13 +1067,64 @@ footer{padding:30px 40px;border-top:1px solid var(--border);display:flex;align-i
 </style>
 
 <!-- CTA FINAL -->
+<!-- SECTION SIMPLICITÉ -->
+<section class="simplicity-section">
+  <div class="section-label" data-i18n="simp.label">Prise en main</div>
+  <h2 class="section-title" data-i18n="simp.title">Simple à utiliser, dès le premier jour</h2>
+  <div class="simplicity-grid">
+    <div class="simp-card">
+      <div class="simp-icon">🎨</div>
+      <div class="simp-text" data-i18n="simp.c1">Interface simple et claire</div>
+    </div>
+    <div class="simp-card">
+      <div class="simp-icon">⚡</div>
+      <div class="simp-text" data-i18n="simp.c2">Prise en main en moins de 10 minutes</div>
+    </div>
+    <div class="simp-card">
+      <div class="simp-icon">🛠</div>
+      <div class="simp-text" data-i18n="simp.c3">Pas besoin de compétences techniques</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION CRÉDIBILITÉ -->
+<section class="cred-section">
+  <div class="cred-inner">
+    <p class="cred-quote" data-i18n="cred.q1">"Conçu à partir de la réalité terrain d'un commercial confronté aux relances oubliées et aux clients perdus."</p>
+    <p class="cred-quote" data-i18n="cred.q2">"Pensé pour les petites entreprises qui gèrent encore leurs clients sur Excel ou des post-it."</p>
+  </div>
+</section>
+
+<!-- SECTION RETOURS TERRAIN -->
+<section class="terrain-section">
+  <div class="section-label" data-i18n="terrain.label">Retours terrain</div>
+  <h2 class="section-title" data-i18n="terrain.title">Retours terrain</h2>
+  <div class="terrain-grid">
+    <div class="terrain-card">
+      <p class="terrain-text" data-i18n="terrain.t1">"Simple et efficace, ça m'évite d'oublier des clients."</p>
+      <div class="terrain-author" data-i18n="terrain.a1">— Test utilisateur</div>
+    </div>
+    <div class="terrain-card">
+      <p class="terrain-text" data-i18n="terrain.t2">"J'ai enfin un suivi clair sans me compliquer la vie."</p>
+      <div class="terrain-author" data-i18n="terrain.a2">— Indépendant</div>
+    </div>
+    <div class="terrain-card">
+      <p class="terrain-text" data-i18n="terrain.t3">"Avant je perdais des prospects parce que j'oubliais de relancer. Maintenant c'est automatique."</p>
+      <div class="terrain-author" data-i18n="terrain.a3">— Artisan, Paris</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
 <section class="cta-section">
   <div class="cta-glow"></div>
-  <div class="hero-badge" style="margin-bottom:24px"><div class="badge-dot"></div><span data-i18n="cta.badge">Démarrez en 2 minutes</span></div>
-  <h2 class="cta-title" data-i18n="cta.title">Votre business mérite<br>mieux qu'un Excel</h2>
-  <p class="cta-sub" data-i18n="cta.sub">Rejoignez les PME qui ont remplacé leurs fichiers<br>par un CRM IA qui travaille à leur place.</p>
-  <a href="signup.html" class="btn-main" style="font-size:16px;padding:16px 36px;text-decoration:none" data-i18n="cta.btn">Créer mon compte gratuit</a>
-  <div class="cta-note" data-i18n="cta.note">Aucune carte bancaire requise · 14 jours Pro offerts</div>
+  <h2 class="cta-title" data-i18n="cta.title">Arrêtez de perdre des clients.<br>Testez pylotIA gratuitement.</h2>
+  <p class="cta-sub" data-i18n="cta.sub">Sans carte bancaire. En ligne en moins de 2 minutes.</p>
+  <a href="signup.html" class="btn-main" style="font-size:16px;padding:16px 36px;text-decoration:none" data-i18n="cta.btn">Commencer gratuitement</a>
+  <div style="margin-top:16px">
+    <button onclick="openDevisModal()" style="background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;text-decoration:underline" data-i18n="cta.demo">Demander une démo personnalisée</button>
+  </div>
+  <div class="cta-note" data-i18n="cta.note">Aucune carte bancaire requise · Gratuit pour toujours</div>
 </section>
 
 <!-- CONTACT FORM -->
@@ -1137,7 +1359,7 @@ const CHAT_LIMIT = 3;
 const CHAT_RESPONSES = {
   fr: {
     greeting: "Bonjour ! 👋 Je suis l'assistant pylotIA. Comment puis-je vous aider ?\n\n• Tarifs & plans\n• Fonctionnalités\n• Import de données\n• Démo & essai gratuit",
-    pricing:  "Nous avons 3 plans :\n\n• **Gratuit** — jusqu'à 10 clients, agenda, pipeline de base\n• **Starter** (199€/mois) — clients illimités, import Excel illimité, relances\n• **Pro** (449€/mois) — tout Starter + assistant IA, rapports automatiques\n\nTous les plans incluent 14 jours d'essai Pro offerts 🎁",
+    pricing:  "Nous avons 4 plans :\n\n• **Gratuit** — jusqu'à 10 contacts, 1 campagne, agenda de base\n• **Starter** (29€/mois) — contacts illimités, kanban et campagnes illimités, import Excel/CSV, support email\n• **Pro** (89€/mois) — tout Starter + Assistant IA, Post-vente, relances auto, export PDF/Excel\n• **Business** (sur devis) — tout Pro + multi-comptes commerciaux, agents IA prospection/closing, support dédié\n\nPrix flat rate — pas par utilisateur 🎁",
     features: "pylotIA centralise tout :\n\n✅ Portefeuille clients\n✅ Agenda & RDV\n✅ Pipeline Kanban\n✅ Import Excel en 30 secondes\n✅ Assistant IA (Pro)\n✅ Campagnes de relance\n\nTout depuis un seul outil, sans installation.",
     import:   "L'import est ultra simple :\n\n1. Glissez votre fichier .xlsx ou .csv\n2. pylotIA détecte automatiquement Nom, Email, Entreprise, Téléphone\n3. Tous vos contacts sont importés en moins de 30 secondes\n\nAucune mise en forme spéciale requise.",
     demo:     "Vous pouvez tester pylotIA gratuitement dès maintenant !\n\n👉 Créez un compte gratuit en 2 minutes — aucune carte bancaire requise.\n\nOu regardez la démo interactive sur cette page (section Démo).",
@@ -1150,7 +1372,7 @@ const CHAT_RESPONSES = {
   },
   en: {
     greeting: "Hello! 👋 I'm the pylotIA assistant. How can I help?\n\n• Pricing & plans\n• Features\n• Data import\n• Demo & free trial",
-    pricing:  "We have 3 plans:\n\n• **Free** — up to 10 clients, calendar, basic pipeline\n• **Starter** ($199/mo) — unlimited clients, Excel import, follow-ups\n• **Pro** ($449/mo) — everything + AI assistant, automated reports\n\nAll plans include a 14-day Pro trial 🎁",
+    pricing:  "We have 4 plans:\n\n• **Free** — up to 10 contacts, 1 campaign, basic calendar\n• **Starter** (€29/mo) — unlimited contacts, unlimited kanban & campaigns, Excel/CSV import, email support\n• **Pro** (€89/mo) — everything in Starter + AI Assistant, after-sales tab, auto follow-ups, PDF/Excel export\n• **Business** (custom pricing) — everything in Pro + multi-user sales accounts, AI prospecting/closing agents, dedicated support\n\nFlat rate pricing — not per user 🎁",
     features: "pylotIA centralizes everything:\n\n✅ Client portfolio\n✅ Calendar & appointments\n✅ Kanban pipeline\n✅ Excel import in 30 seconds\n✅ AI assistant (Pro)\n✅ Follow-up campaigns\n\nAll in one tool, no installation needed.",
     import:   "Import is super simple:\n\n1. Drag your .xlsx or .csv file\n2. pylotIA auto-detects Name, Email, Company, Phone\n3. All contacts imported in under 30 seconds\n\nNo special formatting required.",
     demo:     "You can try pylotIA for free right now!\n\n👉 Create a free account in 2 minutes — no credit card required.\n\nOr check out the interactive demo on this page.",
@@ -1277,11 +1499,36 @@ const TRANSLATIONS = {
   fr: {
     'nav.features':'Fonctionnalités','nav.pricing':'Tarifs','nav.demo':'Démo',
     'nav.contact':'Contact','nav.login':'Se connecter','nav.cta':'Essayer gratuitement',
-    'hero.badge':'CRM intelligent pour TPE/PME',
-    'hero.h1':'Pilotez votre business<br>avec l\'<span class="accent">intelligence</span> artificielle',
-    'hero.sub':'Fini les Excel perdus et les relances oubliées. pylotIA centralise vos clients, vos RDV et votre prospection — et l\'IA fait le reste.',
-    'hero.cta1':'Démarrer gratuitement','hero.cta2':'Voir les tarifs',
-    'hero.stat1':'Pour importer vos clients','hero.stat2':'Pour commencer','hero.stat3':'D\'essai Pro offert',
+    'hero.h1':'Vous <span class="accent">perdez des clients</span><br>chaque semaine sans vous en rendre compte.',
+    'hero.sub':'Entre les post-it, Excel et les relances oubliées, des prospects passent à la trappe. pylotIA centralise vos clients et automatise vos relances pour ne plus jamais perdre une opportunité.',
+    'hero.cta1':'Tester gratuitement','hero.cta2':'Demander une démo',
+    'prob.label':'Le vrai problème','prob.title':'Vous reconnaissez ces situations ?',
+    'prob.c1':'Vous oubliez de relancer des prospects','prob.c2':'Vous perdez des informations clients',
+    'prob.c3':'Vous utilisez encore Excel ou des post-it','prob.c4':'Vous ratez des rendez-vous',
+    'sol.label':'La solution','sol.title':'pylotIA centralise tout, simplement.',
+    'sol.sub':'pylotIA remplace vos post-it et fichiers Excel par un système simple qui centralise tout et relance automatiquement vos clients.',
+    'sol.b1.title':'Tous vos clients au même endroit','sol.b1.desc':'Contacts, documents, historique — tout centralisé, accessible en un clic.',
+    'sol.b2.title':'Relances automatiques','sol.b2.desc':'Plus besoin de se souvenir : pylotIA relance vos prospects au bon moment.',
+    'sol.b3.title':'Suivi simple des prospects','sol.b3.desc':'Un kanban clair pour voir où en est chaque opportunité, sans effort.',
+    'res.label':'Ce que ça change','res.title':'Ce que ça change concrètement',
+    'res.r1':'Plus de rendez-vous fixés','res.r1.note':'Vos prospects sont relancés au bon moment, pas quand vous y pensez.',
+    'res.r2':'Plus de clients convertis','res.r2.note':'Un suivi structuré, c\'est moins de prospects perdus par manque de relance.',
+    'res.r3':'Moins de temps perdu en gestion','res.r3.note':'Finis les heures passées à chercher dans des fichiers Excel et des post-it.',
+    'res.quote':'Les entreprises qui structurent leur prospection convertissent jusqu\'à 3× plus que celles qui l\'improvisent — sans forcément prospecter plus.',
+    'ba.label':'La différence','ba.title':'Avant / Après pylotIA',
+    'ba.before':'AVANT','ba.after':'APRÈS',
+    'ba.b1':'Excel et post-it partout','ba.b2':'Relances oubliées','ba.b3':'Clients perdus en chemin','ba.b4':'Suivi flou, stressant',
+    'ba.a1':'Tout centralisé, en ordre','ba.a2':'Relances automatiques','ba.a3':'Suivi clair en temps réel','ba.a4':'Plus aucun client oublié',
+    'demo.annot1':'🔔 Relances automatiques','demo.annot2':'📊 Suivi des prospects','demo.annot3':'📅 Rendez-vous centralisés',
+    'simp.label':'Prise en main','simp.title':'Simple à utiliser, dès le premier jour',
+    'simp.c1':'Interface simple et claire','simp.c2':'Prise en main en moins de 10 minutes','simp.c3':'Pas besoin de compétences techniques',
+    'cred.q1':'"Conçu à partir de la réalité terrain d\'un commercial confronté aux relances oubliées et aux clients perdus."',
+    'cred.q2':'"Pensé pour les petites entreprises qui gèrent encore leurs clients sur Excel ou des post-it."',
+    'terrain.label':'Retours terrain','terrain.title':'Retours terrain',
+    'terrain.t1':'"Simple et efficace, ça m\'évite d\'oublier des clients."','terrain.a1':'— Test utilisateur',
+    'terrain.t2':'"J\'ai enfin un suivi clair sans me compliquer la vie."','terrain.a2':'— Indépendant',
+    'terrain.t3':'"Avant je perdais des prospects parce que j\'oubliais de relancer. Maintenant c\'est automatique."','terrain.a3':'— Artisan, Paris',
+    'demo.label':'Démo interactive','demo.title':'Un outil simple que vous pouvez utiliser en quelques minutes','demo.sub':'Voici à quoi ressemble votre suivi client avec pylotIA — explorez sans créer de compte.',
     'feat.label':'Fonctionnalités','feat.title':'Tout ce dont votre PME a besoin',
     'feat.sub':'Un seul outil pour remplacer vos fichiers Excel, votre agenda papier et vos relances manuelles.',
     'feat.f1.title':'Portefeuille clients','feat.f1.desc':'Centralisez tous vos contacts. Importez votre Excel en 30 secondes. Suivez chaque client en un coup d\'œil.',
@@ -1310,9 +1557,11 @@ const TRANSLATIONS = {
     'devis.size':'Nombre de commerciaux envisagés','devis.sector':'Secteur d\'activité','devis.msg':'Message libre',
     'devis.submit':'Envoyer la demande','devis.success':'Merci ! Florian vous recontactera sous 48h.',
     'faq.label':'FAQ','faq.title':'Questions fréquentes',
-    'cta.badge':'Démarrez en 2 minutes','cta.title':'Votre business mérite<br>mieux qu\'un Excel',
-    'cta.sub':'Rejoignez les PME qui ont remplacé leurs fichiers<br>par un CRM IA qui travaille à leur place.',
-    'cta.btn':'Créer mon compte gratuit','cta.note':'Aucune carte bancaire requise · 14 jours Pro offerts',
+    'cta.title':'Arrêtez de perdre des clients.<br>Testez pylotIA gratuitement.',
+    'cta.sub':'Sans carte bancaire. En ligne en moins de 2 minutes.',
+    'cta.btn':'Commencer gratuitement',
+    'cta.demo':'Demander une démo personnalisée',
+    'cta.note':'Aucune carte bancaire requise · Gratuit pour toujours',
     'contact.label':'Contact','contact.title':'Une question ?<br>Écrivez-nous.','contact.sub':'Florian ou Lorik vous répond sous 24h.',
     'contact.name':'Votre nom','contact.namePh':'Jean Dupont',
     'contact.email':'Votre email','contact.emailPh':'jean@entreprise.fr',
@@ -1324,11 +1573,41 @@ const TRANSLATIONS = {
   en: {
     'nav.features':'Features','nav.pricing':'Pricing','nav.demo':'Demo',
     'nav.contact':'Contact','nav.login':'Sign in','nav.cta':'Try for free',
-    'hero.badge':'Intelligent CRM for SMBs',
-    'hero.h1':'Run your business<br>with <span class="accent">artificial</span> intelligence',
-    'hero.sub':'No more lost spreadsheets and forgotten follow-ups. pylotIA centralizes your clients, appointments and pipeline — AI does the rest.',
-    'hero.cta1':'Get started free','hero.cta2':'See pricing',
-    'hero.stat1':'To import your clients','hero.stat2':'To get started','hero.stat3':'Pro trial included',
+    'hero.h1':'You\'re <span class="accent">losing customers</span><br>every week without realizing it.',
+    'hero.sub':'Between sticky notes, spreadsheets and forgotten follow-ups, prospects slip through the cracks. pylotIA centralizes your clients and automates your follow-ups so you never lose an opportunity again.',
+    'hero.cta1':'Try for free','hero.cta2':'Request a demo',
+    'prob.label':'The real problem','prob.title':'Do any of these sound familiar?',
+    'prob.c1':'You forget to follow up on prospects','prob.c2':'You lose track of client information',
+    'prob.c3':'You\'re still using Excel or sticky notes','prob.c4':'You miss appointments',
+    'sol.label':'The solution','sol.title':'pylotIA centralizes everything, simply.',
+    'sol.sub':'pylotIA replaces your sticky notes and Excel files with a simple system that centralizes everything and automatically follows up with your clients.',
+    'sol.b1.title':'All your clients in one place','sol.b1.desc':'Contacts, documents, history — all centralized, accessible in one click.',
+    'sol.b2.title':'Automatic follow-ups','sol.b2.desc':'No more remembering: pylotIA follows up with your prospects at the right time.',
+    'sol.b3.title':'Simple prospect tracking','sol.b3.desc':'A clear kanban to see where each opportunity stands, effortlessly.',
+    'res.label':'What changes','res.title':'What it changes in practice',
+    'res.r1':'More meetings booked','res.r1.note':'Your prospects are followed up at the right time, not when you happen to think of it.',
+    'res.r2':'More clients converted','res.r2.note':'Structured tracking means fewer prospects lost from lack of follow-up.',
+    'res.r3':'Less time wasted on admin','res.r3.note':'No more hours searching through Excel files and sticky notes.',
+    'res.quote':'Companies that structure their prospecting convert up to 3× more than those who improvise — without necessarily prospecting more.',
+    'ba.label':'The difference','ba.title':'Before / After pylotIA',
+    'ba.before':'BEFORE','ba.after':'AFTER',
+    'ba.b1':'Excel files and sticky notes everywhere','ba.b2':'Forgotten follow-ups','ba.b3':'Clients lost along the way','ba.b4':'Unclear, stressful tracking',
+    'ba.a1':'Everything centralized, in order','ba.a2':'Automatic follow-ups','ba.a3':'Clear real-time tracking','ba.a4':'No client ever forgotten',
+    'demo.title':'A simple tool you can use in minutes','demo.sub':'Here\'s what your client tracking looks like with pylotIA — explore without creating an account.',
+    'demo.annot1':'🔔 Automatic follow-ups','demo.annot2':'📊 Prospect tracking','demo.annot3':'📅 Centralized appointments',
+    'simp.label':'Getting started','simp.title':'Simple to use, from day one',
+    'simp.c1':'Simple, clean interface','simp.c2':'Up and running in under 10 minutes','simp.c3':'No technical skills required',
+    'cred.q1':'"Built from the real-world experience of a salesperson who struggled with forgotten follow-ups and lost clients."',
+    'cred.q2':'"Designed for small businesses that still manage their clients on Excel or sticky notes."',
+    'terrain.label':'Field feedback','terrain.title':'Field feedback',
+    'terrain.t1':'"Simple and effective — it stops me from forgetting clients."','terrain.a1':'— Beta tester',
+    'terrain.t2':'"I finally have clear tracking without overcomplicating things."','terrain.a2':'— Freelancer',
+    'terrain.t3':'"I used to lose prospects because I forgot to follow up. Now it\'s automatic."','terrain.a3':'— Craftsman, Paris',
+    'cta.title':'Stop losing clients.<br>Try pylotIA for free.',
+    'cta.sub':'No credit card. Online in under 2 minutes.',
+    'cta.btn':'Get started free',
+    'cta.demo':'Request a personalized demo',
+    'cta.note':'No credit card required · Free forever',
     'feat.label':'Features','feat.title':'Everything your business needs',
     'feat.sub':'One tool to replace your Excel files, paper calendar and manual follow-ups.',
     'feat.f1.title':'Client portfolio','feat.f1.desc':'Centralize all your contacts. Import your Excel in 30 seconds. Track every client at a glance.',
@@ -1357,9 +1636,6 @@ const TRANSLATIONS = {
     'devis.size':'Number of sales reps','devis.sector':'Industry','devis.msg':'Additional message',
     'devis.submit':'Send request','devis.success':'Thank you! Florian will get back to you within 48h.',
     'faq.label':'FAQ','faq.title':'Frequently asked questions',
-    'cta.badge':'Get started in 2 minutes','cta.title':'Your business deserves<br>better than a spreadsheet',
-    'cta.sub':'Join the businesses that replaced their files<br>with an AI CRM that works for them.',
-    'cta.btn':'Create my free account','cta.note':'No credit card required · 14-day Pro trial included',
     'contact.label':'Contact','contact.title':'Have a question?<br>Write to us.','contact.sub':'Florian or Lorik will reply within 24h.',
     'contact.name':'Your name','contact.namePh':'John Smith',
     'contact.email':'Your email','contact.emailPh':'john@company.com',
