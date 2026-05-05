@@ -334,7 +334,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 .ai-generate-btn:hover{background:var(--blue2)}
 .ai-generate-btn:disabled{opacity:0.5;cursor:not-allowed}
 .ai-copy-btn{padding:8px 14px;background:var(--dark3);color:var(--text2);border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s}
-.ai-copy-btn:hover{color:#fff;border-color:var(--border2)}
+.ai-copy-btn:hover{color:var(--text);border-color:var(--border2)}
 .ai-typing-wrap{display:flex;gap:4px;align-items:center;padding:10px 14px;background:#f8faff;border-radius:12px;width:fit-content}
 .ai-typing-wrap span{width:6px;height:6px;background:var(--blue);border-radius:50%;animation:aitype 1.2s infinite}
 .ai-typing-wrap span:nth-child(2){animation-delay:0.2s}.ai-typing-wrap span:nth-child(3){animation-delay:0.4s}
@@ -547,7 +547,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
   <button class="nav-item nav-search" onclick="openGlobalSearch()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     Recherche
-    <span style="margin-left:auto;font-size:10px;background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:4px;padding:1px 6px;color:var(--text3);font-family:monospace">⌘K</span>
+    <span style="margin-left:auto;font-size:10px;background:rgba(0,0,0,0.05);border:1px solid var(--border2);border-radius:4px;padding:1px 6px;color:var(--text3);font-family:monospace">⌘K</span>
   </button>
 
   <button class="nav-item active" id="nav-dashboard" onclick="showSection('dashboard')">
@@ -640,23 +640,23 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
     </div>
     <!-- Onboarding état vide -->
     <div id="dash-onboarding" style="display:none;margin-bottom:28px">
-      <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#fff;margin-bottom:20px">Bienvenue sur pylotIA — par où commencer ?</div>
+      <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#0f172a;margin-bottom:20px">Bienvenue sur pylotIA — par où commencer ?</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
         <div style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:22px">
           <div style="font-size:24px;margin-bottom:12px">📁</div>
-          <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:6px">Étape 1 — Importer vos clients</div>
+          <div style="font-size:13px;font-weight:600;color:#0f172a;margin-bottom:6px">Étape 1 — Importer vos clients</div>
           <div style="font-size:12px;color:var(--text3);line-height:1.6;margin-bottom:16px">Glissez votre fichier Excel pour importer vos contacts en 30 secondes.</div>
           <button class="btn btn-blue" style="font-size:12px;padding:7px 14px;width:100%" onclick="showSection('import')">Importer mes contacts →</button>
         </div>
         <div style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:22px">
           <div style="font-size:24px;margin-bottom:12px">⚡</div>
-          <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:6px">Étape 2 — Ajouter un prospect</div>
+          <div style="font-size:13px;font-weight:600;color:#0f172a;margin-bottom:6px">Étape 2 — Ajouter un prospect</div>
           <div style="font-size:12px;color:var(--text3);line-height:1.6;margin-bottom:16px">Ajoutez votre premier prospect et démarrez votre pipeline.</div>
           <button class="btn btn-ghost" style="font-size:12px;padding:7px 14px;width:100%" onclick="showSection('prospection')">Ajouter un prospect →</button>
         </div>
         <div style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:22px">
           <div style="font-size:24px;margin-bottom:12px">📅</div>
-          <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:6px">Étape 3 — Planifier un RDV</div>
+          <div style="font-size:13px;font-weight:600;color:#0f172a;margin-bottom:6px">Étape 3 — Planifier un RDV</div>
           <div style="font-size:12px;color:var(--text3);line-height:1.6;margin-bottom:16px">Planifiez votre premier rendez-vous commercial.</div>
           <button class="btn btn-ghost" style="font-size:12px;padding:7px 14px;width:100%" onclick="showSection('activite')">Ouvrir l'agenda →</button>
         </div>
@@ -987,7 +987,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
     <div class="import-step" id="import-step-2">
       <div style="text-align:center;padding:40px 0">
         <div style="font-size:48px;margin-bottom:16px">✅</div>
-        <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:#fff;margin-bottom:8px">Import réussi !</div>
+        <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:#0f172a;margin-bottom:8px">Import réussi !</div>
         <div style="font-size:14px;color:var(--text2);margin-bottom:32px" id="import-result-sub">—</div>
         <div class="import-stats-row" style="max-width:500px;margin:0 auto 32px">
           <div class="import-stat"><div class="import-stat-val" id="result-total">0</div><div class="import-stat-label">Contacts importés</div></div>
@@ -1105,7 +1105,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
     <!-- Gate non-Pro -->
     <div id="ai-gate" style="display:none;text-align:center;padding:56px 24px;background:var(--dark2);border:1px solid var(--border);border-radius:16px;margin-top:8px">
       <div style="font-size:48px;margin-bottom:16px">✦</div>
-      <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:10px">Assistant IA — Offre Pro</div>
+      <div style="font-size:20px;font-weight:700;color:#0f172a;margin-bottom:10px">Assistant IA — Offre Pro</div>
       <div style="font-size:14px;color:var(--text2);margin-bottom:28px;max-width:440px;margin-left:auto;margin-right:auto;line-height:1.7">Posez des questions en langage naturel sur vos contacts et prospects. L'IA analyse vos données en temps réel et vous dit quoi faire en priorité.</div>
       <div style="display:flex;flex-direction:column;gap:10px;max-width:400px;margin:0 auto 32px;text-align:left">
         <div style="background:var(--dark3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--text2)">💬 "Quels prospects dois-je relancer cette semaine ?"</div>
@@ -1310,7 +1310,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
     <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
       <div class="drawer-avatar" id="drawer-avatar">?</div>
       <div style="min-width:0">
-        <div id="drawer-nom" style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+        <div id="drawer-nom" style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
         <div id="drawer-entreprise-hd" style="font-size:12px;color:var(--text2);margin-top:1px"></div>
       </div>
     </div>
@@ -1375,7 +1375,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
     <!-- Campagne -->
     <div class="drawer-section">
       <div class="drawer-section-title">Campagne de relance</div>
-      <button onclick="assignToCampaign(currentDrawerContactId)" style="width:100%;padding:10px;background:transparent;border:1px dashed rgba(255,255,255,0.1);border-radius:8px;color:var(--text2);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;transition:border-color 0.2s" onmouseover="this.style.borderColor='rgba(59,130,246,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">+ Assigner à une campagne</button>
+      <button onclick="assignToCampaign(currentDrawerContactId)" style="width:100%;padding:10px;background:transparent;border:1px dashed rgba(0,0,0,0.15);border-radius:8px;color:var(--text2);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;transition:border-color 0.2s" onmouseover="this.style.borderColor='rgba(59,130,246,0.4)'" onmouseout="this.style.borderColor='rgba(0,0,0,0.15)'">+ Assigner à une campagne</button>
     </div>
 
   </div>
@@ -1502,7 +1502,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
       <div style="background:var(--dark3);border:1px solid rgba(59,130,246,0.3);border-radius:12px;padding:20px">
         <div style="font-size:11px;color:#93c5fd;font-weight:700;letter-spacing:1px;margin-bottom:10px">STARTER</div>
-        <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:#fff">29€<span style="font-size:13px;font-weight:400;color:var(--text3)">/mois</span></div>
+        <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:#0f172a">29€<span style="font-size:13px;font-weight:400;color:var(--text3)">/mois</span></div>
         <div style="font-size:12px;color:var(--text2);line-height:1.8;margin-top:14px">
           ✓ Contacts illimités<br>
           ✓ Import Excel/CSV illimité<br>
@@ -1514,7 +1514,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
       </div>
       <div style="background:var(--dark3);border:1px solid rgba(245,158,11,0.3);border-radius:12px;padding:20px">
         <div style="font-size:11px;color:#fbbf24;font-weight:700;letter-spacing:1px;margin-bottom:10px">PRO ★</div>
-        <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:#fff">89€<span style="font-size:13px;font-weight:400;color:var(--text3)">/mois</span></div>
+        <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:#0f172a">89€<span style="font-size:13px;font-weight:400;color:var(--text3)">/mois</span></div>
         <div style="font-size:12px;color:var(--text2);line-height:1.8;margin-top:14px">
           ✓ Tout Starter inclus<br>
           ✓ Assistant IA connecté à vos données<br>
@@ -3335,7 +3335,7 @@ function renderProspStatutPicker(selected) {
       style="padding:5px 13px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;
              border:1.5px solid;transition:all 0.15s;font-family:'Inter',sans-serif;
              background:${active ? col.color + '22' : 'transparent'};
-             border-color:${active ? col.color : 'rgba(255,255,255,0.12)'};
+             border-color:${active ? col.color : 'rgba(0,0,0,0.12)'};
              color:${active ? col.color : '#8899bb'}">${col.label}</button>`;
   }).join('');
 }
@@ -3349,7 +3349,7 @@ function selectProspStatut(val) {
     if (!btn) return;
     const active = col.id === val;
     btn.style.background   = active ? col.color + '22' : 'transparent';
-    btn.style.borderColor  = active ? col.color : 'rgba(255,255,255,0.12)';
+    btn.style.borderColor  = active ? col.color : 'rgba(0,0,0,0.12)';
     btn.style.color        = active ? col.color : '#8899bb';
   });
 }
@@ -4176,7 +4176,7 @@ function renderPostVente() {
     if (s==='converti')   return `<span class="pv-statut-tag pv-statut-converti">✓ Converti</span>`;
     if (s==='relancé')    return `<span class="pv-statut-tag pv-statut-relance">↺ Relancé</span>`;
     if (s==='à relancer') return `<span class="pv-statut-tag pv-statut-arelancer">! À relancer</span>`;
-    return `<span class="pv-statut-tag" style="background:rgba(255,255,255,0.05);color:var(--text3);border:1px solid var(--border)">${s}</span>`;
+    return `<span class="pv-statut-tag" style="background:rgba(0,0,0,0.05);color:var(--text3);border:1px solid var(--border)">${s}</span>`;
   };
 
   const bloc3 = inCamp.length === 0
@@ -4586,7 +4586,7 @@ document.addEventListener('keydown', e => {
 
 <!-- LOADING OVERLAY — affiché pendant le chargement initial depuis Supabase -->
 <div id="app-loader" style="position:fixed;inset:0;background:var(--dark);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
-  <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.5px">pylot<span style="color:#3b82f6">IA</span></div>
+  <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#0f172a;letter-spacing:-0.5px">pylot<span style="color:#3b82f6">IA</span></div>
   <div style="display:flex;gap:6px">
     <div style="width:8px;height:8px;border-radius:50%;background:#3b82f6;animation:ld 1s ease-in-out infinite"></div>
     <div style="width:8px;height:8px;border-radius:50%;background:#3b82f6;animation:ld 1s ease-in-out 0.2s infinite"></div>
