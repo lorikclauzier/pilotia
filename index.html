@@ -791,11 +791,7 @@ footer{padding:32px 52px;border-top:1px solid var(--border);display:flex;align-i
   </div>
 
   <div class="demo-annotations-wrap" style="position:relative">
-    <div style="position:absolute;top:-14px;right:24px;z-index:10;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
-      <span class="demo-annot" data-i18n="demo.annot1">🔔 Relances automatiques</span>
-      <span class="demo-annot" data-i18n="demo.annot2">📊 Suivi des prospects</span>
-      <span class="demo-annot" data-i18n="demo.annot3">📅 Rendez-vous centralisés</span>
-    </div>
+
   <div class="app-frame">
 
     <!-- DASHBOARD -->
@@ -878,7 +874,23 @@ footer{padding:32px 52px;border-top:1px solid var(--border);display:flex;align-i
     </div>
 
     <!-- AGENDA -->
-    <div id="tab-agenda" class="agenda-section" style="display:none">
+    <div id="tab-agenda" class="crm-app" style="display:none">
+      <div class="crm-sidebar">
+        <div class="crm-logo"><div class="crm-logo-name">pylotIA</div><div class="crm-logo-sub" data-i18n="demo.crm-sub">CRM intelligent</div></div>
+        <div class="crm-nav">
+          <div class="crm-item" onclick="showTab('dashboard',document.querySelectorAll('.app-tab')[0])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
+          <div class="crm-item" onclick="showTab('contacts',document.querySelectorAll('.app-tab')[1])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Contacts<span class="crm-badge">12</span></div>
+          <div class="crm-item active" onclick="showTab('agenda',document.querySelectorAll('.app-tab')[2])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span data-i18n="demo.nav3">Agenda</span></div>
+          <div class="crm-item" onclick="showTab('activite',document.querySelectorAll('.app-tab')[3])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span data-i18n="demo.nav5">Activit&#233;</span></div>
+          <div class="crm-item" style="opacity:0.42;cursor:default"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><span data-i18n="demo.nav.perf">Performance</span><span class="crm-pro">PRO</span></div>
+          <div class="crm-item" style="opacity:0.42;cursor:default"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span data-i18n="demo.nav.pv">Post-vente</span><span class="crm-pro">PRO</span></div>
+          <div class="crm-item" onclick="showTab('campagnes',document.querySelectorAll('.app-tab')[4])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><span data-i18n="demo.nav6">Campagnes</span></div>
+          <div class="crm-item" onclick="showTab('relances',document.querySelectorAll('.app-tab')[5])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span data-i18n="demo.nav4">Relances</span></div>
+          <div class="crm-item" onclick="showTab('assistant',document.querySelectorAll('.app-tab')[6])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09z"/></svg><span data-i18n="demo.tab5">Assistant IA</span><span class="crm-pro">PRO</span></div>
+        </div>
+        <div class="crm-footer"><div class="crm-plan" data-i18n="demo.plan-label">Offre actuelle</div><div class="crm-plan-name" data-i18n="demo.plan-name">Starter &#8212; Gratuit</div><div class="upgrade-link" onclick="window.location.href='signup.html'" style="cursor:pointer" data-i18n="demo.upgrade">Activer Pro &#x2192;</div></div>
+      </div>
+      <div style="display:flex;flex:1;overflow:hidden">
       <div class="ag-cal-col">
         <div class="ag-cal-hd"><div class="ag-nav">&#8249;</div><div class="ag-month" id="ag-month-label"></div><div class="ag-nav">&#8250;</div></div>
         <div class="cal-grid-hd"><div class="cgh">L</div><div class="cgh">M</div><div class="cgh">M</div><div class="cgh">J</div><div class="cgh">V</div><div class="cgh">S</div><div class="cgh">D</div></div>
@@ -889,6 +901,7 @@ footer{padding:32px 52px;border-top:1px solid var(--border);display:flex;align-i
         <div class="rdv-card"><div class="rdv-time">09h00</div><div class="rdv-bar" style="background:#3b82f6"></div><div class="rdv-info"><div class="rdv-name">Boulangerie Lenoir</div><div class="rdv-type">Pr&#233;sentation offre Starter</div></div><div class="rdv-dot" style="background:#3b82f6"></div></div>
         <div class="rdv-card"><div class="rdv-time">14h30</div><div class="rdv-bar" style="background:#10b981"></div><div class="rdv-info"><div class="rdv-name">Cabinet Perrin</div><div class="rdv-type">Suivi d&#233;mo Assistant IA</div></div><div class="rdv-dot" style="background:#10b981"></div></div>
         <div class="rdv-card" style="border:1px dashed rgba(0,0,0,0.1);background:transparent;cursor:pointer" onclick="window.location.href='signup.html'"><div class="rdv-time" style="color:var(--text3)">+</div><div class="rdv-bar" style="background:rgba(0,0,0,0.06)"></div><div class="rdv-info"><div class="rdv-name" style="color:var(--text3);font-weight:400" data-i18n="demo.new-rdv">Nouveau rendez-vous</div></div><button class="btn-sm btn-sm-blue" onclick="window.location.href='signup.html'" data-i18n="demo.plan">Planifier</button></div>
+      </div>
       </div>
     </div>
 
