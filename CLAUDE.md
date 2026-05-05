@@ -11,17 +11,23 @@ Développé en duo : **Lorik** (DG, dev) + **Flo** (Président, commercial).
 - **Versioning** : Git + GitHub
 
 ## Fichiers principaux
-- `index.html` — Landing page
+- `index.html` — Landing page V2 (design futuriste, copywriting orienté problème, i18n FR/EN, ~1840 lignes)
 - `signup.html` — Inscription (Supabase Auth)
 - `login.html` — Connexion (Supabase Auth)
 - `forgot-password.html` — Reset mot de passe
 - `reset-password.html` — Nouveau mot de passe
-- `dashboard.html` — Dashboard CRM complet
+- `dashboard.html` — Dashboard CRM complet (~4620 lignes)
 - `success.html` — Page après paiement réussi
 - `cancel.html` — Page après annulation paiement
 - `cgu.html` — CGU
 - `mentions-legales.html` — Mentions légales
-- `api/claude.js` — Proxy Vercel vers Anthropic API
+- `api/claude.js` — Proxy Vercel vers Anthropic API (clé via env var Vercel : ANTHROPIC_API_KEY)
+
+## Design system (index.html V2)
+- Police : Syne (titres) + Inter (corps)
+- Dark only — mode clair supprimé en V2
+- Variables CSS : `--bg/bg2/bg3/bg4`, `--blue:#4d8ef5`, `--text/text2/text3`, `--border/border2/border-blue`, `--card-bg`, `--r/r2/r3`
+- login.html et signup.html ont leur propre CSS autonome (variables `--dark`, `--dark2`, `--dark3`) — cohérentes visuellement
 
 ## Liens
 - Site : https://pilotia.vercel.app
