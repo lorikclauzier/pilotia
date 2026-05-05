@@ -1095,33 +1095,33 @@ footer{padding:32px 52px;border-top:1px solid var(--border);display:flex;align-i
   <div style="margin-top:40px;display:flex;flex-direction:column;gap:12px" id="faq-list">
 
     <div class="faq-item" onclick="toggleFaq(this)">
-      <div class="faq-q">C'est compliqué à installer ?<span class="faq-icon">+</span></div>
-      <div class="faq-a">Non. pylotIA est 100% en ligne, aucune installation requise. Vous créez un compte en 2 minutes et vous commencez immédiatement.</div>
+      <div class="faq-q"><span data-i18n="faq.q1">C'est compliqué à installer ?</span><span class="faq-icon">+</span></div>
+      <div class="faq-a" data-i18n="faq.a1">Non. pylotIA est 100% en ligne, aucune installation requise. Vous créez un compte en 2 minutes et vous commencez immédiatement.</div>
     </div>
 
     <div class="faq-item" onclick="toggleFaq(this)">
-      <div class="faq-q">Mes données sont-elles sécurisées ?<span class="faq-icon">+</span></div>
-      <div class="faq-a">Oui. Vos données sont hébergées en Europe (Supabase, infrastructure AWS région EU) et ne sont jamais partagées avec des tiers. Vous pouvez les exporter ou les supprimer à tout moment.</div>
+      <div class="faq-q"><span data-i18n="faq.q2">Mes données sont-elles sécurisées ?</span><span class="faq-icon">+</span></div>
+      <div class="faq-a" data-i18n="faq.a2">Oui. Vos données sont hébergées en Europe (Supabase, infrastructure AWS région EU) et ne sont jamais partagées avec des tiers. Vous pouvez les exporter ou les supprimer à tout moment.</div>
     </div>
 
     <div class="faq-item" onclick="toggleFaq(this)">
-      <div class="faq-q">Je peux annuler quand je veux ?<span class="faq-icon">+</span></div>
-      <div class="faq-a">Oui, sans engagement. Vous résiliez en un clic depuis vos paramètres. Aucun frais d'annulation.</div>
+      <div class="faq-q"><span data-i18n="faq.q3">Je peux annuler quand je veux ?</span><span class="faq-icon">+</span></div>
+      <div class="faq-a" data-i18n="faq.a3">Oui, sans engagement. Vous résiliez en un clic depuis vos paramètres. Aucun frais d'annulation.</div>
     </div>
 
     <div class="faq-item" onclick="toggleFaq(this)">
-      <div class="faq-q">Et si j'ai déjà mes clients dans Excel ?<span class="faq-icon">+</span></div>
-      <div class="faq-a">C'est prévu. Glissez votre fichier .xlsx ou .csv et tous vos contacts sont importés automatiquement en moins de 30 secondes.</div>
+      <div class="faq-q"><span data-i18n="faq.q4">Et si j'ai déjà mes clients dans Excel ?</span><span class="faq-icon">+</span></div>
+      <div class="faq-a" data-i18n="faq.a4">C'est prévu. Glissez votre fichier .xlsx ou .csv et tous vos contacts sont importés automatiquement en moins de 30 secondes.</div>
     </div>
 
     <div class="faq-item" onclick="toggleFaq(this)">
-      <div class="faq-q">Comment fonctionne l'assistant IA ?<span class="faq-icon">+</span></div>
-      <div class="faq-a">L'assistant IA (disponible en offre Pro) analyse votre portefeuille client en temps réel. Posez-lui n'importe quelle question — "qui dois-je relancer ?" ou "quel est mon CA potentiel ?" — et il répond instantanément avec vos vraies données.</div>
+      <div class="faq-q"><span data-i18n="faq.q5">Comment fonctionne l'assistant IA ?</span><span class="faq-icon">+</span></div>
+      <div class="faq-a" data-i18n="faq.a5">L'assistant IA (disponible en offre Pro) analyse votre portefeuille client en temps réel. Posez-lui n'importe quelle question — "qui dois-je relancer ?" ou "quel est mon CA potentiel ?" — et il répond instantanément avec vos vraies données.</div>
     </div>
 
     <div class="faq-item" onclick="toggleFaq(this)">
-      <div class="faq-q">L'essai gratuit de 14 jours nécessite-t-il une carte bancaire ?<span class="faq-icon">+</span></div>
-      <div class="faq-a">Cela dépend du plan choisi. Le plan Gratuit est accessible sans aucune carte bancaire. Pour les plans Starter et Pro, une carte bancaire est requise à l'inscription pour activer l'essai de 14 jours — vous ne serez prélevé qu'à l'issue de cette période. Vous pouvez annuler à tout moment avant la fin de l'essai sans aucun frais.</div>
+      <div class="faq-q"><span data-i18n="faq.q6">L'essai gratuit de 14 jours nécessite-t-il une carte bancaire ?</span><span class="faq-icon">+</span></div>
+      <div class="faq-a" data-i18n="faq.a6">Cela dépend du plan choisi. Le plan Gratuit est accessible sans aucune carte bancaire. Pour les plans Starter et Pro, une carte bancaire est requise à l'inscription pour activer l'essai de 14 jours — vous ne serez prélevé qu'à l'issue de cette période. Vous pouvez annuler à tout moment avant la fin de l'essai sans aucun frais.</div>
     </div>
 
   </div>
@@ -1620,6 +1620,12 @@ const TRANSLATIONS = {
     'devis.size':'Nombre de commerciaux envisagés','devis.sector':'Secteur d\'activité','devis.msg':'Message libre',
     'devis.submit':'Envoyer la demande','devis.success':'Merci ! Florian vous recontactera sous 48h.',
     'faq.label':'FAQ','faq.title':'Questions fréquentes',
+    'faq.q1':'C\'est compliqué à installer ?','faq.a1':'Non. pylotIA est 100% en ligne, aucune installation requise. Vous créez un compte en 2 minutes et vous commencez immédiatement.',
+    'faq.q2':'Mes données sont-elles sécurisées ?','faq.a2':'Oui. Vos données sont hébergées en Europe (Supabase, infrastructure AWS région EU) et ne sont jamais partagées avec des tiers. Vous pouvez les exporter ou les supprimer à tout moment.',
+    'faq.q3':'Je peux annuler quand je veux ?','faq.a3':'Oui, sans engagement. Vous résiliez en un clic depuis vos paramètres. Aucun frais d\'annulation.',
+    'faq.q4':'Et si j\'ai déjà mes clients dans Excel ?','faq.a4':'C\'est prévu. Glissez votre fichier .xlsx ou .csv et tous vos contacts sont importés automatiquement en moins de 30 secondes.',
+    'faq.q5':'Comment fonctionne l\'assistant IA ?','faq.a5':'L\'assistant IA (disponible en offre Pro) analyse votre portefeuille client en temps réel. Posez-lui n\'importe quelle question — "qui dois-je relancer ?" ou "quel est mon CA potentiel ?" — et il répond instantanément avec vos vraies données.',
+    'faq.q6':'L\'essai gratuit de 14 jours nécessite-t-il une carte bancaire ?','faq.a6':'Cela dépend du plan choisi. Le plan Gratuit est accessible sans aucune carte bancaire. Pour les plans Starter et Pro, une carte bancaire est requise à l\'inscription pour activer l\'essai de 14 jours — vous ne serez prélevé qu\'à l\'issue de cette période. Vous pouvez annuler à tout moment avant la fin de l\'essai sans aucun frais.',
     'cta.title':'Arrêtez de perdre des clients.<br>Testez pylotIA gratuitement.',
     'cta.sub':'Sans carte bancaire. En ligne en moins de 2 minutes.',
     'cta.btn':'Commencer gratuitement',
@@ -1704,6 +1710,12 @@ const TRANSLATIONS = {
     'devis.size':'Number of sales reps','devis.sector':'Industry','devis.msg':'Additional message',
     'devis.submit':'Send request','devis.success':'Thank you! Florian will get back to you within 48h.',
     'faq.label':'FAQ','faq.title':'Frequently asked questions',
+    'faq.q1':'Is it complicated to set up?','faq.a1':'No. pylotIA is 100% online, no installation required. Create an account in 2 minutes and get started right away.',
+    'faq.q2':'Is my data secure?','faq.a2':'Yes. Your data is hosted in Europe (Supabase, AWS EU region) and is never shared with third parties. You can export or delete it at any time.',
+    'faq.q3':'Can I cancel anytime?','faq.a3':'Yes, no commitment. Cancel in one click from your settings. No cancellation fees.',
+    'faq.q4':'What if my clients are already in Excel?','faq.a4':'That\'s covered. Drag in your .xlsx or .csv file and all your contacts are imported automatically in under 30 seconds.',
+    'faq.q5':'How does the AI assistant work?','faq.a5':'The AI assistant (available on the Pro plan) analyzes your client portfolio in real time. Ask it anything — "who should I follow up with?" or "what\'s my potential revenue?" — and it answers instantly with your real data.',
+    'faq.q6':'Does the 14-day free trial require a credit card?','faq.a6':'It depends on the plan. The Free plan requires no credit card at all. For Starter and Pro plans, a credit card is required at sign-up to activate the 14-day trial — you won\'t be charged until the trial ends. You can cancel anytime before then at no cost.',
     'contact.label':'Contact','contact.title':'Have a question?<br>Write to us.','contact.sub':'Florian or Lorik will reply within 24h.',
     'contact.name':'Your name','contact.namePh':'John Smith',
     'contact.email':'Your email','contact.emailPh':'john@company.com',
