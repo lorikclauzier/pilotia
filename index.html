@@ -781,10 +781,12 @@ footer{padding:32px 52px;border-top:1px solid var(--border);display:flex;align-i
   <p class="section-sub" data-i18n="demo.sub">Voici à quoi ressemble votre suivi client avec pylotIA — explorez sans créer de compte.</p>
 
   <div class="app-tabs">
-    <button class="app-tab active" onclick="showTab('dashboard',this)" data-i18n="demo.nav1">Tableau de bord</button>
-    <button class="app-tab" onclick="showTab('clients',this)" data-i18n="demo.nav2">Clients</button>
+    <button class="app-tab active" onclick="showTab('dashboard',this)" data-i18n="demo.nav1">Dashboard</button>
+    <button class="app-tab" onclick="showTab('contacts',this)" data-i18n="demo.nav2">Contacts</button>
     <button class="app-tab" onclick="showTab('agenda',this)" data-i18n="demo.nav3">Agenda</button>
-    <button class="app-tab" onclick="showTab('prospection',this)" data-i18n="demo.nav4">Prospection</button>
+    <button class="app-tab" onclick="showTab('activite',this)" data-i18n="demo.nav5">Activité</button>
+    <button class="app-tab" onclick="showTab('campagnes',this)" data-i18n="demo.nav6">Campagnes</button>
+    <button class="app-tab" onclick="showTab('relances',this)" data-i18n="demo.nav4">Relances</button>
     <button class="app-tab" onclick="showTab('assistant',this)" data-i18n="demo.tab5">Assistant IA ✦</button>
   </div>
 
@@ -801,31 +803,34 @@ footer{padding:32px 52px;border-top:1px solid var(--border);display:flex;align-i
       <div class="crm-sidebar">
         <div class="crm-logo"><div class="crm-logo-name">pylotIA</div><div class="crm-logo-sub" data-i18n="demo.crm-sub">CRM intelligent</div></div>
         <div class="crm-nav">
-          <div class="crm-item active"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
-          <div class="crm-item" onclick="showTab('clients',document.querySelectorAll('.app-tab')[1])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>Clients<span class="crm-badge">12</span></div>
+          <div class="crm-item active" onclick="showTab('dashboard',document.querySelectorAll('.app-tab')[0])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
+          <div class="crm-item" onclick="showTab('contacts',document.querySelectorAll('.app-tab')[1])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Contacts<span class="crm-badge">12</span></div>
           <div class="crm-item" onclick="showTab('agenda',document.querySelectorAll('.app-tab')[2])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span data-i18n="demo.nav3">Agenda</span></div>
-          <div class="crm-item" onclick="showTab('prospection',document.querySelectorAll('.app-tab')[3])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span data-i18n="demo.nav4">Prospection</span><span class="crm-badge">7</span></div>
-          <div class="crm-item" onclick="showTab('assistant',document.querySelectorAll('.app-tab')[4])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09z"/></svg><span data-i18n="demo.tab5">Assistant IA</span><span class="crm-pro">PRO</span></div>
+          <div class="crm-item" onclick="showTab('activite',document.querySelectorAll('.app-tab')[3])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span data-i18n="demo.nav5">Activit&#233;</span></div>
+          <div class="crm-item" style="opacity:0.42;cursor:default"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><span data-i18n="demo.nav.perf">Performance</span><span class="crm-pro">PRO</span></div>
+          <div class="crm-item" style="opacity:0.42;cursor:default"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span data-i18n="demo.nav.pv">Post-vente</span><span class="crm-pro">PRO</span></div>
+          <div class="crm-item" onclick="showTab('campagnes',document.querySelectorAll('.app-tab')[4])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><span data-i18n="demo.nav6">Campagnes</span></div>
+          <div class="crm-item" onclick="showTab('relances',document.querySelectorAll('.app-tab')[5])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span data-i18n="demo.nav4">Relances</span></div>
+          <div class="crm-item" onclick="showTab('assistant',document.querySelectorAll('.app-tab')[6])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09z"/></svg><span data-i18n="demo.tab5">Assistant IA</span><span class="crm-pro">PRO</span></div>
         </div>
-        <div class="crm-footer"><div class="crm-plan" data-i18n="demo.plan-label">Offre actuelle</div><div class="crm-plan-name" data-i18n="demo.plan-name">Starter — Gratuit</div><div class="upgrade-link" onclick="window.location.href='signup.html'" style="cursor:pointer" data-i18n="demo.upgrade">Activer Pro →</div></div>
+        <div class="crm-footer"><div class="crm-plan" data-i18n="demo.plan-label">Offre actuelle</div><div class="crm-plan-name" data-i18n="demo.plan-name">Starter &#8212; Gratuit</div><div class="upgrade-link" onclick="window.location.href='signup.html'" style="cursor:pointer" data-i18n="demo.upgrade">Activer Pro &#x2192;</div></div>
       </div>
       <div class="crm-main">
-        <div class="crm-topbar"><div class="crm-page-title" data-i18n="prev.bar">Tableau de bord</div><div class="crm-actions"><button class="btn-sm btn-sm-ghost" data-i18n="demo.export">Exporter</button><button class="btn-sm btn-sm-blue">+ Client</button></div></div>
+        <div class="crm-topbar"><div class="crm-page-title" data-i18n="prev.bar">Tableau de bord</div><div class="crm-actions"><button class="btn-sm btn-sm-ghost" data-i18n="demo.export">Exporter</button><button class="btn-sm btn-sm-blue">+ Contact</button></div></div>
         <div class="crm-content">
           <div class="stats-row">
             <div class="sc"><div class="sc-label" data-i18n="demo.stat1">Clients actifs</div><div class="sc-val">12</div><div class="sc-sub" data-i18n="demo.sub1">+2 ce mois</div></div>
-            <div class="sc"><div class="sc-label" data-i18n="demo.stat3">RDV cette semaine</div><div class="sc-val">5</div></div>
-            <div class="sc"><div class="sc-label">Prospects</div><div class="sc-val">7</div><div class="sc-sub" data-i18n="demo.sub3">3 à relancer</div></div>
-            <div class="sc"><div class="sc-label" data-i18n="demo.stat2">CA potentiel</div><div class="sc-val">8 400€</div></div>
+            <div class="sc"><div class="sc-label">Prospects</div><div class="sc-val">7</div><div class="sc-sub" data-i18n="demo.sub3">3 &#224; relancer</div></div>
+            <div class="sc"><div class="sc-label" data-i18n="demo.stat4">Campagnes</div><div class="sc-val">2</div><div class="sc-sub" data-i18n="demo.sub4">actives</div></div>
+            <div class="sc"><div class="sc-label" data-i18n="demo.stat2">CA potentiel</div><div class="sc-val">8 400&#8364;</div></div>
           </div>
           <div class="data-card">
-            <div class="dc-header"><span class="dc-title">Activité récente</span></div>
-            <table>
-              <thead><tr><th data-i18n="demo.th1">Client</th><th data-i18n="demo.th4">Dernière action</th><th data-i18n="demo.th3">Statut</th></tr></thead>
+            <div class="dc-header"><span class="dc-title" data-i18n="demo.recent">Derniers contacts</span></div>
+            <table><thead><tr><th data-i18n="demo.th1">Client</th><th data-i18n="demo.th4">Derni&#232;re action</th><th data-i18n="demo.th3">Statut</th></tr></thead>
               <tbody>
-                <tr><td><div class="cell-flex"><div class="av av-b">MR</div>Martin & Rénovation</div></td><td>Relance email</td><td><span class="sbadge sb-green">Fait</span></td></tr>
-                <tr><td><div class="cell-flex"><div class="av av-g">BL</div>Boulangerie Lenoir</div></td><td>RDV confirmé</td><td><span class="sbadge sb-blue">Planifié</span></td></tr>
-                <tr><td><div class="cell-flex"><div class="av av-a">CP</div>Cabinet Perrin</div></td><td>Devis envoyé</td><td><span class="sbadge sb-amber">En attente</span></td></tr>
+                <tr><td><div class="cell-flex"><div class="av av-b">MR</div>Martin &amp; R&#233;novation</div></td><td>Relance email</td><td><span class="sbadge sb-green" data-i18n="demo.badge.done">Fait</span></td></tr>
+                <tr><td><div class="cell-flex"><div class="av av-g">BL</div>Boulangerie Lenoir</div></td><td>RDV confirm&#233;</td><td><span class="sbadge sb-blue" data-i18n="demo.badge.scheduled">Planifi&#233;</span></td></tr>
+                <tr><td><div class="cell-flex"><div class="av av-a">CP</div>Cabinet Perrin</div></td><td>Devis envoy&#233;</td><td><span class="sbadge sb-amber" data-i18n="demo.badge.pending">En attente</span></td></tr>
               </tbody>
             </table>
           </div>
@@ -833,35 +838,38 @@ footer{padding:32px 52px;border-top:1px solid var(--border);display:flex;align-i
       </div>
     </div>
 
-    <!-- CLIENTS -->
-    <div id="tab-clients" class="crm-app" style="display:none">
+    <!-- CONTACTS -->
+    <div id="tab-contacts" class="crm-app" style="display:none">
       <div class="crm-sidebar">
         <div class="crm-logo"><div class="crm-logo-name">pylotIA</div><div class="crm-logo-sub" data-i18n="demo.crm-sub">CRM intelligent</div></div>
         <div class="crm-nav">
           <div class="crm-item" onclick="showTab('dashboard',document.querySelectorAll('.app-tab')[0])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
-          <div class="crm-item active"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>Clients<span class="crm-badge">12</span></div>
+          <div class="crm-item active" onclick="showTab('contacts',document.querySelectorAll('.app-tab')[1])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Contacts<span class="crm-badge">12</span></div>
           <div class="crm-item" onclick="showTab('agenda',document.querySelectorAll('.app-tab')[2])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span data-i18n="demo.nav3">Agenda</span></div>
-          <div class="crm-item" onclick="showTab('prospection',document.querySelectorAll('.app-tab')[3])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span data-i18n="demo.nav4">Prospection</span></div>
-          <div class="crm-item" onclick="showTab('assistant',document.querySelectorAll('.app-tab')[4])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09 3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09z"/></svg>Assistant IA<span class="crm-pro">PRO</span></div>
+          <div class="crm-item" onclick="showTab('activite',document.querySelectorAll('.app-tab')[3])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span data-i18n="demo.nav5">Activit&#233;</span></div>
+          <div class="crm-item" style="opacity:0.42;cursor:default"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><span data-i18n="demo.nav.perf">Performance</span><span class="crm-pro">PRO</span></div>
+          <div class="crm-item" style="opacity:0.42;cursor:default"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span data-i18n="demo.nav.pv">Post-vente</span><span class="crm-pro">PRO</span></div>
+          <div class="crm-item" onclick="showTab('campagnes',document.querySelectorAll('.app-tab')[4])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><span data-i18n="demo.nav6">Campagnes</span></div>
+          <div class="crm-item" onclick="showTab('relances',document.querySelectorAll('.app-tab')[5])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span data-i18n="demo.nav4">Relances</span></div>
+          <div class="crm-item" onclick="showTab('assistant',document.querySelectorAll('.app-tab')[6])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09z"/></svg><span data-i18n="demo.tab5">Assistant IA</span><span class="crm-pro">PRO</span></div>
         </div>
-        <div class="crm-footer"><div class="crm-plan" data-i18n="demo.plan-label">Offre actuelle</div><div class="crm-plan-name">Starter</div></div>
+        <div class="crm-footer"><div class="crm-plan" data-i18n="demo.plan-label">Offre actuelle</div><div class="crm-plan-name" data-i18n="demo.plan-name">Starter &#8212; Gratuit</div></div>
       </div>
       <div class="crm-main">
-        <div class="crm-topbar"><div class="crm-page-title">Portefeuille clients</div><div class="crm-actions"><button class="btn-sm btn-sm-ghost">Importer Excel</button><button class="btn-sm btn-sm-blue">+ Client</button></div></div>
+        <div class="crm-topbar"><div class="crm-page-title">Contacts</div><div class="crm-actions"><button class="btn-sm btn-sm-ghost" data-i18n="demo.import">Importer</button><button class="btn-sm btn-sm-blue">+ Contact</button></div></div>
         <div class="crm-content">
-          <div class="data-card" style="margin-bottom:10px;padding:14px 14px 10px;background:var(--bg3);border:1px dashed rgba(59,130,246,0.25);border-radius:10px;text-align:center;cursor:pointer">
-            <div style="font-size:13px;font-weight:500;color:#93c5fd;margin-bottom:4px">Importer vos clients existants</div>
-            <div style="font-size:12px;color:#4a5a78">Glissez votre fichier .xlsx ou .csv ici — import automatique en 30 sec</div>
+          <div class="data-card" style="margin-bottom:10px;padding:14px 14px 10px;background:var(--bg3);border:1px dashed rgba(59,130,246,0.25);border-radius:10px;text-align:center;cursor:pointer" onclick="window.location.href='signup.html'">
+            <div style="font-size:13px;font-weight:500;color:var(--blue);margin-bottom:4px" data-i18n="demo.import-title">Importer vos clients existants</div>
+            <div style="font-size:12px;color:var(--text2)" data-i18n="demo.import-sub">Glissez votre .xlsx ou .csv &#8212; import automatique en 30 sec</div>
           </div>
           <div class="data-card">
-            <div class="dc-header"><span class="dc-title">12 clients</span><button class="btn-sm btn-sm-ghost">Filtrer</button></div>
-            <table>
-              <thead><tr><th>Entreprise</th><th>Contact</th><th>Offre</th><th>Statut</th></tr></thead>
+            <div class="dc-header"><span class="dc-title">12 contacts</span><button class="btn-sm btn-sm-ghost" data-i18n="demo.filter">Filtrer</button></div>
+            <table><thead><tr><th data-i18n="demo.col.company">Entreprise</th><th data-i18n="demo.col.contact">Contact</th><th data-i18n="demo.th2">Offre</th><th data-i18n="demo.th3">Statut</th></tr></thead>
               <tbody>
-                <tr><td><div class="cell-flex"><div class="av av-b">MR</div>Martin & Rénovation</div></td><td>Pierre Martin</td><td>Pro</td><td><span class="sbadge sb-green">Actif</span></td></tr>
-                <tr><td><div class="cell-flex"><div class="av av-g">BL</div>Boulangerie Lenoir</div></td><td>Sophie Lenoir</td><td>Starter</td><td><span class="sbadge sb-amber">À relancer</span></td></tr>
-                <tr><td><div class="cell-flex"><div class="av av-a">CP</div>Cabinet Perrin</div></td><td>Marc Perrin</td><td>Pro</td><td><span class="sbadge sb-blue">Essai 14j</span></td></tr>
-                <tr><td><div class="cell-flex"><div class="av" style="background:rgba(139,92,246,0.15);color:#a78bfa">AG</div>Auto Garage 42</div></td><td>Laurent Vidal</td><td>Starter</td><td><span class="sbadge" style="background:rgba(74,90,120,0.2);color:#4a5a78">Inactif</span></td></tr>
+                <tr><td><div class="cell-flex"><div class="av av-b">MR</div>Martin &amp; R&#233;novation</div></td><td>Pierre Martin</td><td>Pro</td><td><span class="sbadge sb-green" data-i18n="demo.badge.active">Actif</span></td></tr>
+                <tr><td><div class="cell-flex"><div class="av av-g">BL</div>Boulangerie Lenoir</div></td><td>Sophie Lenoir</td><td>Starter</td><td><span class="sbadge sb-amber" data-i18n="demo.badge.followup2">&#192; relancer</span></td></tr>
+                <tr><td><div class="cell-flex"><div class="av av-a">CP</div>Cabinet Perrin</div></td><td>Marc Perrin</td><td>Pro</td><td><span class="sbadge sb-blue" data-i18n="demo.badge.trial">Essai 14j</span></td></tr>
+                <tr><td><div class="cell-flex"><div class="av" style="background:rgba(139,92,246,0.12);color:#a78bfa">AG</div>Auto Garage 42</div></td><td>Laurent Vidal</td><td>Starter</td><td><span class="sbadge" style="background:rgba(0,0,0,0.06);color:var(--text3)" data-i18n="demo.badge.inactive">Inactif</span></td></tr>
               </tbody>
             </table>
           </div>
@@ -872,37 +880,120 @@ footer{padding:32px 52px;border-top:1px solid var(--border);display:flex;align-i
     <!-- AGENDA -->
     <div id="tab-agenda" class="agenda-section" style="display:none">
       <div class="ag-cal-col">
-        <div class="ag-cal-hd"><div class="ag-nav">‹</div><div class="ag-month" id="ag-month-label"></div><div class="ag-nav">›</div></div>
+        <div class="ag-cal-hd"><div class="ag-nav">&#8249;</div><div class="ag-month" id="ag-month-label"></div><div class="ag-nav">&#8250;</div></div>
         <div class="cal-grid-hd"><div class="cgh">L</div><div class="cgh">M</div><div class="cgh">M</div><div class="cgh">J</div><div class="cgh">V</div><div class="cgh">S</div><div class="cgh">D</div></div>
         <div class="cal-grid" id="cal2"></div>
       </div>
       <div class="ag-main">
         <div class="ag-day-title" id="ag-day-title"></div>
-        <div class="rdv-card"><div class="rdv-time">09h00</div><div class="rdv-bar" style="background:#3b82f6"></div><div class="rdv-info"><div class="rdv-name">Boulangerie Lenoir</div><div class="rdv-type">Présentation offre Starter</div></div><div class="rdv-dot" style="background:#3b82f6"></div></div>
-        <div class="rdv-card"><div class="rdv-time">14h30</div><div class="rdv-bar" style="background:#10b981"></div><div class="rdv-info"><div class="rdv-name">Cabinet Perrin</div><div class="rdv-type">Suivi démo chatbot IA</div></div><div class="rdv-dot" style="background:#10b981"></div></div>
-        <div class="rdv-card" style="border:1px dashed rgba(255,255,255,0.08);background:transparent;cursor:pointer" onclick="window.location.href='signup.html'"><div class="rdv-time" style="color:#4a5a78">+</div><div class="rdv-bar" style="background:rgba(255,255,255,0.06)"></div><div class="rdv-info"><div class="rdv-name" style="color:#4a5a78;font-weight:400">Nouveau rendez-vous</div></div><button class="btn-sm btn-sm-blue" onclick="window.location.href='signup.html'">Planifier</button></div>
+        <div class="rdv-card"><div class="rdv-time">09h00</div><div class="rdv-bar" style="background:#3b82f6"></div><div class="rdv-info"><div class="rdv-name">Boulangerie Lenoir</div><div class="rdv-type">Pr&#233;sentation offre Starter</div></div><div class="rdv-dot" style="background:#3b82f6"></div></div>
+        <div class="rdv-card"><div class="rdv-time">14h30</div><div class="rdv-bar" style="background:#10b981"></div><div class="rdv-info"><div class="rdv-name">Cabinet Perrin</div><div class="rdv-type">Suivi d&#233;mo Assistant IA</div></div><div class="rdv-dot" style="background:#10b981"></div></div>
+        <div class="rdv-card" style="border:1px dashed rgba(0,0,0,0.1);background:transparent;cursor:pointer" onclick="window.location.href='signup.html'"><div class="rdv-time" style="color:var(--text3)">+</div><div class="rdv-bar" style="background:rgba(0,0,0,0.06)"></div><div class="rdv-info"><div class="rdv-name" style="color:var(--text3);font-weight:400" data-i18n="demo.new-rdv">Nouveau rendez-vous</div></div><button class="btn-sm btn-sm-blue" onclick="window.location.href='signup.html'" data-i18n="demo.plan">Planifier</button></div>
       </div>
     </div>
 
-    <!-- PROSPECTION -->
-    <div id="tab-prospection" class="kanban-section" style="display:none">
-      <div class="kb-title">Pipeline de prospection</div>
+    <!-- ACTIVIT&#201; -->
+    <div id="tab-activite" class="crm-app" style="display:none">
+      <div class="crm-sidebar">
+        <div class="crm-logo"><div class="crm-logo-name">pylotIA</div><div class="crm-logo-sub" data-i18n="demo.crm-sub">CRM intelligent</div></div>
+        <div class="crm-nav">
+          <div class="crm-item" onclick="showTab('dashboard',document.querySelectorAll('.app-tab')[0])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
+          <div class="crm-item" onclick="showTab('contacts',document.querySelectorAll('.app-tab')[1])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Contacts<span class="crm-badge">12</span></div>
+          <div class="crm-item" onclick="showTab('agenda',document.querySelectorAll('.app-tab')[2])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span data-i18n="demo.nav3">Agenda</span></div>
+          <div class="crm-item active" onclick="showTab('activite',document.querySelectorAll('.app-tab')[3])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span data-i18n="demo.nav5">Activit&#233;</span></div>
+          <div class="crm-item" style="opacity:0.42;cursor:default"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><span data-i18n="demo.nav.perf">Performance</span><span class="crm-pro">PRO</span></div>
+          <div class="crm-item" style="opacity:0.42;cursor:default"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span data-i18n="demo.nav.pv">Post-vente</span><span class="crm-pro">PRO</span></div>
+          <div class="crm-item" onclick="showTab('campagnes',document.querySelectorAll('.app-tab')[4])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><span data-i18n="demo.nav6">Campagnes</span></div>
+          <div class="crm-item" onclick="showTab('relances',document.querySelectorAll('.app-tab')[5])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span data-i18n="demo.nav4">Relances</span></div>
+          <div class="crm-item" onclick="showTab('assistant',document.querySelectorAll('.app-tab')[6])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09z"/></svg><span data-i18n="demo.tab5">Assistant IA</span><span class="crm-pro">PRO</span></div>
+        </div>
+        <div class="crm-footer"><div class="crm-plan" data-i18n="demo.plan-label">Offre actuelle</div><div class="crm-plan-name" data-i18n="demo.plan-name">Starter &#8212; Gratuit</div></div>
+      </div>
+      <div class="crm-main">
+        <div class="crm-topbar"><div class="crm-page-title" data-i18n="demo.nav5">Activit&#233;</div></div>
+        <div class="crm-content">
+          <div class="data-card" style="padding:0;overflow:hidden">
+            <div class="dc-header" style="padding:14px 16px 10px"><span class="dc-title" data-i18n="demo.activity.title">Historique des actions</span></div>
+            <div style="display:flex;flex-direction:column">
+              <div style="display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border)"><div style="width:30px;height:30px;background:rgba(16,185,129,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">&#10003;</div><div style="flex:1"><div style="font-size:13px;font-weight:500;color:var(--text)">Relance email &#8212; Boulangerie Lenoir</div><div style="font-size:11px;color:var(--text3);margin-top:2px" data-i18n="demo.act.t1">Il y a 2 heures</div></div></div>
+              <div style="display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border)"><div style="width:30px;height:30px;background:rgba(59,130,246,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">&#128197;</div><div style="flex:1"><div style="font-size:13px;font-weight:500;color:var(--text)">RDV planifi&#233; &#8212; Cabinet Perrin &#224; 14h30</div><div style="font-size:11px;color:var(--text3);margin-top:2px" data-i18n="demo.act.t2">Il y a 3 heures</div></div></div>
+              <div style="display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border)"><div style="width:30px;height:30px;background:rgba(139,92,246,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">&#128100;</div><div style="flex:1"><div style="font-size:13px;font-weight:500;color:var(--text)">Contact ajout&#233; &#8212; Immobilier Roux</div><div style="font-size:11px;color:var(--text3);margin-top:2px" data-i18n="demo.act.yesterday">Hier</div></div></div>
+              <div style="display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border)"><div style="width:30px;height:30px;background:rgba(245,158,11,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">&#128226;</div><div style="flex:1"><div style="font-size:13px;font-weight:500;color:var(--text)">Campagne lanc&#233;e &#8212; &#171;Offre Pro Q2&#187; &#183; 5 contacts</div><div style="font-size:11px;color:var(--text3);margin-top:2px" data-i18n="demo.act.yesterday">Hier</div></div></div>
+              <div style="display:flex;align-items:flex-start;gap:12px;padding:13px 16px"><div style="width:30px;height:30px;background:rgba(239,68,68,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">&#128203;</div><div style="flex:1"><div style="font-size:13px;font-weight:500;color:var(--text)">Devis envoy&#233; &#8212; BTP Marchand</div><div style="font-size:11px;color:var(--text3);margin-top:2px" data-i18n="demo.act.t3">Il y a 2 jours</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAMPAGNES -->
+    <div id="tab-campagnes" class="crm-app" style="display:none">
+      <div class="crm-sidebar">
+        <div class="crm-logo"><div class="crm-logo-name">pylotIA</div><div class="crm-logo-sub" data-i18n="demo.crm-sub">CRM intelligent</div></div>
+        <div class="crm-nav">
+          <div class="crm-item" onclick="showTab('dashboard',document.querySelectorAll('.app-tab')[0])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
+          <div class="crm-item" onclick="showTab('contacts',document.querySelectorAll('.app-tab')[1])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Contacts<span class="crm-badge">12</span></div>
+          <div class="crm-item" onclick="showTab('agenda',document.querySelectorAll('.app-tab')[2])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span data-i18n="demo.nav3">Agenda</span></div>
+          <div class="crm-item" onclick="showTab('activite',document.querySelectorAll('.app-tab')[3])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span data-i18n="demo.nav5">Activit&#233;</span></div>
+          <div class="crm-item" style="opacity:0.42;cursor:default"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><span data-i18n="demo.nav.perf">Performance</span><span class="crm-pro">PRO</span></div>
+          <div class="crm-item" style="opacity:0.42;cursor:default"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span data-i18n="demo.nav.pv">Post-vente</span><span class="crm-pro">PRO</span></div>
+          <div class="crm-item active" onclick="showTab('campagnes',document.querySelectorAll('.app-tab')[4])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><span data-i18n="demo.nav6">Campagnes</span></div>
+          <div class="crm-item" onclick="showTab('relances',document.querySelectorAll('.app-tab')[5])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span data-i18n="demo.nav4">Relances</span></div>
+          <div class="crm-item" onclick="showTab('assistant',document.querySelectorAll('.app-tab')[6])"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09z"/></svg><span data-i18n="demo.tab5">Assistant IA</span><span class="crm-pro">PRO</span></div>
+        </div>
+        <div class="crm-footer"><div class="crm-plan" data-i18n="demo.plan-label">Offre actuelle</div><div class="crm-plan-name" data-i18n="demo.plan-name">Starter &#8212; Gratuit</div></div>
+      </div>
+      <div class="crm-main">
+        <div class="crm-topbar"><div class="crm-page-title" data-i18n="demo.nav6">Campagnes</div><div class="crm-actions"><button class="btn-sm btn-sm-blue" data-i18n="demo.new-camp">+ Campagne</button></div></div>
+        <div class="crm-content">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="data-card" style="padding:16px;cursor:pointer" onclick="window.location.href='signup.html'">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div style="font-size:13px;font-weight:600;color:var(--text)">&#128226; Relance Offre Pro Q2</div><span class="sbadge sb-green" style="font-size:10px" data-i18n="demo.camp.active">Active</span></div>
+              <div style="font-size:12px;color:var(--text3);margin-bottom:8px">5 contacts</div>
+              <div style="height:4px;background:var(--bg3);border-radius:2px"><div style="width:60%;height:100%;background:var(--blue);border-radius:2px"></div></div>
+              <div style="font-size:11px;color:var(--text3);margin-top:5px">3 / 5 relanci&#233;s</div>
+            </div>
+            <div class="data-card" style="padding:16px;cursor:pointer" onclick="window.location.href='signup.html'">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div style="font-size:13px;font-weight:600;color:var(--text)">&#128226; Suivi Devis Mars</div><span class="sbadge sb-green" style="font-size:10px" data-i18n="demo.camp.active">Active</span></div>
+              <div style="font-size:12px;color:var(--text3);margin-bottom:8px">3 contacts</div>
+              <div style="height:4px;background:var(--bg3);border-radius:2px"><div style="width:33%;height:100%;background:var(--blue);border-radius:2px"></div></div>
+              <div style="font-size:11px;color:var(--text3);margin-top:5px">1 / 3 relanci&#233;s</div>
+            </div>
+            <div class="data-card" style="padding:16px;cursor:pointer" onclick="window.location.href='signup.html'">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div style="font-size:13px;font-weight:600;color:var(--text)">&#128226; Onboarding Starter</div><span class="sbadge" style="font-size:10px;background:rgba(0,0,0,0.06);color:var(--text3)" data-i18n="demo.camp.done">Termin&#233;e</span></div>
+              <div style="font-size:12px;color:var(--text3);margin-bottom:8px">8 contacts</div>
+              <div style="height:4px;background:var(--bg3);border-radius:2px"><div style="width:100%;height:100%;background:#10b981;border-radius:2px"></div></div>
+              <div style="font-size:11px;color:#10b981;margin-top:5px">8 / 8 &#10003;</div>
+            </div>
+            <div class="data-card" style="padding:16px;border:1px dashed rgba(59,130,246,0.25);background:var(--bg3);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px" onclick="window.location.href='signup.html'">
+              <div style="font-size:22px">+</div>
+              <div style="font-size:13px;color:var(--blue);font-weight:500" data-i18n="demo.new-camp">+ Nouvelle campagne</div>
+              <div style="font-size:12px;color:var(--text3)" data-i18n="demo.camp.sub">Organisez vos relances par s&#233;quence</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RELANCES (kanban) -->
+    <div id="tab-relances" class="kanban-section" style="display:none">
+      <div class="kb-title" data-i18n="demo.nav4">Relances</div>
       <div class="kb-grid">
         <div class="kb-col">
-          <div class="kb-col-hd">À contacter<span class="kb-cnt">3</span></div>
-          <div class="kb-card"><div class="kb-company">Garage Lefèvre</div><div class="kb-contact">Jean Lefèvre</div><div class="kb-footer"><span class="sbadge" style="background:rgba(74,90,120,0.2);color:#4a5a78;font-size:10px;padding:2px 7px;border-radius:4px;">Froid</span><span class="kb-val" style="color:#34d399">1 200 €</span></div></div>
-          <div class="kb-card"><div class="kb-company">Pharmacie Dubois</div><div class="kb-contact">Claire Dubois</div><div class="kb-footer"><span class="sbadge" style="background:rgba(74,90,120,0.2);color:#4a5a78;font-size:10px;padding:2px 7px;border-radius:4px;">Froid</span><span class="kb-val" style="color:#34d399">2 700 €</span></div></div>
-          <div class="kb-card"><div class="kb-company">Optic Grandjean</div><div class="kb-contact">T. Grandjean</div><div class="kb-footer"><span class="sbadge" style="background:rgba(74,90,120,0.2);color:#4a5a78;font-size:10px;padding:2px 7px;border-radius:4px;">Froid</span><span class="kb-val" style="color:#34d399">1 800 €</span></div></div>
+          <div class="kb-col-hd"><span data-i18n="demo.kb.contact">&#192; contacter</span><span class="kb-cnt">3</span></div>
+          <div class="kb-card"><div class="kb-company">Garage Lef&#232;vre</div><div class="kb-contact">Jean Lef&#232;vre</div><div class="kb-footer"><span class="sbadge" style="background:rgba(0,0,0,0.06);color:var(--text3);font-size:10px;padding:2px 7px;border-radius:4px" data-i18n="demo.kb.cold">Froid</span><span class="kb-val" style="color:#34d399">1 200 &#8364;</span></div></div>
+          <div class="kb-card"><div class="kb-company">Pharmacie Dubois</div><div class="kb-contact">Claire Dubois</div><div class="kb-footer"><span class="sbadge" style="background:rgba(0,0,0,0.06);color:var(--text3);font-size:10px;padding:2px 7px;border-radius:4px" data-i18n="demo.kb.cold">Froid</span><span class="kb-val" style="color:#34d399">2 700 &#8364;</span></div></div>
+          <div class="kb-card"><div class="kb-company">Optic Grandjean</div><div class="kb-contact">T. Grandjean</div><div class="kb-footer"><span class="sbadge" style="background:rgba(0,0,0,0.06);color:var(--text3);font-size:10px;padding:2px 7px;border-radius:4px" data-i18n="demo.kb.cold">Froid</span><span class="kb-val" style="color:#34d399">1 800 &#8364;</span></div></div>
         </div>
         <div class="kb-col">
-          <div class="kb-col-hd">En discussion<span class="kb-cnt">2</span></div>
-          <div class="kb-card"><div class="kb-company">Immobilier Roux</div><div class="kb-contact">Paul Roux · RDV jeudi</div><div class="kb-footer"><span class="sbadge sb-amber" style="font-size:10px;padding:2px 7px;border-radius:4px;">Chaud</span><span class="kb-val" style="color:#34d399">4 500 €</span></div></div>
-          <div class="kb-card"><div class="kb-company">Assurance Moreau</div><div class="kb-contact">Devis envoyé</div><div class="kb-footer"><span class="sbadge sb-amber" style="font-size:10px;padding:2px 7px;border-radius:4px;">Tiède</span><span class="kb-val" style="color:#34d399">3 200 €</span></div></div>
+          <div class="kb-col-hd"><span data-i18n="demo.kb.discuss">En discussion</span><span class="kb-cnt">2</span></div>
+          <div class="kb-card"><div class="kb-company">Immobilier Roux</div><div class="kb-contact">Paul Roux &#183; RDV jeudi</div><div class="kb-footer"><span class="sbadge sb-amber" style="font-size:10px;padding:2px 7px;border-radius:4px" data-i18n="demo.kb.hot">Chaud</span><span class="kb-val" style="color:#34d399">4 500 &#8364;</span></div></div>
+          <div class="kb-card"><div class="kb-company">Assurance Moreau</div><div class="kb-contact">Devis envoy&#233;</div><div class="kb-footer"><span class="sbadge sb-amber" style="font-size:10px;padding:2px 7px;border-radius:4px" data-i18n="demo.kb.warm">Ti&#232;de</span><span class="kb-val" style="color:#34d399">3 200 &#8364;</span></div></div>
         </div>
         <div class="kb-col">
-          <div class="kb-col-hd">À relancer<span class="kb-cnt">2</span></div>
-          <div class="kb-card"><div class="kb-company">BTP Marchand</div><div class="kb-contact">Relance J+7 due</div><div class="kb-footer"><span class="sbadge" style="background:rgba(239,68,68,0.1);color:#f87171;font-size:10px;padding:2px 7px;border-radius:4px;">Urgent</span><span class="kb-val" style="color:#34d399">6 000 €</span></div></div>
-          <div class="kb-card"><div class="kb-company">Kiné Beaumont</div><div class="kb-contact">Pas de réponse x2</div><div class="kb-footer"><span class="sbadge sb-amber" style="font-size:10px;padding:2px 7px;border-radius:4px;">Tiède</span><span class="kb-val" style="color:#34d399">2 400 €</span></div></div>
+          <div class="kb-col-hd"><span data-i18n="demo.kb.followup">&#192; relancer</span><span class="kb-cnt">2</span></div>
+          <div class="kb-card"><div class="kb-company">BTP Marchand</div><div class="kb-contact">Relance J+7 due</div><div class="kb-footer"><span class="sbadge" style="background:rgba(239,68,68,0.1);color:#f87171;font-size:10px;padding:2px 7px;border-radius:4px" data-i18n="demo.kb.urgent">Urgent</span><span class="kb-val" style="color:#34d399">6 000 &#8364;</span></div></div>
+          <div class="kb-card"><div class="kb-company">Kin&#233; Beaumont</div><div class="kb-contact">Pas de r&#233;ponse x2</div><div class="kb-footer"><span class="sbadge sb-amber" style="font-size:10px;padding:2px 7px;border-radius:4px" data-i18n="demo.kb.warm">Ti&#232;de</span><span class="kb-val" style="color:#34d399">2 400 &#8364;</span></div></div>
         </div>
       </div>
     </div>
@@ -910,47 +1001,45 @@ footer{padding:32px 52px;border-top:1px solid var(--border);display:flex;align-i
     <!-- ASSISTANT IA -->
     <div id="tab-assistant" class="chat-section-inner" style="display:none">
       <div class="chat-contacts">
-        <div class="chat-contact-hd">Analyses rapides</div>
-        <div class="cc-item" onclick="askAI('Quels clients dois-je relancer en priorité ?')"><div class="cc-name">Relances urgentes</div><div class="cc-sub">3 en attente</div></div>
-        <div class="cc-item" onclick="askAI('Quel est mon CA potentiel ce mois-ci ?')"><div class="cc-name">CA potentiel</div><div class="cc-sub">Pipeline actif</div></div>
-        <div class="cc-item" onclick="askAI('Quels prospects sont les plus chauds ?')"><div class="cc-name">Prospects chauds</div><div class="cc-sub">2 identifiés</div></div>
-        <div class="cc-item" onclick="askAI('Génère un rapport hebdomadaire de mon activité')"><div class="cc-name">Rapport semaine</div><div class="cc-sub">Auto-généré</div></div>
-        <div class="chat-contact-hd" style="margin-top:12px">Clients</div>
-        <div class="cc-item" onclick="askAI('Donne-moi un résumé du dossier Martin et Rénovation')"><div class="cc-name">Martin & Rénov.</div><div class="cc-sub">Pro · Actif</div></div>
-        <div class="cc-item" onclick="askAI('Quand dois-je relancer Boulangerie Lenoir ?')"><div class="cc-name">Boulangerie Lenoir</div><div class="cc-sub">À relancer</div></div>
+        <div class="chat-contact-hd" data-i18n="demo.ai.quick">Analyses rapides</div>
+        <div class="cc-item" onclick="askAI('Quels clients dois-je relancer en priorit&#233; ?')"><div class="cc-name" data-i18n="demo.ai.rel">Relances urgentes</div><div class="cc-sub">3 en attente</div></div>
+        <div class="cc-item" onclick="askAI('Quel est mon CA potentiel ce mois-ci ?')"><div class="cc-name" data-i18n="demo.ai.ca">CA potentiel</div><div class="cc-sub" data-i18n="demo.ai.pipeline">Pipeline actif</div></div>
+        <div class="cc-item" onclick="askAI('Quels prospects sont les plus chauds ?')"><div class="cc-name" data-i18n="demo.ai.hot">Prospects chauds</div><div class="cc-sub" data-i18n="demo.ai.identified">2 identifi&#233;s</div></div>
+        <div class="cc-item" onclick="askAI('G&#233;n&#232;re un rapport hebdomadaire de mon activit&#233;')"><div class="cc-name" data-i18n="demo.ai.report">Rapport semaine</div><div class="cc-sub" data-i18n="demo.ai.auto">Auto-g&#233;n&#233;r&#233;</div></div>
+        <div class="chat-contact-hd" style="margin-top:12px" data-i18n="demo.th1">Clients</div>
+        <div class="cc-item" onclick="askAI('Donne-moi un r&#233;sum&#233; du dossier Martin et R&#233;novation')"><div class="cc-name">Martin &amp; R&#233;nov.</div><div class="cc-sub" data-i18n="demo.badge.active">Pro &#183; Actif</div></div>
+        <div class="cc-item" onclick="askAI('Quand dois-je relancer Boulangerie Lenoir ?')"><div class="cc-name">Boulangerie Lenoir</div><div class="cc-sub" data-i18n="demo.badge.followup2">&#192; relancer</div></div>
       </div>
       <div class="chat-main">
         <div class="chat-hd">
           <div class="ai-dot"></div>
-          <div><div class="chat-hd-name">Assistant IA pylotIA</div><div class="chat-hd-sub">Analyse votre portefeuille en temps réel</div></div>
+          <div><div class="chat-hd-name" data-i18n="demo.ai.name">Assistant IA pylotIA</div><div class="chat-hd-sub" data-i18n="demo.ai.sub">Analyse votre portefeuille en temps r&#233;el</div></div>
           <div class="pro-tag">Pro</div>
         </div>
         <div class="chat-msgs" id="ai-messages">
           <div class="cmsg ai">
             <div class="cmsg-av cav-ai">IA</div>
-            <div>
-              <div class="cbubble cbubble-ai">
-                Bonjour ! J'ai analysé votre portefeuille. Voici votre résumé :
-                <div class="icard">
-                  <div class="irow"><span class="il">Clients actifs</span><span class="iv">12</span></div>
-                  <div class="irow"><span class="il">Relances urgentes</span><span style="background:rgba(239,68,68,0.1);color:#f87171;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500;">3 en retard</span></div>
-                  <div class="irow"><span class="il">RDV aujourd'hui</span><span style="background:rgba(245,158,11,0.1);color:#fbbf24;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500;">2 prévus</span></div>
-                  <div class="irow"><span class="il">CA potentiel</span><span style="background:rgba(16,185,129,0.1);color:#34d399;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500;">8 400 €</span></div>
-                </div>
+            <div><div class="cbubble cbubble-ai">
+              <span data-i18n="demo.ai.greeting">Bonjour ! J'ai analys&#233; votre portefeuille. Voici votre r&#233;sum&#233; :</span>
+              <div class="icard">
+                <div class="irow"><span class="il" data-i18n="demo.stat1">Clients actifs</span><span class="iv">12</span></div>
+                <div class="irow"><span class="il" data-i18n="demo.ai.urgent">Relances urgentes</span><span style="background:rgba(239,68,68,0.1);color:#f87171;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500" data-i18n="demo.ai.urgent-val">3 en retard</span></div>
+                <div class="irow"><span class="il" data-i18n="demo.ai.today">RDV aujourd'hui</span><span style="background:rgba(245,158,11,0.1);color:#fbbf24;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500" data-i18n="demo.ai.today-val">2 pr&#233;vus</span></div>
+                <div class="irow"><span class="il" data-i18n="demo.stat2">CA potentiel</span><span style="background:rgba(16,185,129,0.1);color:#34d399;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500">8 400 &#8364;</span></div>
               </div>
-            </div>
+            </div></div>
           </div>
         </div>
         <div class="chat-sugs" id="ai-sugs">
-          <div class="csug" onclick="askAI('Quels clients dois-je relancer en priorité ?')">Relances prioritaires</div>
-          <div class="csug" onclick="askAI('Quel est mon CA potentiel ?')">CA potentiel</div>
-          <div class="csug" onclick="askAI('Génère un rapport hebdomadaire')">Rapport semaine</div>
+          <div class="csug" onclick="askAI('Quels clients dois-je relancer en priorit&#233; ?')" data-i18n="demo.ai.sug1">Relances prioritaires</div>
+          <div class="csug" onclick="askAI('Quel est mon CA potentiel ?')" data-i18n="demo.ai.sug2">CA potentiel</div>
+          <div class="csug" onclick="askAI('G&#233;n&#232;re un rapport hebdomadaire')" data-i18n="demo.ai.sug3">Rapport semaine</div>
         </div>
         <div class="chat-input-row">
-          <input class="ci" id="ai-input" placeholder="Posez une question sur vos clients..." onkeydown="if(event.key==='Enter')sendAI()">
+          <input class="ci" id="ai-input" data-i18n-placeholder="demo.ai.placeholder" placeholder="Posez une question sur vos clients..." onkeydown="if(event.key==='Enter')sendAI()">
           <button class="csend" onclick="sendAI()"><svg stroke-width="2" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
         </div>
-        <div style="text-align:center;font-size:11px;color:var(--text3);opacity:0.6;padding:8px 16px 4px">Données de démonstration — dans votre compte, l'IA analysera vos vraies données.</div>
+        <div style="text-align:center;font-size:11px;color:var(--text3);opacity:0.6;padding:8px 16px 4px" data-i18n="demo.ai.disclaimer">Donn&#233;es de d&#233;monstration &#8212; l'IA analysera vos vraies donn&#233;es.</div>
       </div>
     </div>
 
@@ -1261,14 +1350,13 @@ footer{padding:32px 52px;border-top:1px solid var(--border);display:flex;align-i
 
 <script>
 function showTab(name, btn) {
-  ['dashboard','clients','agenda','prospection','assistant'].forEach(t => {
+  ['dashboard','contacts','agenda','activite','campagnes','relances','assistant'].forEach(t => {
     const el = document.getElementById('tab-'+t);
     if(el) el.style.display = 'none';
   });
   document.querySelectorAll('.app-tab').forEach(b => b.classList.remove('active'));
   const tab = document.getElementById('tab-'+name);
-  if(tab) tab.style.display = (name==='prospection'||name==='agenda') ? 'flex' : 'flex';
-  if(name==='prospection') tab.style.display='block';
+  if(tab) tab.style.display = name==='relances' ? 'block' : 'flex';
   if(btn) btn.classList.add('active');
 }
 
@@ -1644,7 +1732,30 @@ const TRANSLATIONS = {
     'demo.upgrade':'Activer Pro →','demo.export':'Exporter',
     'demo.stat3':'RDV cette semaine','demo.sub1':'+2 ce mois','demo.sub3':'3 à relancer',
     'demo.th4':'Dernière action','price.period':'/mois',
-    'demo.nav1':'Dashboard','demo.nav2':'Clients','demo.nav3':'Agenda','demo.nav4':'Prospects','demo.tab5':'Assistant IA ✦',
+    'demo.nav.perf':'Performance','demo.nav.pv':'Post-vente',
+    'demo.nav5':'Activité','demo.nav6':'Campagnes',
+    'demo.recent':'Derniers contacts','demo.import':'Importer','demo.filter':'Filtrer',
+    'demo.import-title':'Importer vos clients existants','demo.import-sub':'Glissez votre .xlsx ou .csv — import automatique en 30 sec',
+    'demo.col.company':'Entreprise','demo.col.contact':'Contact',
+    'demo.stat4':'Campagnes','demo.sub4':'actives',
+    'demo.badge.done':'Fait','demo.badge.scheduled':'Planifié','demo.badge.pending':'En attente',
+    'demo.badge.active':'Actif','demo.badge.followup2':'À relancer','demo.badge.inactive':'Inactif',
+    'demo.new-rdv':'Nouveau rendez-vous','demo.plan':'Planifier',
+    'demo.activity.title':'Historique des actions',
+    'demo.act.t1':'Il y a 2 heures','demo.act.t2':'Il y a 3 heures','demo.act.yesterday':'Hier','demo.act.t3':'Il y a 2 jours',
+    'demo.new-camp':'+ Campagne','demo.camp.active':'Active','demo.camp.done':'Terminée','demo.camp.sub':'Organisez vos relances par séquence',
+    'demo.kb.contact':'À contacter','demo.kb.discuss':'En discussion','demo.kb.followup':'À relancer',
+    'demo.kb.cold':'Froid','demo.kb.hot':'Chaud','demo.kb.warm':'Tiède','demo.kb.urgent':'Urgent',
+    'demo.ai.quick':'Analyses rapides','demo.ai.rel':'Relances urgentes','demo.ai.ca':'CA potentiel',
+    'demo.ai.pipeline':'Pipeline actif','demo.ai.hot':'Prospects chauds','demo.ai.identified':'2 identifiés',
+    'demo.ai.report':'Rapport semaine','demo.ai.auto':'Auto-généré',
+    'demo.ai.name':'Assistant IA pylotIA','demo.ai.sub':'Analyse votre portefeuille en temps réel',
+    'demo.ai.greeting':'Bonjour ! J\'ai analysé votre portefeuille. Voici votre résumé :',
+    'demo.ai.urgent':'Relances urgentes','demo.ai.urgent-val':'3 en retard',
+    'demo.ai.today':'RDV aujourd\'hui','demo.ai.today-val':'2 prévus',
+    'demo.ai.sug1':'Relances prioritaires','demo.ai.sug2':'CA potentiel','demo.ai.sug3':'Rapport semaine',
+    'demo.ai.placeholder':'Posez une question sur vos clients...','demo.ai.disclaimer':'Données de démo — l\'IA analysera vos vraies données.',
+    'demo.nav1':'Dashboard','demo.nav2':'Contacts','demo.nav3':'Agenda','demo.nav4':'Relances','demo.tab5':'Assistant IA ✦',
     'demo.stat1':'Clients actifs','demo.stat2':'CA potentiel',
     'demo.th1':'Client','demo.th2':'Offre','demo.th3':'Statut',
     'demo.badge.active':'Actif','demo.badge.followup':'Relancer','demo.badge.trial':'Essai',
@@ -1735,7 +1846,30 @@ const TRANSLATIONS = {
     'demo.upgrade':'Activate Pro →','demo.export':'Export',
     'demo.stat3':'Appointments this week','demo.sub1':'+2 this month','demo.sub3':'3 to follow up',
     'demo.th4':'Last action','price.period':'/mo',
-    'demo.nav1':'Dashboard','demo.nav2':'Clients','demo.nav3':'Calendar','demo.nav4':'Pipeline','demo.tab5':'AI Assistant ✦',
+    'demo.nav.perf':'Performance','demo.nav.pv':'After-sales',
+    'demo.nav5':'Activity','demo.nav6':'Campaigns',
+    'demo.recent':'Recent clients','demo.import':'Import','demo.filter':'Filter',
+    'demo.import-title':'Import your existing clients','demo.import-sub':'Drop your .xlsx or .csv — auto-import in 30 sec',
+    'demo.col.company':'Company','demo.col.contact':'Contact',
+    'demo.stat4':'Campaigns','demo.sub4':'active',
+    'demo.badge.done':'Done','demo.badge.scheduled':'Scheduled','demo.badge.pending':'Pending',
+    'demo.badge.active':'Active','demo.badge.followup2':'Follow up','demo.badge.inactive':'Inactive',
+    'demo.new-rdv':'New appointment','demo.plan':'Schedule',
+    'demo.activity.title':'Action history',
+    'demo.act.t1':'2 hours ago','demo.act.t2':'3 hours ago','demo.act.yesterday':'Yesterday','demo.act.t3':'2 days ago',
+    'demo.new-camp':'+ Campaign','demo.camp.active':'Active','demo.camp.done':'Completed','demo.camp.sub':'Organize your follow-ups by sequence',
+    'demo.kb.contact':'To contact','demo.kb.discuss':'In discussion','demo.kb.followup':'Follow up',
+    'demo.kb.cold':'Cold','demo.kb.hot':'Hot','demo.kb.warm':'Warm','demo.kb.urgent':'Urgent',
+    'demo.ai.quick':'Quick analysis','demo.ai.rel':'Urgent follow-ups','demo.ai.ca':'Pipeline value',
+    'demo.ai.pipeline':'Active pipeline','demo.ai.hot':'Hot prospects','demo.ai.identified':'2 identified',
+    'demo.ai.report':'Weekly report','demo.ai.auto':'Auto-generated',
+    'demo.ai.name':'pylotIA AI Assistant','demo.ai.sub':'Analyzes your portfolio in real time',
+    'demo.ai.greeting':'Hello! I analyzed your portfolio. Here\'s your summary:',
+    'demo.ai.urgent':'Urgent follow-ups','demo.ai.urgent-val':'3 overdue',
+    'demo.ai.today':'Appointments today','demo.ai.today-val':'2 scheduled',
+    'demo.ai.sug1':'Priority follow-ups','demo.ai.sug2':'Pipeline value','demo.ai.sug3':'Weekly report',
+    'demo.ai.placeholder':'Ask a question about your clients...','demo.ai.disclaimer':'Demo data — AI will analyze your real data in your account.',
+    'demo.nav1':'Dashboard','demo.nav2':'Contacts','demo.nav3':'Calendar','demo.nav4':'Follow-ups','demo.tab5':'AI Assistant ✦',
     'demo.stat1':'Active clients','demo.stat2':'Pipeline value',
     'demo.th1':'Client','demo.th2':'Plan','demo.th3':'Status',
     'demo.badge.active':'Active','demo.badge.followup':'Follow up','demo.badge.trial':'Trial',
