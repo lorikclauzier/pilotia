@@ -1,5 +1,5 @@
 # pylotIA — Référence projet pour Claude Code
-> Mis à jour : mai 2026 — Post-audit production complet
+> Mis à jour : mai 2026 — Sprint UI (kanban clients, assistant IA, post-vente, agenda)
 
 ---
 
@@ -206,6 +206,29 @@ getPlan()        // retourne 'free' | 'starter' | 'pro' | 'business'
 Assistant IA — 5 modes : chat libre, relances prioritaires, prospects chauds, message de relance, rapport hebdo.
 Modèle : `claude-sonnet-4-6`.
 
+#### Détails Kanban (prospection)
+- **Colonne "Clients ✓"** (`client_actif`) en fin de kanban — carte non-draggable, badge vert, sans bouton "+ Ajouter"
+- `convertProspectToContact(id)` : crée le contact **ET** passe le prospect en `client_actif` (ne supprime PAS le prospect)
+- `kbCardHtml()` : rendu spécial si `p.statut === 'client_actif'` (bordure verte, badge "✓ Client")
+
+#### Détails Assistant IA
+- `_initAiChat()` : affiche barre de stats (contacts/prospects/pipeline/relances urgentes) + message de bienvenue personnalisé + chips de suggestions cliquables
+- `buildAIContext()` : inclut RDV à venir (`allAppointments`, non `_appointments`), jour de la semaine, relances en retard marquées ⚠️
+- `formatAiText(text)` : escape HTML puis rend `**gras**` → `<strong>` et `\n` → `<br>` pour les messages bot
+- `useSuggestion(btn, text)` : remplit l'input et envoie immédiatement
+- Chips de suggestions masquées après le premier envoi
+
+#### Détails Post-vente
+- Mini agenda : section "En retard" (RDVs passés, `status !== 'fait'`) en rouge + section "À venir" (14 jours)
+- `markRdvDone(id)` : update `status: 'fait'` dans Supabase, re-render post-vente + agenda
+- Bouton ✓ sur chaque RDV — stopPropagation pour ne pas ouvrir l'éditeur
+- Clic sur un RDV → `editRdv(id)` (plus `showSection('agenda')`)
+
+#### Détails Agenda
+- `agendaView` : variable globale `'jour'` | `'upcoming'`
+- `switchAgendaView(view, btn)` : bascule entre vue jour (existante) et vue "À venir"
+- `renderUpcomingList()` : liste tous les RDVs futurs non faits, groupés par date, labels "Aujourd'hui"/"Demain"/date courte
+
 ### Documents joints (fiche contact)
 - Upload dans Supabase Storage (bucket `contact-documents`)
 - Chemin : `{user_id}/{contact_id}/{timestamp}.{ext}`
@@ -241,8 +264,14 @@ Modèle : `claude-sonnet-4-6`.
 - `planAllows(name)` — vérification plan pour une section donnée
 - `openUpgradeModal()` / `closeUpgradeModal()` — modal upgrade plan
 - `loadContacts()`, `loadProspects()`, `loadAppointments()` — chargement Supabase
-- `renderKanban()` — affichage kanban prospects
-- `renderPostVente()` — section post-vente
+- `renderKanban()` — affichage kanban prospects (colonne `client_actif` sans bouton "+ Ajouter")
+- `kbCardHtml(p, plan)` — rendu carte kanban (rendu spécial si `p.statut === 'client_actif'`)
+- `convertProspectToContact(id)` — crée contact + passe prospect en `client_actif`
+- `renderPostVente()` — section post-vente (mini agenda avec retards + à venir)
+- `markRdvDone(id)` — marque un RDV comme fait dans Supabase
+- `renderUpcomingList()` — liste RDVs futurs groupés par date (onglet "À venir" agenda)
+- `buildAIContext()` — contexte IA enrichi (RDV, jour, retards)
+- `_initAiChat()` — init stats bar + bienvenue personnalisé + chips suggestions
 - `callClaude(systemPrompt, messages, maxTokens)` — appel `/api/claude` avec JWT
 - `updatePlanBadges()` — met à jour badges + opacité nav items selon plan
 
@@ -268,6 +297,7 @@ Modèle : `claude-sonnet-4-6`.
 | CGU / Mentions légales | Squelettes prêts — à compléter avec SIRET |
 | SIRET Florian | En cours de création |
 | Tests automatisés | 34/34 ✅ (Playwright, compte Free, production) |
+| Comptes internes | Lorik + Flo + gerome.nba@yahoo.com passés en plan Pro (SQL Supabase) |
 
 ---
 
@@ -289,6 +319,12 @@ Modèle : `claude-sonnet-4-6`.
 ### Priorité basse
 6. Compléter CGU + Mentions légales avec SIRET
 7. Profil LinkedIn Florian
+
+### Fait — Sprint UI mai 2026
+- ✅ Colonne "Clients ✓" dans le Kanban (statut `client_actif`)
+- ✅ Assistant IA : stats bar, bienvenue personnalisé, chips suggestions, rendu gras/sauts de ligne
+- ✅ Post-vente : bouton "✓ Fait" sur RDVs, section "En retard" en rouge
+- ✅ Agenda : onglet "À venir" (RDVs futurs groupés par date), fix contraste light mode
 
 ---
 
