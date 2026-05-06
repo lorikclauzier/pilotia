@@ -215,6 +215,9 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 .pv-rdv-title{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pv-rdv-meta{font-size:11px;color:var(--text3);margin-top:2px}
 .pv-rdv-type{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;flex-shrink:0}
+.pv-rdv-done-btn{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:#10b981;border-radius:6px;width:28px;height:28px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;font-family:'Inter',sans-serif}
+.pv-rdv-done-btn:hover{background:rgba(16,185,129,0.25);border-color:rgba(16,185,129,0.5)}
+.pv-rdv-overdue{border-left:3px solid #f87171}
 
 /* CONTACT DRAWER */
 .contact-drawer{position:fixed;top:0;right:-500px;width:480px;max-width:100vw;height:100vh;background:var(--dark2);border-left:1px solid var(--border2);z-index:900;transition:right 0.3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden}
@@ -3093,6 +3096,26 @@ function deleteRdv() {
   if (editingRdvId) confirmDeleteRdv(editingRdvId).then(() => closeRdvModal());
 }
 
+async function markRdvDone(id) {
+  const rdv = allAppointments.find(a => a.id === id);
+  if (!rdv) return;
+  try {
+    const { error } = await supabaseClient.from('appointments')
+      .update({ status: 'fait' })
+      .eq('id', id)
+      .eq('user_id', currentUser.id);
+    if (error) throw error;
+    rdv.status = 'fait';
+    renderPostVente();
+    renderCalendar();
+    renderRdvList();
+    addActivity('edit', 'RDV terminé : ' + rdv.title);
+    showToast('RDV marqué comme fait ✓');
+  } catch(e) {
+    showToast('Erreur : ' + e.message);
+  }
+}
+
 function updateAgendaBadge() {
   const today = new Date().toISOString().split('T')[0];
   const todayCount = allAppointments.filter(a => a.date === today).length;
@@ -3884,9 +3907,9 @@ function buildAIContext() {
       }).join('\n')
     : 'Aucun prospect.';
 
-  const rdvStr = _appointments && _appointments.length
-    ? _appointments.filter(a => a.date >= todayStr).slice(0,5).map(a =>
-        `• ${a.titre||'RDV'} — ${new Date(a.date+'T00:00:00').toLocaleDateString('fr-FR')} ${a.heure||''} | ${a.contact||''} ${a.note?' | note: '+a.note:''}`
+  const rdvStr = allAppointments && allAppointments.length
+    ? allAppointments.filter(a => a.date >= todayStr && a.status !== 'fait').slice(0,5).map(a =>
+        `• ${a.title||'RDV'} — ${new Date(a.date+'T12:00:00').toLocaleDateString('fr-FR')} ${a.time||''} | contact: ${a.contact_name||'/'} | type: ${a.type||'rdv'}${a.notes?' | note: '+a.notes:''}`
       ).join('\n') || 'Aucun RDV à venir.'
     : 'Aucun RDV à venir.';
 
@@ -4194,37 +4217,50 @@ function renderPostVente() {
   const in14  = new Date(Date.now() + 14*86400000).toISOString().split('T')[0];
   const typeColors = { rdv:'#3b82f6', appel:'#10b981', email:'#8b5cf6', relance:'#f59e0b', autre:'#6b7280' };
   const typeLabels = { rdv:'RDV', appel:'Appel', email:'Email', relance:'Relance', autre:'Autre' };
+
+  const overdueRdvs = (allAppointments || [])
+    .filter(a => a.date < today && a.status !== 'fait')
+    .sort((a,b) => b.date.localeCompare(a.date))
+    .slice(0, 4);
   const upcomingRdvs = (allAppointments || [])
-    .filter(a => a.date >= today && a.date <= in14)
+    .filter(a => a.date >= today && a.date <= in14 && a.status !== 'fait')
     .sort((a,b) => a.date.localeCompare(b.date) || (a.time||'').localeCompare(b.time||''))
     .slice(0, 6);
+
+  function pvRdvRow(r, overdue=false) {
+    const d     = new Date(r.date + 'T12:00:00');
+    const day   = d.getDate();
+    const month = d.toLocaleDateString('fr-FR',{month:'short'});
+    const isToday = r.date === today;
+    const color = typeColors[r.type] || '#6b7280';
+    return `<div class="pv-rdv-item${overdue?' pv-rdv-overdue':''}" onclick="editRdv('${r.id}')">
+      <div class="pv-rdv-date">
+        <div class="pv-rdv-day" style="${isToday?'color:var(--blue)':overdue?'color:#f87171':''}">${day}</div>
+        <div class="pv-rdv-month">${month}</div>
+      </div>
+      <div class="pv-rdv-body">
+        <div class="pv-rdv-title">${r.title}</div>
+        <div class="pv-rdv-meta">${r.time ? r.time.slice(0,5) + ' · ' : ''}${r.contact_name || ''}</div>
+      </div>
+      <span class="pv-rdv-type" style="background:${color}18;color:${color}">${typeLabels[r.type]||r.type||'RDV'}</span>
+      <button class="pv-rdv-done-btn" onclick="event.stopPropagation();markRdvDone('${r.id}')" title="Marquer comme fait">✓</button>
+    </div>`;
+  }
+
   const agendaHtml = `
     <div class="pv-agenda">
       <div class="pv-agenda-hd">
-        <div class="pv-agenda-title">📅 Prochains RDVs <span class="pv-section-count">${upcomingRdvs.length}</span></div>
+        <div class="pv-agenda-title">📅 Agenda <span class="pv-section-count">${upcomingRdvs.length + overdueRdvs.length}</span>${overdueRdvs.length>0?` <span style="font-size:10px;background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:1px 7px;font-weight:600">${overdueRdvs.length} en retard</span>`:''}</div>
         <button class="btn-sm btn-sm-blue" onclick="showSection('agenda')">Voir l'agenda →</button>
       </div>
-      ${upcomingRdvs.length === 0
-        ? `<div style="font-size:13px;color:var(--text3);text-align:center;padding:16px 0">Aucun RDV dans les 14 prochains jours. <span style="cursor:pointer;color:var(--blue)" onclick="showSection('agenda')">Planifier →</span></div>`
-        : `<div class="pv-agenda-list">${upcomingRdvs.map(r => {
-            const d = new Date(r.date + 'T12:00:00');
-            const day = d.getDate();
-            const month = d.toLocaleDateString('fr-FR',{month:'short'});
-            const isToday = r.date === today;
-            const color = typeColors[r.type] || '#6b7280';
-            return `<div class="pv-rdv-item" onclick="showSection('agenda')">
-              <div class="pv-rdv-date">
-                <div class="pv-rdv-day" style="${isToday?'color:var(--blue)':''}">${day}</div>
-                <div class="pv-rdv-month">${month}</div>
-              </div>
-              <div class="pv-rdv-body">
-                <div class="pv-rdv-title">${r.title}</div>
-                <div class="pv-rdv-meta">${r.time ? r.time.slice(0,5) + ' · ' : ''}${r.contact_name || ''}</div>
-              </div>
-              <span class="pv-rdv-type" style="background:${color}18;color:${color}">${typeLabels[r.type]||r.type||'RDV'}</span>
-            </div>`;
-          }).join('')}</div>`
-      }
+      ${overdueRdvs.length > 0 ? `
+        <div style="font-size:11px;font-weight:600;color:#f87171;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">⚠️ En retard</div>
+        <div class="pv-agenda-list" style="margin-bottom:14px">${overdueRdvs.map(r => pvRdvRow(r, true)).join('')}</div>
+      ` : ''}
+      ${upcomingRdvs.length > 0 ? `
+        ${overdueRdvs.length > 0 ? `<div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">À venir</div>` : ''}
+        <div class="pv-agenda-list">${upcomingRdvs.map(r => pvRdvRow(r, false)).join('')}</div>
+      ` : overdueRdvs.length === 0 ? `<div style="font-size:13px;color:var(--text3);text-align:center;padding:16px 0">Aucun RDV dans les 14 prochains jours. <span style="cursor:pointer;color:var(--blue)" onclick="showSection('agenda')">Planifier →</span></div>` : ''}
     </div>`;
   function pvMatch(c) {
     if (!pvSearch) return true;
