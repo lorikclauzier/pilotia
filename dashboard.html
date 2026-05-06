@@ -3849,9 +3849,14 @@ Réponds toujours en français, de façon concise et orientée action. Utilise U
 }
 
 async function callClaude(systemPrompt, messages, maxTokens) {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  const token = session?.access_token;
   const response = await fetch('/api/claude', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+    },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
       max_tokens: maxTokens || 800,
