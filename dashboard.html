@@ -3128,8 +3128,9 @@ const KB_COLS = [
   { id: 'lead_contacte',      label: 'Lead contacté',       color: '#93c5fd' },
   { id: 'prospect_qualifie',  label: 'Prospect qualifié',   color: '#818cf8' },
   { id: 'proposition_envoyee',label: 'Proposition envoyée',  color: '#fbbf24' },
-  { id: 'lead_converti',      label: 'Lead converti ✓',     color: '#34d399' },
+  { id: 'lead_converti',      label: 'Lead converti',       color: '#34d399' },
   { id: 'non_retenu',         label: 'Non retenu',          color: '#f87171' },
+  { id: 'client_actif',       label: 'Clients ✓',           color: '#10b981', clientCol: true },
 ];
 
 // getProspects() / getPlan() sont définis dans la section STORAGE HELPERS ci-dessus.
@@ -3222,12 +3223,24 @@ function renderKanban() {
         <span class="kb-cnt">${cards.length}</span>
       </div>
       ${cards.map(p => kbCardHtml(p, plan)).join('')}
-      <div class="kb-add" onclick="openProspModal(null,'${col.id}')">+ Ajouter</div>
+      ${col.clientCol ? '' : `<div class="kb-add" onclick="openProspModal(null,'${col.id}')">+ Ajouter</div>`}
     </div>`;
   }).join('');
 }
 
 function kbCardHtml(p, plan) {
+  if (p.statut === 'client_actif') {
+    const valeur = p.valeur ? `<div style="margin-top:6px;font-size:11px;color:#10b981">💶 ${Number(p.valeur).toLocaleString('fr-FR')} €</div>` : '';
+    return `<div class="kb-card" style="border-left:3px solid #10b981;cursor:pointer"
+      onclick="openProspModal('${p.id}')">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+        <div class="kb-card-name">${p.nom}</div>
+        <span style="background:rgba(16,185,129,0.15);color:#10b981;border-radius:4px;padding:1px 7px;font-size:10px;font-weight:600">✓ Client</span>
+      </div>
+      <div class="kb-card-co">${p.entreprise || '—'}</div>
+      ${valeur}
+    </div>`;
+  }
   const today = new Date().toISOString().split('T')[0];
   const overdue  = p.relance && p.relance <= today;
   const soon     = p.relance && p.relance > today && p.relance <= new Date(Date.now() + 3*86400000).toISOString().split('T')[0];
@@ -3500,6 +3513,9 @@ async function convertProspectToContact(id) {
     };
     const saved = await dbAddContact(fields);
     _contacts.unshift(normalizeContact(saved));
+    // Move prospect to "Clients ✓" column
+    p.statut = 'client_actif';
+    await dbUpdateProspect(p.id, { ...p, statut: 'client_actif' });
     addActivity('add', 'Contact créé depuis prospect : ' + p.nom);
     showToast(p.nom + ' ajouté aux contacts ✓');
     renderKanban();
