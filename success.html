@@ -10,18 +10,18 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --dark:#080c14;
-  --dark2:#0e1420;
-  --dark3:#141c2e;
+  --dark:#f6f9ff;
+  --dark2:#ffffff;
+  --dark3:#f0f5ff;
   --blue:#3b82f6;
   --blue2:#2563eb;
   --green:#10b981;
   --green2:#059669;
-  --text:#f0f4ff;
-  --text2:#8899bb;
+  --text:#0d1628;
+  --text2:#4a5a78;
   --text3:#4a5a78;
-  --border:rgba(0,0,0,0.06);
-  --border2:rgba(0,0,0,0.1);
+  --border:rgba(0,0,0,0.08);
+  --border2:rgba(0,0,0,0.14);
 }
 body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:48px 24px;overflow-x:hidden}
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(59,130,246,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.06) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%);pointer-events:none}
@@ -32,7 +32,7 @@ body::after{content:'';position:fixed;top:0;left:50%;transform:translateX(-50%);
 
 .wrap{position:relative;z-index:1;width:100%;max-width:500px;text-align:center}
 
-.logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.5px;margin-bottom:40px;display:inline-block;text-decoration:none}
+.logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;margin-bottom:40px;display:inline-block;text-decoration:none}
 .logo span{color:var(--blue)}
 
 .icon-wrap{width:72px;height:72px;background:rgba(16,185,129,0.12);border:1.5px solid rgba(16,185,129,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;animation:pop 0.5s cubic-bezier(0.34,1.56,0.64,1) both}
@@ -46,7 +46,7 @@ body::after{content:'';position:fixed;top:0;left:50%;transform:translateX(-50%);
 .badge::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 
-h1{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#fff;letter-spacing:-0.8px;margin-bottom:10px;line-height:1.2}
+h1{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--text);letter-spacing:-0.8px;margin-bottom:10px;line-height:1.2}
 h1 span{color:var(--green)}
 .subtitle{font-size:15px;color:var(--text2);line-height:1.6;margin-bottom:32px}
 
@@ -119,9 +119,9 @@ const PLANS = {
     features: [
       { icon: '👥', text: '<strong>Contacts illimités</strong> — gérez tous vos clients sans restriction' },
       { icon: '📊', text: '<strong>Pipeline prospects</strong> — suivi complet de vos opportunités commerciales' },
-      { icon: '🤖', text: '<strong>Assistant IA</strong> — 100 messages/mois pour automatiser votre activité' },
       { icon: '📅', text: '<strong>Agenda intelligent</strong> — planification et rappels automatiques' },
       { icon: '📤', text: '<strong>Export CSV</strong> — exportez vos données à tout moment' },
+      { icon: '🔔', text: '<strong>Campagnes de relance</strong> — automatisez vos suivis clients' },
     ]
   },
   pro: {
