@@ -544,10 +544,10 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
   <div class="sidebar-logo">pylot<span>IA</span></div>
   <div class="plan-badge plan-free" id="plan-badge-sidebar" style="margin:0 10px 16px">● Free</div>
 
-  <button class="nav-item nav-search" onclick="openGlobalSearch()">
+  <button class="nav-item nav-search" id="nav-search" onclick="openGlobalSearch()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     Recherche
-    <span style="margin-left:auto;font-size:10px;background:rgba(0,0,0,0.05);border:1px solid var(--border2);border-radius:4px;padding:1px 6px;color:var(--text3);font-family:monospace">⌘K</span>
+    <span style="margin-left:auto;font-size:9px;background:rgba(99,179,237,0.2);color:#93c5fd;padding:2px 5px;border-radius:4px;font-weight:700" id="search-plan-badge">STARTER</span>
   </button>
 
   <button class="nav-item active" id="nav-dashboard" onclick="showSection('dashboard')">
@@ -3171,7 +3171,7 @@ function updatePlanBadges() {
   // Grey out locked nav items
   const starterLocked = plan === 'free';
   const proLocked = !['pro','business'].includes(plan);
-  ['messages','prospection'].forEach(s => {
+  ['messages','prospection','search'].forEach(s => {
     const el = document.getElementById('nav-' + s);
     if (el) el.style.opacity = starterLocked ? '0.45' : '1';
   });
@@ -3179,6 +3179,9 @@ function updatePlanBadges() {
     const el = document.getElementById('nav-' + s);
     if (el) el.style.opacity = proLocked ? '0.45' : '1';
   });
+  // Hide search badge when unlocked
+  const searchBadge = document.getElementById('search-plan-badge');
+  if (searchBadge) searchBadge.style.display = starterLocked ? 'inline' : 'none';
 }
 
 function checkProspLocks() {
@@ -4423,6 +4426,7 @@ function renderPerformance() {
 let _gsearchFocusIdx = -1;
 
 function openGlobalSearch() {
+  if (getPlan() === 'free') { openUpgradeModal(); return; }
   document.getElementById('gsearch-overlay').style.display = 'flex';
   _gsearchFocusIdx = -1;
   setTimeout(() => {
