@@ -365,20 +365,25 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 .cal-day:hover{background:rgba(0,0,0,0.05)}
 .cal-day.today{background:rgba(59,130,246,0.15);color:var(--blue2);font-weight:700}
 .cal-day.selected{background:var(--blue);color:#fff;font-weight:700}
-.cal-day.other-month{color:var(--text3);opacity:0.4}
+.cal-day.other-month{color:var(--text3);opacity:0.55}
 .cal-dot{width:4px;height:4px;border-radius:50%;background:var(--blue);position:absolute;bottom:3px}
+.agenda-tabs{display:flex;gap:4px;margin-bottom:14px}
+.agenda-tab{padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--dark2);font-size:13px;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s}
+.agenda-tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.agenda-tab:hover:not(.active){border-color:rgba(59,130,246,0.3);color:var(--blue2)}
 .rdv-list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
 .rdv-date-title{font-size:15px;font-weight:600;color:#0f172a}
-.rdv-date-sub{font-size:12px;color:var(--text3);margin-left:8px}
+.rdv-date-sub{font-size:12px;color:var(--text2);margin-left:8px}
 .rdv-card{display:flex;gap:14px;background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;transition:border-color 0.2s}
 .rdv-card:hover{border-color:rgba(59,130,246,0.3)}
 .rdv-time{font-size:13px;font-weight:600;color:#0f172a;min-width:52px;white-space:nowrap}
 .rdv-bar{width:3px;border-radius:2px;flex-shrink:0}
 .rdv-body{flex:1;min-width:0}
 .rdv-title{font-size:13px;font-weight:500;color:#0f172a;margin-bottom:3px}
-.rdv-contact{font-size:12px;color:var(--text3)}
+.rdv-contact{font-size:12px;color:var(--text2)}
 .rdv-type-badge{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;display:inline-block;margin-top:4px}
 .rdv-actions{display:flex;gap:6px;align-items:flex-start}
+.rdv-date-group{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin:0 0 8px;display:flex;align-items:center;gap:8px}
 
 /* IMPORT */
 .import-methods{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px}
@@ -1036,7 +1041,11 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
       </div>
       <!-- Liste des RDV -->
       <div>
-        <div class="rdv-list-header">
+        <div class="agenda-tabs">
+          <button class="agenda-tab active" data-view="jour" onclick="switchAgendaView('jour',this)">📅 Jour</button>
+          <button class="agenda-tab" data-view="upcoming" onclick="switchAgendaView('upcoming',this)">⏭ À venir</button>
+        </div>
+        <div id="rdv-day-header" class="rdv-list-header">
           <div style="display:flex;align-items:baseline;gap:2px">
             <div class="rdv-date-title" id="rdv-day-title">—</div>
             <span class="rdv-date-sub" id="rdv-day-sub"></span>
@@ -1045,6 +1054,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
         <div id="rdv-list">
           <div style="padding:32px;text-align:center;color:var(--text3);font-size:13px;background:var(--dark2);border:1px solid var(--border);border-radius:10px">Chargement...</div>
         </div>
+        <div id="rdv-upcoming" style="display:none"></div>
       </div>
     </div>
   </div>
@@ -2999,6 +3009,82 @@ function renderRdvList() {
         <button class="btn-sm btn-sm-red" onclick="confirmDeleteRdv('${r.id}')">✕</button>
       </div>
     </div>`;
+  }).join('');
+}
+
+let agendaView = 'jour';
+
+function switchAgendaView(view, btn) {
+  agendaView = view;
+  document.querySelectorAll('.agenda-tab').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+  const dayHeader  = document.getElementById('rdv-day-header');
+  const dayList    = document.getElementById('rdv-list');
+  const upcomingEl = document.getElementById('rdv-upcoming');
+  if (view === 'jour') {
+    dayHeader.style.display  = 'flex';
+    dayList.style.display    = 'block';
+    upcomingEl.style.display = 'none';
+  } else {
+    dayHeader.style.display  = 'none';
+    dayList.style.display    = 'none';
+    upcomingEl.style.display = 'block';
+    renderUpcomingList();
+  }
+}
+
+function renderUpcomingList() {
+  const el = document.getElementById('rdv-upcoming');
+  if (!el) return;
+  const today    = new Date().toISOString().split('T')[0];
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+  const typeColors = { rdv:'#3b82f6', appel:'#34d399', email:'#8b5cf6', relance:'#f59e0b', demo:'#fbbf24', suivi:'#a78bfa', autre:'#4a5a78' };
+  const typeLabels = { rdv:'RDV', appel:'Appel', email:'Email', relance:'Relance', demo:'Démo', suivi:'Suivi', autre:'Autre' };
+  const jours = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  const mois  = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
+
+  const upcoming = (allAppointments || [])
+    .filter(a => a.date >= today && a.status !== 'fait')
+    .sort((a,b) => a.date.localeCompare(b.date) || (a.time||'').localeCompare(b.time||''))
+    .slice(0, 25);
+
+  if (!upcoming.length) {
+    el.innerHTML = `<div style="padding:32px;text-align:center;color:var(--text3);font-size:13px;background:var(--dark2);border:1px solid var(--border);border-radius:10px">Aucun RDV à venir — <button onclick="openRdvModal()" style="background:none;border:none;color:var(--blue);cursor:pointer;font-family:'Inter',sans-serif;font-size:13px">en planifier un</button></div>`;
+    return;
+  }
+
+  // Grouper par date
+  const groups = {};
+  upcoming.forEach(r => { if (!groups[r.date]) groups[r.date] = []; groups[r.date].push(r); });
+
+  el.innerHTML = Object.entries(groups).map(([date, rdvs]) => {
+    const d = new Date(date + 'T12:00:00');
+    const isToday    = date === today;
+    const isTomorrow = date === tomorrow;
+    const label = isToday ? "Aujourd'hui" : isTomorrow ? 'Demain' : `${jours[d.getDay()]} ${d.getDate()} ${mois[d.getMonth()]}`;
+    return `
+      <div style="margin-bottom:20px">
+        <div class="rdv-date-group" style="${isToday?'color:var(--blue)':''}">
+          ${label}
+          ${isToday ? `<span style="background:rgba(59,130,246,0.12);color:var(--blue);font-size:10px;padding:1px 7px;border-radius:8px;font-weight:600;text-transform:none;letter-spacing:0">aujourd'hui</span>` : ''}
+        </div>
+        ${rdvs.map(r => {
+          const timeStr = r.time ? r.time.slice(0,5).replace(':','h') : '—';
+          const color   = typeColors[r.type] || '#4a5a78';
+          return `<div class="rdv-card">
+            <div class="rdv-time">${timeStr}</div>
+            <div class="rdv-bar" style="background:${color}"></div>
+            <div class="rdv-body">
+              <div class="rdv-title">${r.title}</div>
+              ${r.contact_name ? `<div class="rdv-contact">👤 ${r.contact_name}</div>` : ''}
+              <span class="rdv-type-badge" style="background:${color}18;color:${color}">${typeLabels[r.type]||r.type||'RDV'}</span>
+            </div>
+            <div class="rdv-actions">
+              <button class="btn-sm btn-sm-ghost" onclick="editRdv('${r.id}')">✏️</button>
+              <button class="btn-sm btn-sm-red" onclick="confirmDeleteRdv('${r.id}')">✕</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
   }).join('');
 }
 
