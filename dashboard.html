@@ -342,6 +342,12 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 .ai-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px}
 .ai-panel-title{font-weight:600;color:#0f172a;font-size:15px;margin-bottom:4px}
 .ai-panel-sub{font-size:13px;color:var(--text3)}
+.ai-suggestions{display:flex;flex-wrap:wrap;gap:8px;padding:10px 12px;background:var(--dark3);border-left:1px solid var(--border);border-right:1px solid var(--border)}
+.ai-sug-chip{padding:6px 13px;background:var(--dark2);border:1px solid var(--border2);border-radius:20px;font-size:12px;color:var(--text2);cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;white-space:nowrap}
+.ai-sug-chip:hover{border-color:rgba(59,130,246,0.4);color:var(--blue2);background:#f0f7ff}
+.ai-stats-bar{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.ai-stat-pill{background:var(--dark2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px}
+.ai-stat-pill strong{color:var(--text);font-size:14px}
 
 /* AGENDA */
 .agenda-layout{display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:start}
@@ -1131,15 +1137,12 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 
       <!-- CHAT -->
       <div class="ai-panel active" id="aipanel-chat">
+        <div id="ai-stats-bar" class="ai-stats-bar"></div>
         <div class="ai-chat-wrap">
-          <div class="ai-messages" id="ai-chat-messages">
-            <div class="ai-msg">
-              <div class="ai-avatar bot">IA</div>
-              <div class="ai-bubble bot">Bonjour ! Je suis votre assistant pylotIA. J'ai accès à tous vos contacts, prospects et votre activité. Posez-moi n'importe quelle question sur votre pipeline commercial !</div>
-            </div>
-          </div>
+          <div class="ai-messages" id="ai-chat-messages"></div>
+          <div class="ai-suggestions" id="ai-suggestions" style="display:none"></div>
           <div class="ai-input-row">
-            <textarea class="ai-input" id="ai-chat-input" placeholder="Ex: Qui dois-je appeler aujourd'hui ? Quel est mon CA potentiel ce mois ?" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAiChat()}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+            <textarea class="ai-input" id="ai-chat-input" placeholder="Ex : Qui dois-je relancer cette semaine ?" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAiChat()}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
             <button class="ai-send" id="ai-chat-send" onclick="sendAiChat()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
               Envoyer
@@ -3799,7 +3802,56 @@ function initAssistant() {
     gate.style.display    = 'none';
     content.style.display = 'block';
     populateContactSelect();
+    _initAiChat();
   }
+}
+
+function _initAiChat() {
+  const contacts  = getContacts();
+  const prospects = getProspects();
+  const today     = new Date();
+  const valPipeline = prospects.reduce((s,p) => s + (parseFloat(p.valeur)||0), 0);
+  const urgents   = prospects.filter(p => p.relance && p.relance <= today.toISOString().split('T')[0]).length;
+
+  // Stats bar
+  const bar = document.getElementById('ai-stats-bar');
+  if (bar) bar.innerHTML = [
+    { icon:'👥', label:'Contacts', val: contacts.length },
+    { icon:'📊', label:'Prospects', val: prospects.length },
+    { icon:'💶', label:'Pipeline', val: valPipeline.toLocaleString('fr-FR') + ' €' },
+    ...(urgents > 0 ? [{ icon:'⚡', label:'Relances urgentes', val: urgents, red: true }] : []),
+  ].map(s => `<div class="ai-stat-pill">${s.icon} ${s.label} <strong style="${s.red?'color:#f87171':''}">${s.val}</strong></div>`).join('');
+
+  // Greeting dynamique
+  const msgs = document.getElementById('ai-chat-messages');
+  if (msgs && !msgs.children.length) {
+    const greet = contacts.length === 0 && prospects.length === 0
+      ? 'Bonjour ! Je suis votre assistant pylotIA. Commencez par ajouter des contacts ou des prospects — je pourrai ensuite analyser votre pipeline et vous dire quoi faire en priorité.'
+      : `Bonjour ! J'ai accès à vos **${contacts.length} contact${contacts.length>1?'s':''}**, **${prospects.length} prospect${prospects.length>1?'s':''}**${valPipeline>0?' et un pipeline de **'+valPipeline.toLocaleString('fr-FR')+' €**':''}.${urgents>0?' ⚡ **'+urgents+' relance'+( urgents>1?'s':'')+' en retard** — je vous conseille de commencer par là.':''} Comment puis-je vous aider ?`;
+    addAiMsg('assistant', greet);
+  }
+
+  // Chips de suggestions
+  const sugs = document.getElementById('ai-suggestions');
+  if (sugs && aiChatHistory.length === 0) {
+    const chips = [
+      'Qui dois-je relancer cette semaine ?',
+      'Quels sont mes prospects les plus chauds ?',
+      'Quel est mon CA potentiel ?',
+      'Donne-moi un résumé de mon activité',
+      'Que faire en priorité aujourd\'hui ?',
+    ];
+    sugs.style.display = 'flex';
+    sugs.innerHTML = chips.map(c =>
+      `<button class="ai-sug-chip" onclick="useSuggestion(this,'${c.replace(/'/g,"\\'")}')"">${c}</button>`
+    ).join('');
+  }
+}
+
+function useSuggestion(btn, text) {
+  document.getElementById('ai-chat-input').value = text;
+  document.getElementById('ai-suggestions').style.display = 'none';
+  sendAiChat();
 }
 
 function switchAiTab(name, btn) {
@@ -3814,40 +3866,54 @@ function buildAIContext() {
   const prospects = getProspects();
   const activity  = JSON.parse(localStorage.getItem('pylotia_activity') || '[]');
   const today     = new Date();
+  const todayStr  = today.toISOString().split('T')[0];
+  const days      = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
 
   const contactsStr = contacts.length
     ? contacts.map(c => {
-        const days = c.date ? Math.floor((today - new Date(c.date)) / 86400000) : '?';
-        return `• ${c.nom}${c.entreprise?' ('+c.entreprise+')':''} | statut: ${c.statut||'/'} | email: ${c.email||'/'} | tél: ${c.tel||'/'} | ajouté il y a ${days} jours${c.note?' | note: '+c.note:''}`;
+        const age = c.date ? Math.floor((today - new Date(c.date)) / 86400000) : '?';
+        return `• ${c.nom}${c.entreprise?' ('+c.entreprise+')':''} | statut: ${c.statut||'/'} | email: ${c.email||'/'} | tél: ${c.tel||'/'} | ajouté il y a ${age}j${c.note?' | note: '+c.note:''}`;
       }).join('\n')
     : 'Aucun contact.';
 
   const prospectsStr = prospects.length
     ? prospects.map(p => {
         const relance = p.relance ? new Date(p.relance).toLocaleDateString('fr-FR') : '/';
-        return `• ${p.nom}${p.entreprise?' ('+p.entreprise+')':''} | étape: ${p.statut||'nouveau_lead'} | valeur: ${p.valeur||0}€ | relance: ${relance}${p.note?' | note: '+p.note:''}`;
+        const late = p.relance && p.relance < todayStr ? ' ⚠️ EN RETARD' : '';
+        return `• ${p.nom}${p.entreprise?' ('+p.entreprise+')':''} | étape: ${p.statut||'nouveau_lead'} | valeur: ${p.valeur||0}€ | relance: ${relance}${late}${p.note?' | note: '+p.note:''}`;
       }).join('\n')
     : 'Aucun prospect.';
 
-  const activityStr = activity.slice(0,15).map(a =>
+  const rdvStr = _appointments && _appointments.length
+    ? _appointments.filter(a => a.date >= todayStr).slice(0,5).map(a =>
+        `• ${a.titre||'RDV'} — ${new Date(a.date+'T00:00:00').toLocaleDateString('fr-FR')} ${a.heure||''} | ${a.contact||''} ${a.note?' | note: '+a.note:''}`
+      ).join('\n') || 'Aucun RDV à venir.'
+    : 'Aucun RDV à venir.';
+
+  const activityStr = activity.slice(0,12).map(a =>
     `• ${a.text}${a.date?' ('+new Date(a.date).toLocaleDateString('fr-FR')+')':''}`
   ).join('\n') || 'Aucune activité.';
 
   const valPipeline = prospects.reduce((s,p) => s + (parseFloat(p.valeur)||0), 0);
+  const convertis   = prospects.filter(p => ['lead_converti','client_actif'].includes(p.statut)).length;
+  const urgents     = prospects.filter(p => p.relance && p.relance < todayStr).length;
 
-  return `Tu es l'assistant IA commercial de pylotIA. Tu aides l'utilisateur à piloter son activité commerciale.
-Date d'aujourd'hui : ${today.toLocaleDateString('fr-FR')}
+  return `Tu es l'assistant IA commercial de pylotIA. Tu aides l'utilisateur (un commercial/entrepreneur) à piloter son activité.
+Aujourd'hui : ${days[today.getDay()]} ${today.toLocaleDateString('fr-FR')}
 
 === CONTACTS (${contacts.length}) ===
 ${contactsStr}
 
-=== PIPELINE PROSPECTS (${prospects.length} — valeur totale : ${valPipeline}€) ===
+=== PIPELINE PROSPECTS (${prospects.length} — valeur totale : ${valPipeline.toLocaleString('fr-FR')}€ | ${convertis} convertis | ${urgents} relances en retard) ===
 ${prospectsStr}
+
+=== RDV À VENIR ===
+${rdvStr}
 
 === ACTIVITÉ RÉCENTE ===
 ${activityStr}
 
-Réponds toujours en français, de façon concise et orientée action. Utilise UNIQUEMENT les vraies données ci-dessus.`;
+INSTRUCTIONS : Réponds en français, de façon concise et orientée action. Utilise du **gras** pour les points importants. Utilise UNIQUEMENT les données ci-dessus — ne pas inventer. Si une donnée manque, dis-le clairement.`;
 }
 
 async function callClaude(systemPrompt, messages, maxTokens) {
@@ -3876,6 +3942,13 @@ async function callClaude(systemPrompt, messages, maxTokens) {
 }
 
 // ─ Chat ─
+function formatAiText(text) {
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\n/g,'<br>');
+}
+
 function addAiMsg(role, text) {
   const msgs = document.getElementById('ai-chat-messages');
   const div  = document.createElement('div');
@@ -3885,7 +3958,8 @@ function addAiMsg(role, text) {
   av.textContent = role==='user' ? 'Vous' : 'IA';
   const bub = document.createElement('div');
   bub.className  = 'ai-bubble ' + (role==='user'?'user':'bot');
-  bub.textContent = text;
+  if (role === 'user') bub.textContent = text;
+  else bub.innerHTML = formatAiText(text);
   div.appendChild(av); div.appendChild(bub);
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
@@ -3909,17 +3983,19 @@ async function sendAiChat() {
   btn.disabled = true;
   input.value  = '';
   input.style.height = 'auto';
+  const sugs = document.getElementById('ai-suggestions');
+  if (sugs) sugs.style.display = 'none';
   addAiMsg('user', text);
   aiChatHistory.push({ role: 'user', content: text });
   showAiTyping();
   try {
-    const reply = await callClaude(buildAIContext(), aiChatHistory.slice(-10), 800);
+    const reply = await callClaude(buildAIContext(), aiChatHistory.slice(-12), 900);
     hideAiTyping();
     aiChatHistory.push({ role: 'assistant', content: reply });
     addAiMsg('assistant', reply);
   } catch(e) {
     hideAiTyping();
-    addAiMsg('assistant', '❌ ' + e.message);
+    addAiMsg('assistant', '❌ ' + (e.message || 'Erreur inattendue — réessayez.'));
   }
   btn.disabled = false;
 }
@@ -3958,7 +4034,7 @@ Max 8 relances, triées par urgence décroissante.`;
         </div>`).join('') + '</div>';
     }
   } catch(e) {
-    result.innerHTML = '<div style="padding:16px;color:#f87171;font-size:13px">❌ ' + e.message + '</div>';
+    result.innerHTML = `<div style="padding:16px;color:#f87171;font-size:13px">❌ ${e.message || 'Erreur inattendue'} <button class="ai-copy-btn" style="margin-left:12px" onclick="genRelances()">↺ Réessayer</button></div>`;
   }
   btn.disabled = false; btn.textContent = '⚡ Analyser maintenant';
 }
@@ -3992,7 +4068,7 @@ Max 5 prospects, triés par score décroissant.`;
         </div>`).join('') + '</div>';
     }
   } catch(e) {
-    result.innerHTML = '<div style="padding:16px;color:#f87171;font-size:13px">❌ ' + e.message + '</div>';
+    result.innerHTML = `<div style="padding:16px;color:#f87171;font-size:13px">❌ ${e.message || 'Erreur inattendue'} <button class="ai-copy-btn" style="margin-left:12px" onclick="genProspects()">↺ Réessayer</button></div>`;
   }
   btn.disabled = false; btn.textContent = '🔥 Identifier';
 }
@@ -4051,7 +4127,7 @@ async function genMessage() {
         <button class="ai-copy-btn" onclick="navigator.clipboard.writeText(document.querySelector('.ai-msg-box').textContent);showToast('Message copié ✓')">📋 Copier</button>
       </div>`;
   } catch(e) {
-    result.innerHTML = '<div style="padding:16px;color:#f87171;font-size:13px">❌ ' + e.message + '</div>';
+    result.innerHTML = `<div style="padding:16px;color:#f87171;font-size:13px">❌ ${e.message || 'Erreur inattendue'} <button class="ai-copy-btn" style="margin-left:12px" onclick="genMessage()">↺ Réessayer</button></div>`;
   }
   btn.disabled = false; btn.textContent = '✉️ Générer le message';
 }
@@ -4062,15 +4138,15 @@ async function genRapport() {
   const result = document.getElementById('rapport-result');
   btn.disabled = true; btn.textContent = 'Génération…';
   result.innerHTML = aiLoader();
-  const sys = buildAIContext() + '\nTu es analyste commercial expert. Tu génères des rapports hebdomadaires clairs, structurés et actionnables.';
+  const sys = buildAIContext() + '\nTu es analyste commercial expert. Tu génères des rapports hebdomadaires clairs, structurés et actionnables. Utilise **gras** pour les titres de sections. Sois direct et actionnable.';
   try {
-    const text = await callClaude(sys, [{ role:'user', content:'Génère un rapport hebdomadaire complet de mon activité commerciale. Structure :\n1) Résumé de la semaine\n2) Points forts\n3) Points d\'attention\n4) Recommandations prioritaires pour la semaine prochaine\n\nSois concis et actionnable.' }], 1200);
-    result.innerHTML = `<div class="rapport-box">${text}</div>
+    const text = await callClaude(sys, [{ role:'user', content:'Génère un rapport hebdomadaire de mon activité commerciale. Structure en 4 parties :\n**1. Résumé de la semaine**\n**2. Points forts**\n**3. Points d\'attention**\n**4. Priorités pour la semaine prochaine**\n\nSois concis (max 300 mots) et actionnable. Utilise les vraies données.' }], 1200);
+    result.innerHTML = `<div class="rapport-box">${formatAiText(text)}</div>
       <div class="rapport-copy">
-        <button class="ai-copy-btn" onclick="navigator.clipboard.writeText(document.querySelector('.rapport-box').textContent);showToast('Rapport copié ✓')">📋 Copier le rapport</button>
+        <button class="ai-copy-btn" onclick="navigator.clipboard.writeText(document.querySelector('.rapport-box').innerText);showToast('Rapport copié ✓')">📋 Copier le rapport</button>
       </div>`;
   } catch(e) {
-    result.innerHTML = '<div style="padding:16px;color:#f87171;font-size:13px">❌ ' + e.message + '</div>';
+    result.innerHTML = `<div style="padding:16px;color:#f87171;font-size:13px">❌ ${e.message || 'Erreur inattendue'} <button class="ai-copy-btn" style="margin-left:12px" onclick="genRapport()">↺ Réessayer</button></div>`;
   }
   btn.disabled = false; btn.textContent = '📊 Générer le rapport';
 }
