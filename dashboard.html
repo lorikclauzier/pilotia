@@ -571,18 +571,22 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
   <button class="nav-item" id="nav-performance" onclick="showSection('performance')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
     Performance
+    <span style="font-size:9px;background:rgba(245,158,11,0.2);color:#fbbf24;padding:2px 5px;border-radius:4px;font-weight:700;margin-left:auto">PRO</span>
   </button>
   <button class="nav-item" id="nav-postvente" onclick="showSection('postvente')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
     Post-vente
+    <span style="font-size:9px;background:rgba(245,158,11,0.2);color:#fbbf24;padding:2px 5px;border-radius:4px;font-weight:700;margin-left:auto">PRO</span>
   </button>
   <button class="nav-item" id="nav-messages" onclick="showSection('messages')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
     Campagnes
+    <span style="font-size:9px;background:rgba(99,179,237,0.2);color:#93c5fd;padding:2px 5px;border-radius:4px;font-weight:700;margin-left:auto">STARTER</span>
   </button>
   <button class="nav-item" id="nav-prospection" onclick="showSection('prospection')">
     <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
     Relances
+    <span style="font-size:9px;background:rgba(99,179,237,0.2);color:#93c5fd;padding:2px 5px;border-radius:4px;font-weight:700;margin-left:auto">STARTER</span>
   </button>
   <button class="nav-item" id="nav-assistant" onclick="showSection('assistant')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09z"/><path d="M18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/></svg>
@@ -705,6 +709,9 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
         <option value="nom-za">Nom Z → A</option>
         <option value="entreprise">Entreprise A → Z</option>
       </select>
+    </div>
+    <div id="contacts-free-banner" style="display:none;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:#fbbf24;display:none;align-items:center;gap:10px">
+      <span>⚠️ Plan Free : <span id="contacts-free-count">0</span>/10 contacts utilisés. <span style="cursor:pointer;text-decoration:underline;color:#fbbf24" onclick="openUpgradeModal()">Passer au plan Starter pour des contacts illimités →</span></span>
     </div>
     <div class="table-wrap">
       <div class="table-head" style="grid-template-columns:1fr 160px 100px 120px 90px">
@@ -1886,6 +1893,12 @@ function showSection(name) {
 function getContacts()  { return _contacts; }
 function getProspects() { return _prospects; }
 function getPlan()      { return _plan; }
+function planAllows(name) {
+  const plan = getPlan();
+  if (['messages','prospection','import'].includes(name)) return ['starter','pro','business'].includes(plan);
+  if (['performance','postvente','assistant'].includes(name)) return ['pro','business'].includes(plan);
+  return true;
+}
 function getActivity()  { return JSON.parse(localStorage.getItem('pylotia_activity') || '[]'); }
 function saveActivity(data) { localStorage.setItem('pylotia_activity', JSON.stringify(data)); }
 
@@ -1911,6 +1924,13 @@ function renderContacts() {
   else if (sortContacts === 'entreprise') filtered.sort((a,b) => (a.entreprise||'').localeCompare(b.entreprise||''));
   // 'recent' = ordre par défaut (déjà trié par date d'ajout)
   document.getElementById('contacts-count').textContent = contacts.length;
+  // Free plan banner
+  const freeBanner = document.getElementById('contacts-free-banner');
+  if (freeBanner) {
+    const isFree = getPlan() === 'free';
+    freeBanner.style.display = isFree ? 'flex' : 'none';
+    if (isFree) document.getElementById('contacts-free-count').textContent = contacts.length;
+  }
   const list = document.getElementById('contacts-list');
   if (!list) return;
   if (filtered.length === 0) {
@@ -1980,6 +2000,11 @@ async function saveContact() {
       addActivity('edit', 'Contact modifié : ' + nom);
       showToast('Contact mis à jour ✓');
     } else {
+      if (getPlan() === 'free' && _contacts.length >= 10) {
+        showToast('Plan Free : limite de 10 contacts atteinte');
+        openUpgradeModal();
+        return;
+      }
       closeModal();
       const saved = await dbAddContact({ ...fields, date: new Date().toISOString() });
       _contacts.unshift(normalizeContact(saved));
@@ -2780,6 +2805,7 @@ function detectColumns(headers) {
 
 async function doImport() {
   if (!importedRows.length) return;
+  if (!planAllows('import')) { openUpgradeModal(); return; }
   const mode       = document.querySelector('input[name="import-mode"]:checked').value;
   const headers    = Object.keys(importedRows[0]);
   const colMap     = detectColumns(headers);
@@ -3136,12 +3162,22 @@ function updatePlanBadges() {
   const plan = getPlan();
   const cls = { free: 'plan-free', starter: 'plan-starter', pro: 'plan-pro' };
   const txt = { free: '● Free', starter: '✦ Starter', pro: '★ Pro' };
-  // textContent updates text only — does NOT touch element attributes (onclick, style, etc.)
   ['plan-badge-prosp','plan-badge-sidebar'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     el.className = 'plan-badge ' + cls[plan];
     el.textContent = txt[plan];
+  });
+  // Grey out locked nav items
+  const starterLocked = plan === 'free';
+  const proLocked = !['pro','business'].includes(plan);
+  ['messages','prospection'].forEach(s => {
+    const el = document.getElementById('nav-' + s);
+    if (el) el.style.opacity = starterLocked ? '0.45' : '1';
+  });
+  ['performance','postvente','assistant'].forEach(s => {
+    const el = document.getElementById('nav-' + s);
+    if (el) el.style.opacity = proLocked ? '0.45' : '1';
   });
 }
 
@@ -4052,6 +4088,7 @@ function closeMobileMore() {
 // Hook into showSection
 const _origShowSection = showSection;
 showSection = function(name) {
+  if (!planAllows(name)) { openUpgradeModal(); return; }
   _origShowSection(name);
   updateBottomNav(name);
 };
