@@ -3145,7 +3145,7 @@ function renderUpcomingList() {
   const mois  = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
 
   const upcoming = (allAppointments || [])
-    .filter(a => a.date >= today && a.status !== 'fait')
+    .filter(a => a.date >= today && a.status !== 'terminé')
     .sort((a,b) => a.date.localeCompare(b.date) || (a.time||'').localeCompare(b.time||''))
     .slice(0, 25);
 
@@ -3289,11 +3289,11 @@ async function markRdvDone(id) {
   if (!rdv) return;
   try {
     const { error } = await supabaseClient.from('appointments')
-      .update({ status: 'fait' })
+      .update({ status: 'terminé' })
       .eq('id', id)
       .eq('user_id', currentUser.id);
     if (error) throw error;
-    rdv.status = 'fait';
+    rdv.status = 'terminé';
     renderPostVente();
     renderCalendar();
     renderRdvList();
@@ -4199,7 +4199,7 @@ function buildAIContext() {
     : 'Aucun prospect.';
 
   const rdvStr = allAppointments && allAppointments.length
-    ? allAppointments.filter(a => a.date >= todayStr && a.status !== 'fait').slice(0,5).map(a =>
+    ? allAppointments.filter(a => a.date >= todayStr && a.status !== 'terminé').slice(0,5).map(a =>
         `• ${a.title||'RDV'} — ${new Date(a.date+'T12:00:00').toLocaleDateString('fr-FR')} ${a.time||''} | contact: ${a.contact_name||'/'} | type: ${a.type||'rdv'}${a.notes?' | note: '+a.notes:''}`
       ).join('\n') || 'Aucun RDV à venir.'
     : 'Aucun RDV à venir.';
@@ -4510,11 +4510,11 @@ function renderPostVente() {
   const typeLabels = { rdv:'RDV', appel:'Appel', email:'Email', relance:'Relance', autre:'Autre' };
 
   const overdueRdvs = (allAppointments || [])
-    .filter(a => a.date < today && a.status !== 'fait')
+    .filter(a => a.date < today && a.status !== 'terminé')
     .sort((a,b) => b.date.localeCompare(a.date))
     .slice(0, 4);
   const upcomingRdvs = (allAppointments || [])
-    .filter(a => a.date >= today && a.date <= in14 && a.status !== 'fait')
+    .filter(a => a.date >= today && a.date <= in14 && a.status !== 'terminé')
     .sort((a,b) => a.date.localeCompare(b.date) || (a.time||'').localeCompare(b.time||''))
     .slice(0, 6);
 
@@ -5024,7 +5024,7 @@ async function draftMessageContact() {
       (a.contact_name && c.nom && a.contact_name.toLowerCase() === c.nom.toLowerCase()) || a.contact_id === c.id
     );
     const rdvStr = rdvs.length
-      ? rdvs.slice(0,4).map(r => `• ${r.title||'RDV'} — ${r.date}${r.status==='fait'?' (fait)':''}`).join('\n')
+      ? rdvs.slice(0,4).map(r => `• ${r.title||'RDV'} — ${r.date}${r.status==='terminé'?' (fait)':''}`).join('\n')
       : 'Aucun';
     const sys = `Tu es l'assistant commercial de pylotIA. Rédige un message de relance court et personnalisé pour ce contact.
 
@@ -5065,7 +5065,7 @@ async function draftMessageProspect() {
       a.contact_name && p.nom && a.contact_name.toLowerCase() === p.nom.toLowerCase()
     );
     const rdvStr = rdvs.length
-      ? rdvs.slice(0,4).map(r => `• ${r.title||'RDV'} — ${r.date}${r.status==='fait'?' (fait)':''}`).join('\n')
+      ? rdvs.slice(0,4).map(r => `• ${r.title||'RDV'} — ${r.date}${r.status==='terminé'?' (fait)':''}`).join('\n')
       : 'Aucun';
     const stageCtx = {
       nouveau_lead:'premier contact (ne s\'est jamais manifesté)',
@@ -5122,7 +5122,7 @@ async function analyseContact() {
       a.contact_id === c.id
     );
     const rdvStr = rdvs.length
-      ? rdvs.slice(0, 4).map(r => `• ${r.title || 'RDV'} — ${r.date}${r.time ? ' ' + r.time : ''}${r.status === 'fait' ? ' (fait)' : ''}`).join('\n')
+      ? rdvs.slice(0, 4).map(r => `• ${r.title || 'RDV'} — ${r.date}${r.time ? ' ' + r.time : ''}${r.status === 'terminé' ? ' (fait)' : ''}`).join('\n')
       : 'Aucun';
 
     const sys = `Tu es l'assistant commercial de pylotIA. Analyse ce contact et fournis une recommandation.
@@ -5172,7 +5172,7 @@ async function analyseProspect() {
       a.contact_name && p.nom && a.contact_name.toLowerCase() === p.nom.toLowerCase()
     );
     const rdvStr = rdvs.length
-      ? rdvs.slice(0, 4).map(r => `• ${r.title || 'RDV'} — ${r.date}${r.status === 'fait' ? ' (fait)' : ''}`).join('\n')
+      ? rdvs.slice(0, 4).map(r => `• ${r.title || 'RDV'} — ${r.date}${r.status === 'terminé' ? ' (fait)' : ''}`).join('\n')
       : 'Aucun';
 
     const sys = `Tu es l'assistant commercial de pylotIA. Analyse ce prospect et fournis une recommandation précise.
@@ -5223,7 +5223,7 @@ function _gatherBriefUrgencies() {
 
   // RDV aujourd'hui ou demain
   (allAppointments || []).filter(a =>
-    a.date >= todayStr && a.date <= tomStr && a.status !== 'fait'
+    a.date >= todayStr && a.date <= tomStr && a.status !== 'terminé'
   ).slice(0, 3).forEach(a => urgencies.push({
     text: `RDV "${a.title || 'Sans titre'}" ${a.date === todayStr ? "aujourd'hui" : "demain"}${a.time ? ' à ' + a.time : ''}${a.contact_name ? ' · ' + a.contact_name : ''}`,
     section: 'agenda', id: a.id, priority: 1
@@ -5293,7 +5293,7 @@ async function _generateBriefIntro() {
   try {
     const todayStr = _briefTodayStr();
     const overdue  = (_prospects || []).filter(p => p.relance && p.relance < todayStr && p.statut !== 'client_actif').length;
-    const rdvAuj   = (allAppointments || []).filter(a => a.date === todayStr && a.status !== 'fait').length;
+    const rdvAuj   = (allAppointments || []).filter(a => a.date === todayStr && a.status !== 'terminé').length;
     const sys = `Tu es l'assistant de pylotIA. Génère UNE SEULE phrase d'accroche naturelle et motivante pour ouvrir un brief commercial quotidien. Données : ${(_contacts||[]).length} contacts, ${(_prospects||[]).length} prospects, ${overdue} relance${overdue>1?'s':''} en retard, ${rdvAuj} RDV aujourd'hui. Phrase directe, sans ponctuation finale excessive. Maximum 20 mots.`;
     const text = await callClaude(sys, [{ role:'user', content:'Génère l\'accroche.' }], 80);
     const result = text.trim().replace(/\.$/, '') + '.';
