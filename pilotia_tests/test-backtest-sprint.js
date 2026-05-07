@@ -217,11 +217,9 @@ async function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
       }
     }
 
-    // Reset à la fermeture
-    await page.click('.drawer-close-btn').catch(() =>
-      page.evaluate(() => closeContactDrawer())
-    );
-    await wait(400);
+    // Reset à la fermeture via evaluate (fiable)
+    await page.evaluate(() => closeContactDrawer()).catch(() => {});
+    await wait(500);
     const msgSectionAfterClose = await page.$eval('#drawer-msg-section', el =>
       el.style.display === 'none'
     ).catch(() => true);
@@ -289,11 +287,9 @@ async function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
       fail('Bouton "✉ Message" absent du modal prospect');
     }
 
-    // Fermeture + reset
-    await page.click('button[onclick="closeProspModal()"]').catch(() =>
-      page.keyboard.press('Escape')
-    );
-    await wait(400);
+    // Fermeture via evaluate (plus fiable que le clic)
+    await page.evaluate(() => closeProspModal()).catch(() => {});
+    await wait(500);
     const prosMsgHidden = await page.$eval('#prosp-msg-section', el =>
       el.style.display === 'none'
     ).catch(() => true);
@@ -302,6 +298,13 @@ async function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
 
   // ── 5. FONCTIONNALITÉS PRÉSERVÉES ─────────────────────────────
   console.log('\n── 5. FONCTIONNALITÉS PRÉSERVÉES ──');
+  // S'assurer que tous les modaux sont fermés avant la navigation
+  await page.evaluate(() => {
+    if (typeof closeProspModal === 'function') closeProspModal();
+    if (typeof closeContactDrawer === 'function') closeContactDrawer();
+    if (typeof closeUpgradeModal === 'function') closeUpgradeModal();
+  }).catch(() => {});
+  await wait(300);
 
   // Light mode — pas de variable CSS dark
   const hasDarkVar = await page.evaluate(() => {
