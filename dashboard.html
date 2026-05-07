@@ -3579,6 +3579,9 @@ async function kbDrop(e, colId) {
   e.preventDefault();
   e.currentTarget.classList.remove('drag-over');
   if (!dragProspId || dragProspId === 'null' || dragProspId === 'undefined') return;
+  // Colonne client_actif = affichage uniquement (contacts) — pas de drag&drop vers cette colonne
+  const col = KB_COLS.find(c => c.id === colId);
+  if (col?.clientCol) { dragProspId = null; return; }
   const p = _prospects.find(x => x.id === dragProspId);
   if (p) {
     const oldStatut = p.statut;
@@ -3586,7 +3589,7 @@ async function kbDrop(e, colId) {
     renderKanban(); // Mise à jour optimiste immédiate
     try {
       await dbUpdateProspect(p.id, { ...p, statut: colId });
-      addActivity('edit', `Prospect déplacé : ${p.nom} → ${KB_COLS.find(c => c.id === colId)?.label}`);
+      addActivity('edit', `Prospect déplacé : ${p.nom} → ${col?.label}`);
     } catch(err) {
       p.statut = oldStatut; // Rollback si erreur
       renderKanban();
