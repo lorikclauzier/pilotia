@@ -34,7 +34,14 @@ async function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
   if (page.url().includes('dashboard')) ok('Login → redirection dashboard');
   else { fail('Login échoué — arrêt'); await browser.close(); process.exit(1); }
 
-  await wait(2000); // laisser le JS charger les données
+  await wait(2500); // laisser le JS charger les données + brief modal (1.5s delay)
+
+  // Fermer la modale brief si elle est ouverte (bloque les clics)
+  await page.evaluate(() => {
+    const overlay = document.getElementById('brief-overlay');
+    if (overlay && overlay.classList.contains('open')) closeBriefModal();
+  }).catch(() => {});
+  await wait(300);
 
   // ── 2. SIDEBAR ──────────────────────────────────────────────
   console.log('\n── SIDEBAR ──');

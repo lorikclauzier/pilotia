@@ -2049,12 +2049,12 @@ async function saveContact() {
   };
   try {
     if (editingId) {
-      // Mise à jour optimiste en mémoire immédiate
-      const idx = _contacts.findIndex(x => x.id === editingId);
+      const idToUpdate = editingId; // capturer avant closeModal() qui remet editingId à null
+      const idx = _contacts.findIndex(x => x.id === idToUpdate);
       if (idx !== -1) _contacts[idx] = { ..._contacts[idx], ...fields };
       closeModal(); renderContacts(); updateDashStats();
       // Écriture Supabase en arrière-plan
-      await dbUpdateContact(editingId, fields);
+      await dbUpdateContact(idToUpdate, fields);
       addActivity('edit', 'Contact modifié : ' + nom);
       showToast('Contact mis à jour ✓');
     } else {
