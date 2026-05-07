@@ -4883,6 +4883,16 @@ function _renderBriefActions() {
 async function _generateBriefIntro() {
   const intro  = document.getElementById('brief-intro');
   const loader = document.getElementById('brief-loader');
+
+  // Cache localStorage — 1 seul appel API par jour
+  const cacheKey = 'pylotia_brief_intro_' + _briefTodayStr();
+  const cached   = localStorage.getItem(cacheKey);
+  if (cached) {
+    intro.textContent = cached;
+    intro.style.display = 'block';
+    return;
+  }
+
   intro.style.display = 'none';
   loader.style.display = 'block';
   try {
@@ -4891,8 +4901,10 @@ async function _generateBriefIntro() {
     const rdvAuj   = (allAppointments || []).filter(a => a.date === todayStr && a.status !== 'fait').length;
     const sys = `Tu es l'assistant de pylotIA. Génère UNE SEULE phrase d'accroche naturelle et motivante pour ouvrir un brief commercial quotidien. Données : ${(_contacts||[]).length} contacts, ${(_prospects||[]).length} prospects, ${overdue} relance${overdue>1?'s':''} en retard, ${rdvAuj} RDV aujourd'hui. Phrase directe, sans ponctuation finale excessive. Maximum 20 mots.`;
     const text = await callClaude(sys, [{ role:'user', content:'Génère l\'accroche.' }], 80);
+    const result = text.trim().replace(/\.$/, '') + '.';
+    localStorage.setItem(cacheKey, result);
     loader.style.display = 'none';
-    intro.textContent = text.trim().replace(/\.$/, '') + '.';
+    intro.textContent = result;
     intro.style.display = 'block';
   } catch(e) {
     loader.style.display = 'none';
