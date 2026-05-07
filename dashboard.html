@@ -3386,18 +3386,23 @@ function switchProspTab(tab) {
 const _kbScores = new Map(); // cache scores Claude : id → 'chaud'|'tiede'|'froid'
 
 function kbLocalScore(p) {
-  let score = 0;
   const today = new Date().toISOString().split('T')[0];
-  if (p.statut === 'proposition_envoyee') score += 3;
-  else if (p.statut === 'prospect_qualifie') score += 2;
+  // proposition envoyée = chaud dès qu'il y a un signal supplémentaire, sinon tiède
+  if (p.statut === 'proposition_envoyee') {
+    const hasSignal = (p.relance) || (p.valeur >= 500) || (p.note && p.note.length > 30);
+    return hasSignal ? 'chaud' : 'tiede';
+  }
+  let score = 0;
+  if (p.statut === 'prospect_qualifie') score += 3;
   else if (p.statut === 'lead_contacte') score += 1;
-  if (p.relance && p.relance <= today) score += 2;
+  // nouveau_lead = 0
+  if (p.relance && p.relance <= today) score += 3; // relance en retard = urgent
   else if (p.relance) score += 1;
   if (p.valeur >= 5000) score += 2;
   else if (p.valeur >= 1000) score += 1;
   if (p.note && p.note.length > 50) score += 1;
-  if (score >= 5) return 'chaud';
-  if (score >= 2) return 'tiede';
+  if (score >= 4) return 'chaud';
+  if (score >= 1) return 'tiede';
   return 'froid';
 }
 
@@ -3418,7 +3423,7 @@ async function computeKbScoresAI() {
     valeur: p.valeur || null, relance: p.relance || null,
     note: p.note ? p.note.substring(0, 120) : null
   }));
-  const sys = `Tu es un assistant CRM. Pour chaque prospect, attribue un score de conversion: "chaud" (forte probabilité dans les 15 jours), "tiede" (intéressé mais pas urgent), "froid" (peu actif/qualifié). Réponds UNIQUEMENT avec un JSON valide: [{"id":"...","score":"chaud|tiede|froid"}]. Aucun texte en dehors du JSON.`;
+  const sys = `Tu es un assistant CRM expert en scoring commercial. Pour chaque prospect, attribue exactement un score parmi: "chaud" (conversion probable dans 15 jours — proposition envoyée, relance urgente, valeur élevée, note détaillée), "tiede" (intéressé mais pas encore prêt — qualifié, contacté, relance prévue), "froid" (peu actif — nouveau lead sans engagement ni relance). RÈGLE IMPÉRATIVE : différencie les prospects — ne mets pas tous le même score. Réponds UNIQUEMENT avec un JSON valide : [{"id":"...","score":"chaud|tiede|froid"}]. Zéro texte en dehors du JSON.`;
   try {
     const resp = await callClaude(sys, [{ role: 'user', content: `Prospects: ${JSON.stringify(list)}` }], 400);
     const match = resp.match(/\[[\s\S]*?\]/);
@@ -3492,7 +3497,7 @@ function kbCardHtml(p, plan) {
   const overdue  = p.relance && p.relance <= today;
   const soon     = p.relance && p.relance > today && p.relance <= new Date(Date.now() + 3*86400000).toISOString().split('T')[0];
   const relBadge = overdue ? `<span class="kb-relance">⚡ Relance</span>` : soon ? `<span class="kb-relance" style="color:#fbbf24">↻ Bientôt</span>` : '';
-  const aiBtn    = plan === 'pro' ? `<button onclick="event.stopPropagation();aiDraftEmail('${p.id}')" style="background:rgba(245,158,11,0.12);color:#fbbf24;border:none;border-radius:5px;padding:2px 8px;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;margin-top:6px">✦ Rédigez email IA</button>` : '';
+  const aiBtn    = '';
   const already  = _contacts.some(c => c.email && c.email === p.email) || _contacts.some(c => c.nom === p.nom);
   const convBtn  = already
     ? `<button disabled style="background:rgba(16,185,129,0.08);color:#34d399;border:1px solid rgba(16,185,129,0.2);border-radius:5px;padding:2px 8px;font-size:10px;font-family:'Inter',sans-serif;margin-top:4px;cursor:default">✓ Déjà contact</button>`
