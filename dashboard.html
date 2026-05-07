@@ -562,6 +562,10 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 .btn-analyse{padding:7px 12px;font-size:12px;min-height:34px;color:#2563eb;border-color:rgba(37,99,235,0.35);background:rgba(37,99,235,0.05)}
 .btn-analyse:hover{background:rgba(37,99,235,0.1);border-color:rgba(37,99,235,0.55)}
 .btn-analyse:disabled{opacity:0.5;cursor:default}
+.msg-textarea{width:100%;box-sizing:border-box;min-height:120px;padding:10px 12px;border:1px solid rgba(37,99,235,0.2);border-radius:8px;background:rgba(37,99,235,0.03);font-size:13px;color:var(--text);line-height:1.6;resize:vertical;font-family:'Inter',sans-serif;margin-top:8px}
+.msg-textarea:focus{outline:none;border-color:rgba(37,99,235,0.45)}
+.btn-copy{padding:5px 14px;font-size:12px;min-height:30px;color:#2563eb;border:1px solid rgba(37,99,235,0.3);background:rgba(37,99,235,0.06);border-radius:7px;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.15s}
+.btn-copy:hover{background:rgba(37,99,235,0.12)}
 
 /* ─── BRIEF QUOTIDIEN ──────────────────────────────────────────── */
 #brief-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,0.45);z-index:1100;align-items:center;justify-content:center}
@@ -1380,10 +1384,23 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
     <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
       <button class="btn btn-ghost" onclick="editFromDrawer()" style="padding:7px 14px;font-size:12px;min-height:34px">✏️ Modifier</button>
       <button class="btn btn-ghost btn-analyse" id="drawer-analyse-btn" onclick="analyseContact()">✦ Analyser</button>
+      <button class="btn btn-ghost btn-analyse" id="drawer-msg-btn" onclick="draftMessageContact()">✉ Message</button>
       <button class="drawer-close-btn" onclick="closeContactDrawer()">✕</button>
     </div>
   </div>
   <div class="drawer-body">
+
+    <!-- Message IA — masqué par défaut -->
+    <div class="drawer-section" id="drawer-msg-section" style="display:none">
+      <div class="drawer-section-title" style="display:flex;align-items:center;justify-content:space-between;border:none;padding:0 0 8px">
+        <span style="display:flex;align-items:center;gap:5px">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5"><path d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+          Message IA
+        </span>
+        <button onclick="document.getElementById('drawer-msg-section').style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px;line-height:1;padding:0">✕</button>
+      </div>
+      <div id="drawer-msg-result"></div>
+    </div>
 
     <!-- Analyse IA — masquée par défaut -->
     <div class="drawer-section" id="drawer-ai-section" style="display:none">
@@ -1508,10 +1525,13 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
     </div>
     <!-- Analyse IA prospect — masquée par défaut -->
     <div id="prosp-ai-section" style="display:none;margin-top:14px"></div>
+    <!-- Message IA prospect — masqué par défaut -->
+    <div id="prosp-msg-section" style="display:none;margin-top:14px"></div>
 
     <div class="modal-actions">
       <button class="btn btn-danger" id="prosp-delete-btn" onclick="deleteProspect(editingProspId)" style="display:none;margin-right:auto;order:-1;flex-basis:100%">Supprimer</button>
       <button class="btn btn-ghost btn-analyse" id="prosp-analyse-btn" onclick="analyseProspect()" style="display:none">✦ Analyser</button>
+      <button class="btn btn-ghost btn-analyse" id="prosp-msg-btn" onclick="draftMessageProspect()" style="display:none">✉ Message</button>
       <button class="btn btn-ghost" id="prosp-convert-btn" onclick="convertProspectToContact(editingProspId)" style="display:none">→ Créer contact</button>
       <button class="btn btn-ghost" onclick="closeProspModal()">Annuler</button>
       <button class="btn btn-blue" id="prosp-modal-submit" onclick="saveProspect()">Ajouter</button>
@@ -2111,11 +2131,15 @@ function openContactDrawer(id) {
 
   loadContactDocuments(id);
 
-  // Réinitialiser la section analyse
+  // Réinitialiser les sections IA
   document.getElementById('drawer-ai-section').style.display = 'none';
   document.getElementById('drawer-ai-result').innerHTML = '';
   const aBtn = document.getElementById('drawer-analyse-btn');
   aBtn.disabled = false; aBtn.textContent = '✦ Analyser';
+  document.getElementById('drawer-msg-section').style.display = 'none';
+  document.getElementById('drawer-msg-result').innerHTML = '';
+  const mBtn = document.getElementById('drawer-msg-btn');
+  mBtn.disabled = false; mBtn.textContent = '✉ Message';
 
   document.getElementById('contact-drawer').classList.add('open');
   document.getElementById('drawer-overlay').classList.add('open');
@@ -3663,12 +3687,17 @@ function openProspModal(id, defaultStatut) {
   editingProspId = (id && id !== 'null' && id !== 'undefined') ? id : null;
   const isEdit = !!editingProspId;
 
-  // Réinitialiser la section analyse
+  // Réinitialiser les sections IA
   const paiSec = document.getElementById('prosp-ai-section');
   paiSec.style.display = 'none'; paiSec.innerHTML = '';
   const paiBtn = document.getElementById('prosp-analyse-btn');
   paiBtn.style.display = isEdit ? 'inline-flex' : 'none';
   paiBtn.disabled = false; paiBtn.textContent = '✦ Analyser';
+  const pmsgSec = document.getElementById('prosp-msg-section');
+  pmsgSec.style.display = 'none'; pmsgSec.innerHTML = '';
+  const pmsgBtn = document.getElementById('prosp-msg-btn');
+  pmsgBtn.style.display = isEdit ? 'inline-flex' : 'none';
+  pmsgBtn.disabled = false; pmsgBtn.textContent = '✉ Message';
 
   document.getElementById('prosp-modal-title').textContent  = isEdit ? 'Modifier le prospect' : 'Nouveau prospect';
   document.getElementById('prosp-modal-submit').textContent = isEdit ? 'Enregistrer' : 'Ajouter';
@@ -3709,6 +3738,8 @@ function closeProspModal() {
   document.getElementById('modal-prospect').classList.remove('open');
   const paiSec = document.getElementById('prosp-ai-section');
   paiSec.style.display = 'none'; paiSec.innerHTML = '';
+  const pmsgSec = document.getElementById('prosp-msg-section');
+  pmsgSec.style.display = 'none'; pmsgSec.innerHTML = '';
   editingProspId = null;
 }
 
@@ -4949,6 +4980,114 @@ function _aiAnalyseLoader() {
 
 function _aiAnalyseError(msg) {
   return `<div style="font-size:13px;color:#f87171;padding:10px 12px;background:rgba(239,68,68,0.05);border-radius:8px;border:1px solid rgba(239,68,68,0.15)">❌ ${_briefEsc(msg || 'Erreur inattendue')}</div>`;
+}
+
+function _msgHeader() {
+  return `<div class="ai-analyse-header"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5"><path d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>Message IA</div>`;
+}
+
+function _buildMsgResult(text, taId) {
+  const safe = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return `<div class="ai-analyse-box">${_msgHeader()}<textarea class="msg-textarea" id="${taId}">${safe}</textarea><div style="display:flex;justify-content:flex-end;margin-top:8px"><button class="btn-copy" onclick="copyDraftMessage(this,'${taId}')">Copier</button></div></div>`;
+}
+
+function copyDraftMessage(btn, taId) {
+  const ta = document.getElementById(taId);
+  if (!ta) return;
+  const copy = () => { btn.textContent = '✓ Copié !'; setTimeout(() => btn.textContent = 'Copier', 2000); };
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(ta.value).then(copy).catch(() => { ta.select(); document.execCommand('copy'); copy(); });
+  } else { ta.select(); document.execCommand('copy'); copy(); }
+}
+
+async function draftMessageContact() {
+  if (!['pro','business'].includes(getPlan())) { openUpgradeModal(); return; }
+  const c = _contacts.find(x => x.id === currentDrawerContactId);
+  if (!c) return;
+  const btn     = document.getElementById('drawer-msg-btn');
+  const section = document.getElementById('drawer-msg-section');
+  const result  = document.getElementById('drawer-msg-result');
+  btn.disabled = true; btn.textContent = '…';
+  section.style.display = 'block';
+  result.innerHTML = _aiAnalyseLoader();
+  try {
+    const rdvs = (allAppointments || []).filter(a =>
+      (a.contact_name && c.nom && a.contact_name.toLowerCase() === c.nom.toLowerCase()) || a.contact_id === c.id
+    );
+    const rdvStr = rdvs.length
+      ? rdvs.slice(0,4).map(r => `• ${r.title||'RDV'} — ${r.date}${r.status==='fait'?' (fait)':''}`).join('\n')
+      : 'Aucun';
+    const sys = `Tu es l'assistant commercial de pylotIA. Rédige un message de relance court et personnalisé pour ce contact.
+
+Contact :
+- Nom : ${c.nom}
+- Entreprise : ${c.entreprise||'/'}
+- Statut : ${c.statut||'/'}
+- Poste : ${c.poste||'/'}
+- Notes : ${c.note||'Aucune note'}
+- RDV liés :
+${rdvStr}
+
+RÈGLES :
+- Message prêt à envoyer (email ou SMS), court et naturel, maximum 5 lignes
+- Adapte le ton : si peu de données → prise de contact ; si historique → suivi précis
+- Pas de placeholder [À compléter] — le message doit être complet
+- Pas de signature ni formule de politesse finale
+- Termine par une question ou un appel à l'action précis`;
+    const text = await callClaude(sys, [{role:'user',content:'Rédige le message.'}], 300);
+    result.innerHTML = _buildMsgResult(text, 'drawer-msg-ta');
+  } catch(e) { result.innerHTML = _aiAnalyseError(e.message); }
+  btn.disabled = false; btn.textContent = '✉ Message';
+}
+
+async function draftMessageProspect() {
+  if (!['pro','business'].includes(getPlan())) { openUpgradeModal(); return; }
+  const p = getProspects().find(x => x.id === editingProspId);
+  if (!p) return;
+  const btn     = document.getElementById('prosp-msg-btn');
+  const section = document.getElementById('prosp-msg-section');
+  btn.disabled = true; btn.textContent = '…';
+  section.style.display = 'block';
+  section.innerHTML = _aiAnalyseLoader();
+  try {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const isLate   = p.relance && p.relance < todayStr;
+    const rdvs = (allAppointments || []).filter(a =>
+      a.contact_name && p.nom && a.contact_name.toLowerCase() === p.nom.toLowerCase()
+    );
+    const rdvStr = rdvs.length
+      ? rdvs.slice(0,4).map(r => `• ${r.title||'RDV'} — ${r.date}${r.status==='fait'?' (fait)':''}`).join('\n')
+      : 'Aucun';
+    const stageCtx = {
+      nouveau_lead:'premier contact (ne s\'est jamais manifesté)',
+      lead_contacte:'déjà contacté, pas encore qualifié',
+      prospect_qualifie:'qualifié, intéressé mais pas encore en discussion d\'offre',
+      proposition_envoyee:'proposition commerciale envoyée, en attente de retour',
+      lead_converti:'en cours de conversion',
+      non_retenu:'n\'a pas retenu notre offre'
+    }[p.statut] || p.statut;
+    const sys = `Tu es l'assistant commercial de pylotIA. Rédige un message de relance court et personnalisé pour ce prospect.
+
+Prospect :
+- Nom : ${p.nom}
+- Entreprise : ${p.entreprise||'/'}
+- Contexte pipeline : ${stageCtx}
+- Valeur estimée : ${p.valeur?p.valeur+'€':'/'}
+- Relance prévue : ${p.relance?new Date(p.relance+'T12:00:00').toLocaleDateString('fr-FR'):'/'}${isLate?' ⚠️ EN RETARD':''}
+- Notes : ${p.note||'Aucune note'}
+- RDV liés :
+${rdvStr}
+
+RÈGLES :
+- Message prêt à envoyer (email ou SMS), court et naturel, maximum 5 lignes
+- Adapte au contexte pipeline — si proposition envoyée : relance l'offre spécifiquement
+- Pas de placeholder [À compléter] — le message doit être complet
+- Pas de signature ni formule de politesse finale
+- Termine par une question ou un appel à l'action précis`;
+    const text = await callClaude(sys, [{role:'user',content:'Rédige le message.'}], 300);
+    section.innerHTML = _buildMsgResult(text, 'prosp-msg-ta');
+  } catch(e) { section.innerHTML = _aiAnalyseError(e.message); }
+  btn.disabled = false; btn.textContent = '✉ Message';
 }
 
 function _aiAnalyseHeader() {
