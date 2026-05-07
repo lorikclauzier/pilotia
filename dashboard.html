@@ -549,6 +549,34 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 }
 
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+
+/* ─── BRIEF QUOTIDIEN ──────────────────────────────────────────── */
+#brief-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,0.45);z-index:1100;align-items:center;justify-content:center}
+#brief-overlay.open{display:flex}
+#brief-modal{background:#fff;border:1px solid rgba(37,99,235,0.18);border-radius:16px;padding:28px;width:480px;max-width:92vw;box-shadow:0 8px 40px rgba(37,99,235,0.12);position:relative;max-height:88vh;overflow-y:auto}
+#brief-close-btn{position:absolute;top:14px;right:14px;background:none;border:none;cursor:pointer;color:var(--text3);font-size:18px;line-height:1;padding:4px 7px;border-radius:6px}
+#brief-close-btn:hover{background:var(--dark3)}
+#brief-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#0f172a;margin-bottom:4px}
+#brief-subtitle{font-size:12px;color:var(--text3);margin-bottom:14px;text-transform:capitalize}
+#brief-intro{font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6;padding:10px 12px;background:rgba(37,99,235,0.05);border-left:3px solid #3b82f6;border-radius:0 8px 8px 0}
+#brief-loader{padding:18px 0;text-align:center}
+.brief-actions-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:8px}
+.brief-action-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--dark3);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:border-color 0.15s,background 0.15s}
+.brief-action-item:hover{border-color:rgba(59,130,246,0.4);background:#eef3ff}
+.brief-action-item.done{opacity:0.55}
+.brief-action-item.done .brief-action-text{text-decoration:line-through;color:var(--text3)}
+.brief-action-dot{width:7px;height:7px;border-radius:50%;background:#3b82f6;flex-shrink:0;margin-top:5px}
+.brief-action-done-icon{color:#22c55e;font-size:14px;flex-shrink:0;margin-top:1px}
+.brief-action-text{font-size:13px;color:#0f172a;flex:1;line-height:1.5}
+.brief-action-arrow{font-size:11px;color:var(--text3);flex-shrink:0;margin-top:3px}
+#brief-empty{font-size:14px;color:var(--text2);text-align:center;padding:20px 0;line-height:1.6}
+#brief-fab{display:none;position:fixed;bottom:28px;right:28px;width:44px;height:44px;background:#fff;border:1.5px solid rgba(37,99,235,0.3);border-radius:50%;box-shadow:0 4px 16px rgba(37,99,235,0.18);cursor:pointer;z-index:900;align-items:center;justify-content:center;font-size:20px;transition:box-shadow 0.2s,border-color 0.2s;color:#2563eb}
+#brief-fab.visible{display:flex}
+#brief-fab:hover{box-shadow:0 6px 24px rgba(37,99,235,0.28);border-color:rgba(37,99,235,0.55)}
+@media(max-width:768px){
+  #brief-fab{bottom:72px;right:16px;width:40px;height:40px;font-size:18px}
+  #brief-modal{padding:22px 16px}
+}
 </style>
 </head>
 <body>
@@ -1856,6 +1884,9 @@ async function initApp() {
 
   // Masquer l'overlay de chargement
   document.getElementById('app-loader').style.display = 'none';
+
+  // Brief quotidien (non bloquant)
+  initDailyBrief();
 }
 
 initApp().catch(err => {
@@ -4772,8 +4803,152 @@ document.addEventListener('keydown', e => {
   } else if (e.key === 'Escape') {
     const ov = document.getElementById('gsearch-overlay');
     if (ov && ov.style.display !== 'none') closeGlobalSearch();
+    else if (document.getElementById('brief-overlay').classList.contains('open')) closeBriefModal();
   }
 });
+
+// ─── BRIEF QUOTIDIEN ──────────────────────────────────────────────
+let _briefActions = [];
+const _briefDateKey  = 'pylotia_brief_date';
+const _briefDoneKey  = 'pylotia_brief_done_';
+
+function _briefTodayStr() { return new Date().toISOString().split('T')[0]; }
+
+function _briefAlreadyShownToday() {
+  return localStorage.getItem(_briefDateKey) === _briefTodayStr();
+}
+
+function _gatherBriefUrgencies() {
+  const todayStr = _briefTodayStr();
+  const tom = new Date(); tom.setDate(tom.getDate() + 1);
+  const tomStr = tom.toISOString().split('T')[0];
+  const urgencies = [];
+
+  // RDV aujourd'hui ou demain
+  (allAppointments || []).filter(a =>
+    a.date >= todayStr && a.date <= tomStr && a.status !== 'fait'
+  ).slice(0, 3).forEach(a => urgencies.push({
+    text: `RDV "${a.title || 'Sans titre'}" ${a.date === todayStr ? "aujourd'hui" : "demain"}${a.time ? ' à ' + a.time : ''}${a.contact_name ? ' · ' + a.contact_name : ''}`,
+    section: 'agenda', id: a.id, priority: 1
+  }));
+
+  // Relances prospects en retard
+  const overdue = (_prospects || []).filter(p =>
+    p.relance && p.relance < todayStr && p.statut !== 'client_actif'
+  );
+  overdue.slice(0, 3).forEach(p => urgencies.push({
+    text: `Relancer ${p.nom}${p.entreprise ? ' (' + p.entreprise + ')' : ''} — prévu le ${new Date(p.relance + 'T12:00:00').toLocaleDateString('fr-FR')}`,
+    section: 'prospection', id: p.id, priority: 2
+  }));
+
+  // Prospects chauds sans relance fixée
+  (_prospects || []).filter(p =>
+    ['qualification','proposition','negociation'].includes(p.statut) &&
+    !overdue.find(o => o.id === p.id) &&
+    (!p.relance || p.relance < todayStr)
+  ).slice(0, 2).forEach(p => urgencies.push({
+    text: `Suivre ${p.nom}${p.entreprise ? ' (' + p.entreprise + ')' : ''} — étape : ${p.statut}${p.valeur ? ' · ' + Number(p.valeur).toLocaleString('fr-FR') + '€' : ''}`,
+    section: 'prospection', id: p.id, priority: 3
+  }));
+
+  return urgencies.sort((a, b) => a.priority - b.priority).slice(0, 5);
+}
+
+function _briefEsc(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function _renderBriefActions() {
+  const list  = document.getElementById('brief-actions-list');
+  const empty = document.getElementById('brief-empty');
+  if (!_briefActions.length) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  list.innerHTML = '<div class="brief-actions-label">Actions prioritaires</div>' +
+    _briefActions.map((a, i) => `
+      <div class="brief-action-item${a.done ? ' done' : ''}" onclick="briefActionClick(${i})">
+        ${a.done
+          ? '<span class="brief-action-done-icon">✓</span>'
+          : '<span class="brief-action-dot"></span>'}
+        <span class="brief-action-text">${_briefEsc(a.text)}</span>
+        ${!a.done ? '<span class="brief-action-arrow">→</span>' : ''}
+      </div>`).join('');
+}
+
+async function _generateBriefIntro() {
+  const intro  = document.getElementById('brief-intro');
+  const loader = document.getElementById('brief-loader');
+  intro.style.display = 'none';
+  loader.style.display = 'block';
+  try {
+    const todayStr = _briefTodayStr();
+    const overdue  = (_prospects || []).filter(p => p.relance && p.relance < todayStr && p.statut !== 'client_actif').length;
+    const rdvAuj   = (allAppointments || []).filter(a => a.date === todayStr && a.status !== 'fait').length;
+    const sys = `Tu es l'assistant de pylotIA. Génère UNE SEULE phrase d'accroche naturelle et motivante pour ouvrir un brief commercial quotidien. Données : ${(_contacts||[]).length} contacts, ${(_prospects||[]).length} prospects, ${overdue} relance${overdue>1?'s':''} en retard, ${rdvAuj} RDV aujourd'hui. Phrase directe, sans ponctuation finale excessive. Maximum 20 mots.`;
+    const text = await callClaude(sys, [{ role:'user', content:'Génère l\'accroche.' }], 80);
+    loader.style.display = 'none';
+    intro.textContent = text.trim().replace(/\.$/, '') + '.';
+    intro.style.display = 'block';
+  } catch(e) {
+    loader.style.display = 'none';
+  }
+}
+
+function _renderBriefModal() {
+  const today = new Date();
+  const days  = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  document.getElementById('brief-subtitle').textContent =
+    days[today.getDay()] + ' ' + today.toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'});
+
+  const savedDone = JSON.parse(localStorage.getItem(_briefDoneKey + _briefTodayStr()) || '[]');
+  _briefActions = _gatherBriefUrgencies().map((a, i) => ({ ...a, idx: i, done: savedDone.includes(i) }));
+  _renderBriefActions();
+
+  if (['pro','business'].includes(getPlan())) {
+    _generateBriefIntro();
+  } else {
+    document.getElementById('brief-intro').style.display = 'none';
+    document.getElementById('brief-loader').style.display = 'none';
+  }
+}
+
+function openBriefModal() {
+  document.getElementById('brief-overlay').classList.add('open');
+  _renderBriefModal();
+}
+
+function closeBriefModal() {
+  document.getElementById('brief-overlay').classList.remove('open');
+  localStorage.setItem(_briefDateKey, _briefTodayStr());
+  document.getElementById('brief-fab').classList.add('visible');
+}
+
+function briefActionClick(idx) {
+  const action = _briefActions[idx];
+  if (!action) return;
+  if (!action.done) {
+    action.done = true;
+    const key  = _briefDoneKey + _briefTodayStr();
+    const done = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!done.includes(idx)) { done.push(idx); localStorage.setItem(key, JSON.stringify(done)); }
+    _renderBriefActions();
+    showToast('✓ Bien joué !');
+  }
+  closeBriefModal();
+  setTimeout(() => showSection(action.section), 200);
+}
+
+async function initDailyBrief() {
+  if (_briefAlreadyShownToday()) {
+    document.getElementById('brief-fab').classList.add('visible');
+    return;
+  }
+  await new Promise(r => setTimeout(r, 1500));
+  openBriefModal();
+}
 </script>
 
 <!-- BOTTOM NAV BAR -->
@@ -4827,6 +5002,28 @@ document.addEventListener('keydown', e => {
     Se déconnecter
   </button>
 </div>
+
+<!-- BRIEF QUOTIDIEN -->
+<div id="brief-overlay" onclick="if(event.target===this)closeBriefModal()">
+  <div id="brief-modal" onclick="event.stopPropagation()">
+    <button id="brief-close-btn" onclick="closeBriefModal()" title="Fermer">✕</button>
+    <div id="brief-title">⚡ Brief du jour</div>
+    <div id="brief-subtitle"></div>
+    <div id="brief-intro" style="display:none"></div>
+    <div id="brief-loader" style="display:none">
+      <div class="ai-typing-wrap" style="margin:0 auto"><span></span><span></span><span></span></div>
+      <div style="font-size:12px;color:var(--text3);margin-top:8px">L'IA analyse votre journée…</div>
+    </div>
+    <div id="brief-actions-list"></div>
+    <div id="brief-empty" style="display:none">✅ Tout est à jour — bonne journée !</div>
+    <div style="margin-top:18px;border-top:1px solid var(--border);padding-top:14px;display:flex;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeBriefModal()" style="font-size:12px;color:var(--text3)">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- FAB Brief -->
+<button id="brief-fab" onclick="openBriefModal()" title="Brief du jour">⚡</button>
 
 <!-- LOADING OVERLAY — affiché pendant le chargement initial depuis Supabase -->
 <div id="app-loader" style="position:fixed;inset:0;background:var(--dark);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
