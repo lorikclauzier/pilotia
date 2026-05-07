@@ -2148,6 +2148,15 @@ function openContactDrawer(id) {
 function closeContactDrawer() {
   document.getElementById('contact-drawer').classList.remove('open');
   document.getElementById('drawer-overlay').classList.remove('open');
+  // Réinitialiser les sections IA à la fermeture
+  document.getElementById('drawer-ai-section').style.display = 'none';
+  document.getElementById('drawer-ai-result').innerHTML = '';
+  document.getElementById('drawer-msg-section').style.display = 'none';
+  document.getElementById('drawer-msg-result').innerHTML = '';
+  const aBtn = document.getElementById('drawer-analyse-btn');
+  if (aBtn) { aBtn.disabled = false; aBtn.textContent = '✦ Analyser'; }
+  const mBtn = document.getElementById('drawer-msg-btn');
+  if (mBtn) { mBtn.disabled = false; mBtn.textContent = '✉ Message'; }
   currentDrawerContactId = null;
 }
 
