@@ -550,6 +550,12 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 
+/* ─── KB SCORE BADGE ───────────────────────────────────────────── */
+.kb-score{width:19px;height:19px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity 0.3s}
+.kb-score.chaud{background:#2563eb}
+.kb-score.tiede{background:#f97316}
+.kb-score.froid{background:#94a3b8}
+
 /* ─── ANALYSE IA (contact & prospect) ──────────────────────────── */
 .ai-analyse-box{font-size:13px;color:var(--text);line-height:1.7;background:rgba(37,99,235,0.05);border:1px solid rgba(37,99,235,0.15);border-radius:10px;padding:12px 14px}
 .ai-analyse-header{font-size:10px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;display:flex;align-items:center;gap:5px}
@@ -3318,6 +3324,7 @@ function initProspection() {
   updatePlanBadges();
   checkProspLocks();
   renderKanban();
+  computeKbScoresAI(); // non-bloquant — badges IA en arrière-plan pour Pro/Business
 }
 
 function updatePlanBadges() {
@@ -3375,6 +3382,54 @@ function switchProspTab(tab) {
   if (tab === 'import') checkProspLocks();
 }
 
+// ── KANBAN SCORING ──
+const _kbScores = new Map(); // cache scores Claude : id → 'chaud'|'tiede'|'froid'
+
+function kbLocalScore(p) {
+  let score = 0;
+  const today = new Date().toISOString().split('T')[0];
+  if (p.statut === 'proposition_envoyee') score += 3;
+  else if (p.statut === 'prospect_qualifie') score += 2;
+  else if (p.statut === 'lead_contacte') score += 1;
+  if (p.relance && p.relance <= today) score += 2;
+  else if (p.relance) score += 1;
+  if (p.valeur >= 5000) score += 2;
+  else if (p.valeur >= 1000) score += 1;
+  if (p.note && p.note.length > 50) score += 1;
+  if (score >= 5) return 'chaud';
+  if (score >= 2) return 'tiede';
+  return 'froid';
+}
+
+function kbScoreBadge(p) {
+  const score = _kbScores.get(p.id) || kbLocalScore(p);
+  const icons  = { chaud: '▲', tiede: '◆', froid: '▽' };
+  const labels = { chaud: 'Prospect chaud', tiede: 'Prospect tiède', froid: 'Prospect froid' };
+  return `<span class="kb-score ${score}" title="${labels[score]}" style="font-size:8px;color:white;font-weight:700;line-height:1">${icons[score]}</span>`;
+}
+
+async function computeKbScoresAI() {
+  const plan = getPlan();
+  if (!['pro', 'business'].includes(plan)) return;
+  const prospects = getProspects().filter(p => p.statut !== 'client_actif');
+  if (prospects.length === 0) return;
+  const list = prospects.map(p => ({
+    id: p.id, nom: p.nom, statut: p.statut,
+    valeur: p.valeur || null, relance: p.relance || null,
+    note: p.note ? p.note.substring(0, 120) : null
+  }));
+  const sys = `Tu es un assistant CRM. Pour chaque prospect, attribue un score de conversion: "chaud" (forte probabilité dans les 15 jours), "tiede" (intéressé mais pas urgent), "froid" (peu actif/qualifié). Réponds UNIQUEMENT avec un JSON valide: [{"id":"...","score":"chaud|tiede|froid"}]. Aucun texte en dehors du JSON.`;
+  try {
+    const resp = await callClaude(sys, [{ role: 'user', content: `Prospects: ${JSON.stringify(list)}` }], 400);
+    const match = resp.match(/\[[\s\S]*?\]/);
+    if (!match) return;
+    JSON.parse(match[0]).forEach(s => {
+      if (s.id && ['chaud','tiede','froid'].includes(s.score)) _kbScores.set(s.id, s.score);
+    });
+    renderKanban();
+  } catch(e) { /* scoring local déjà actif */ }
+}
+
 // ── KANBAN ──
 function renderKanban() {
   const prospects = getProspects();
@@ -3430,7 +3485,10 @@ function kbCardHtml(p, plan) {
     ondragstart="kbDragStart(event,'${p.id}')"
     ondragend="kbDragEnd(event)"
     onclick="openProspModal('${p.id}')">
-    <div class="kb-card-name">${p.nom}</div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:4px">
+      <div class="kb-card-name" style="margin-bottom:0;flex:1">${p.nom}</div>
+      ${kbScoreBadge(p)}
+    </div>
     <div class="kb-card-co">${p.entreprise || '—'}</div>
     <div class="kb-card-footer">
       <span class="kb-source">${p.source || 'Manuel'}</span>
