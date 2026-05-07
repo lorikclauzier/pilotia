@@ -3442,17 +3442,34 @@ function renderKanban() {
     (p.entreprise||'').toLowerCase().includes(search) ||
     (p.email||'').toLowerCase().includes(search)
   ) : prospects;
+  // Contacts "Client" déjà représentés comme prospect client_actif (dédupliqués par email/nom)
+  const clientActifProspects = prospects.filter(p => p.statut === 'client_actif');
+  const clientContacts = (_contacts || []).filter(c => {
+    if (c.statut !== 'Client') return false;
+    // exclure si déjà dans client_actif par email ou nom
+    return !clientActifProspects.some(p =>
+      (c.email && p.email && c.email === p.email) || c.nom === p.nom
+    );
+  });
   board.innerHTML = KB_COLS.map(col => {
     const cards = filtered.filter(p => p.statut === col.id);
+    const contactCards = col.clientCol ? (search
+      ? clientContacts.filter(c =>
+          c.nom.toLowerCase().includes(search) ||
+          (c.entreprise||'').toLowerCase().includes(search) ||
+          (c.email||'').toLowerCase().includes(search))
+      : clientContacts) : [];
+    const total = cards.length + contactCards.length;
     return `<div class="kb-col" id="kbc-${col.id}"
       ondragover="kbDragOver(event,'${col.id}')"
       ondrop="kbDrop(event,'${col.id}')"
       ondragleave="kbDragLeave(event)">
       <div class="kb-col-hd">
         <span class="kb-col-name" style="color:${col.color}">${col.label}</span>
-        <span class="kb-cnt">${cards.length}</span>
+        <span class="kb-cnt">${total}</span>
       </div>
       ${cards.map(p => kbCardHtml(p, plan)).join('')}
+      ${contactCards.map(c => kbContactCardHtml(c)).join('')}
       ${col.clientCol ? '' : `<div class="kb-add" onclick="openProspModal(null,'${col.id}')">+ Ajouter</div>`}
     </div>`;
   }).join('');
@@ -3497,6 +3514,18 @@ function kbCardHtml(p, plan) {
     ${valeur}
     ${aiBtn}
     ${convBtn}
+  </div>`;
+}
+
+function kbContactCardHtml(c) {
+  return `<div class="kb-card" style="border-left:3px solid #10b981;cursor:pointer"
+    onclick="openContactDrawer('${c.id}')">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+      <div class="kb-card-name">${c.nom}</div>
+      <span style="background:rgba(16,185,129,0.15);color:#10b981;border-radius:4px;padding:1px 7px;font-size:10px;font-weight:600">✓ Client</span>
+    </div>
+    <div class="kb-card-co">${c.entreprise || '—'}</div>
+    ${c.email ? `<div style="margin-top:4px;font-size:11px;color:var(--text3)">${c.email}</div>` : ''}
   </div>`;
 }
 
