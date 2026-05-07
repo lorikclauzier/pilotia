@@ -36,54 +36,51 @@ async function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
 
   // ── 1. BRIEF QUOTIDIEN ────────────────────────────────────────
   console.log('\n── 1. BRIEF QUOTIDIEN ──');
-  await wait(2500); // laisser le délai 1.5s s'écouler
+
+  // Forcer l'ouverture du brief pour ce test (reset localStorage)
+  await page.evaluate(() => localStorage.removeItem('pylotia_brief_date'));
+  // Attendre jusqu'a 6s max (Supabase + delai 1.5s initDailyBrief)
+  let briefOpen = null;
+  for (let i = 0; i < 12; i++) {
+    await wait(500);
+    briefOpen = await page.$('#brief-overlay.open');
+    if (briefOpen) break;
+  }
 
   const briefOverlay = await page.$('#brief-overlay');
   briefOverlay ? ok('brief-overlay présent dans le DOM') : fail('brief-overlay absent du DOM');
+  briefOpen ? ok('Brief auto-ouvert après login') : fail('Brief non ouvert apres 6s (verifier initDailyBrief)');
 
-  const briefOpen = await page.$('#brief-overlay.open');
-  briefOpen ? ok('Brief auto-ouvert après login') : warn('Brief non auto-ouvert (déjà vu aujourd\'hui ou erreur)');
-
-  // FAB visible si brief fermé, ou doit devenir visible après fermeture
   if (briefOpen) {
-    // Fermer via clic extérieur
+    // Fermer via clic exterieur
     await page.evaluate(() => {
       const overlay = document.getElementById('brief-overlay');
       overlay.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
     await wait(400);
     const briefClosed = !(await page.$('#brief-overlay.open'));
-    briefClosed ? ok('Brief fermé au clic en dehors') : fail('Brief ne se ferme pas au clic en dehors');
-  } else {
-    // Forcer localStorage pour tester clic extérieur au prochain chargement — on vérifie juste la structure
-    warn('Brief déjà vu aujourd\'hui — test fermeture clic extérieur non exécuté');
+    briefClosed ? ok('Brief ferme au clic en dehors') : fail('Brief ne se ferme pas au clic en dehors');
   }
 
   const fabVisible = await page.$('#brief-fab.visible');
-  fabVisible ? ok('FAB sparkle bleu visible après fermeture') : fail('FAB #brief-fab.visible absent');
+  fabVisible ? ok('FAB sparkle bleu visible apres fermeture') : fail('FAB #brief-fab.visible absent');
 
-  // Rouvrir via FAB
   if (fabVisible) {
     await page.click('#brief-fab');
     await wait(300);
     const reopened = await page.$('#brief-overlay.open');
-    reopened ? ok('Brief réouvert via FAB') : fail('Brief ne se réouvre pas via FAB');
-    if (reopened) {
-      // Fermer proprement pour la suite
-      await page.click('#brief-close-btn').catch(() =>
-        page.evaluate(() => closeBriefModal())
-      );
-      await wait(300);
-    }
+    reopened ? ok('Brief reovert via FAB') : fail('Brief ne se reouvre pas via FAB');
+    await page.evaluate(() => closeBriefModal()).catch(() => {});
+    await wait(300);
   }
 
-  // Vérifier les sections du brief
+  // Verifier les sections du brief
   const briefTitle   = await page.$('#brief-title');
   const briefActions = await page.$('#brief-actions-list');
   const briefIntro   = await page.$('#brief-intro');
-  briefTitle   ? ok('Brief — section titre présente') : fail('Brief — #brief-title absent');
-  briefActions ? ok('Brief — section actions urgentes présente') : fail('Brief — #brief-actions-list absent');
-  briefIntro   ? ok('Brief — section intro IA présente') : fail('Brief — #brief-intro absent');
+  briefTitle   ? ok('Brief - section titre presente') : fail('Brief - #brief-title absent');
+  briefActions ? ok('Brief - section actions urgentes presente') : fail('Brief - #brief-actions-list absent');
+  briefIntro   ? ok('Brief - section intro IA presente') : fail('Brief - #brief-intro absent');
 
   // ── 2. SCORING KANBAN ─────────────────────────────────────────
   console.log('\n── 2. SCORING KANBAN ──');
