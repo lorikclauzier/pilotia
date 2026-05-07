@@ -3342,9 +3342,8 @@ const KB_COLS = [
   { id: 'lead_contacte',      label: 'Lead contacté',       color: '#93c5fd' },
   { id: 'prospect_qualifie',  label: 'Prospect qualifié',   color: '#818cf8' },
   { id: 'proposition_envoyee',label: 'Proposition envoyée',  color: '#fbbf24' },
-  { id: 'lead_converti',      label: 'Lead converti',       color: '#34d399' },
   { id: 'non_retenu',         label: 'Non retenu',          color: '#f87171' },
-  { id: 'client_actif',       label: 'Clients ✓',           color: '#10b981', clientCol: true },
+  { id: 'lead_converti',      label: 'Clients ✓',           color: '#10b981', clientCol: true },
 ];
 
 // getProspects() / getPlan() sont définis dans la section STORAGE HELPERS ci-dessus.
@@ -3449,7 +3448,7 @@ function kbScoreBadge(p) {
 async function computeKbScoresAI() {
   const plan = getPlan();
   if (!['pro', 'business'].includes(plan)) return;
-  const prospects = getProspects().filter(p => p.statut !== 'client_actif');
+  const prospects = getProspects().filter(p => p.statut !== 'lead_converti');
   if (prospects.length === 0) return;
   const list = prospects.map(p => ({
     id: p.id, nom: p.nom, statut: p.statut,
@@ -3480,12 +3479,12 @@ function renderKanban() {
     (p.entreprise||'').toLowerCase().includes(search) ||
     (p.email||'').toLowerCase().includes(search)
   ) : prospects;
-  // Contacts "Client" déjà représentés comme prospect client_actif (dédupliqués par email/nom)
-  const clientActifProspects = prospects.filter(p => p.statut === 'client_actif');
+  // Contacts "Client" non encore représentés en tant que prospect lead_converti (dédupliqués par email/nom)
+  const convertedProspects = prospects.filter(p => p.statut === 'lead_converti');
   const clientContacts = (_contacts || []).filter(c => {
     if (c.statut !== 'Client') return false;
-    // exclure si déjà dans client_actif par email ou nom
-    return !clientActifProspects.some(p =>
+    // exclure si déjà représenté par un prospect lead_converti
+    return !convertedProspects.some(p =>
       (c.email && p.email && c.email === p.email) || c.nom === p.nom
     );
   });
@@ -3514,7 +3513,7 @@ function renderKanban() {
 }
 
 function kbCardHtml(p, plan) {
-  if (p.statut === 'client_actif') {
+  if (p.statut === 'lead_converti') {
     const valeur = p.valeur ? `<div style="margin-top:6px;font-size:11px;color:#10b981">💶 ${Number(p.valeur).toLocaleString('fr-FR')} €</div>` : '';
     return `<div class="kb-card" style="border-left:3px solid #10b981;cursor:pointer"
       onclick="openProspModal('${p.id}')">
@@ -3622,7 +3621,7 @@ function drawPieChart(prospects) {
   const canvas = document.getElementById('pie-chart');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  const colorMap = { nouveau_lead:'#4a5a78', lead_contacte:'#93c5fd', prospect_qualifie:'#818cf8', proposition_envoyee:'#fbbf24', lead_converti:'#34d399', non_retenu:'#f87171' };
+  const colorMap = { nouveau_lead:'#4a5a78', lead_contacte:'#93c5fd', prospect_qualifie:'#818cf8', proposition_envoyee:'#fbbf24', lead_converti:'#10b981', non_retenu:'#f87171' };
   const data = KB_COLS.map(col => ({ label: col.label, color: colorMap[col.id], count: prospects.filter(p => p.statut === col.id).length }));
   const total = data.reduce((s, d) => s + d.count, 0);
   ctx.clearRect(0, 0, 140, 140);
@@ -3831,8 +3830,8 @@ async function convertProspectToContact(id) {
     const saved = await dbAddContact(fields);
     _contacts.unshift(normalizeContact(saved));
     // Move prospect to "Clients ✓" column
-    p.statut = 'client_actif';
-    await dbUpdateProspect(p.id, { ...p, statut: 'client_actif' });
+    p.statut = 'lead_converti';
+    await dbUpdateProspect(p.id, { ...p, statut: 'lead_converti' });
     addActivity('add', 'Contact créé depuis prospect : ' + p.nom);
     showToast(p.nom + ' ajouté aux contacts ✓');
     renderKanban();
@@ -4209,7 +4208,7 @@ function buildAIContext() {
   ).join('\n') || 'Aucune activité.';
 
   const valPipeline = prospects.reduce((s,p) => s + (parseFloat(p.valeur)||0), 0);
-  const convertis   = prospects.filter(p => ['lead_converti','client_actif'].includes(p.statut)).length;
+  const convertis   = prospects.filter(p => p.statut === 'lead_converti').length;
   const urgents     = prospects.filter(p => p.relance && p.relance < todayStr).length;
 
   return `Tu es l'assistant IA commercial de pylotIA. Tu aides l'utilisateur (un commercial/entrepreneur) à piloter son activité.
@@ -5231,7 +5230,7 @@ function _gatherBriefUrgencies() {
 
   // Relances prospects en retard
   const overdue = (_prospects || []).filter(p =>
-    p.relance && p.relance < todayStr && p.statut !== 'client_actif'
+    p.relance && p.relance < todayStr && p.statut !== 'lead_converti'
   );
   overdue.slice(0, 3).forEach(p => urgencies.push({
     text: `Relancer ${p.nom}${p.entreprise ? ' (' + p.entreprise + ')' : ''} — prévu le ${new Date(p.relance + 'T12:00:00').toLocaleDateString('fr-FR')}`,
@@ -5292,7 +5291,7 @@ async function _generateBriefIntro() {
   loader.style.display = 'block';
   try {
     const todayStr = _briefTodayStr();
-    const overdue  = (_prospects || []).filter(p => p.relance && p.relance < todayStr && p.statut !== 'client_actif').length;
+    const overdue  = (_prospects || []).filter(p => p.relance && p.relance < todayStr && p.statut !== 'lead_converti').length;
     const rdvAuj   = (allAppointments || []).filter(a => a.date === todayStr && a.status !== 'terminé').length;
     const sys = `Tu es l'assistant de pylotIA. Génère UNE SEULE phrase d'accroche naturelle et motivante pour ouvrir un brief commercial quotidien. Données : ${(_contacts||[]).length} contacts, ${(_prospects||[]).length} prospects, ${overdue} relance${overdue>1?'s':''} en retard, ${rdvAuj} RDV aujourd'hui. Phrase directe, sans ponctuation finale excessive. Maximum 20 mots.`;
     const text = await callClaude(sys, [{ role:'user', content:'Génère l\'accroche.' }], 80);
