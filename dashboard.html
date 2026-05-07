@@ -3449,7 +3449,7 @@ function kbScoreBadge(p) {
 async function computeKbScoresAI() {
   const plan = getPlan();
   if (!['pro', 'business'].includes(plan)) return;
-  const prospects = getProspects().filter(p => p.statut !== 'lead_converti');
+  const prospects = getProspects().filter(p => p.statut !== 'lead_converti' && p.statut !== 'client_actif');
   if (prospects.length === 0) return;
   const list = prospects.map(p => ({
     id: p.id, nom: p.nom, statut: p.statut,
@@ -3480,12 +3480,11 @@ function renderKanban() {
     (p.entreprise||'').toLowerCase().includes(search) ||
     (p.email||'').toLowerCase().includes(search)
   ) : prospects;
-  // Contacts "Client" non encore représentés en tant que prospect lead_converti (dédupliqués par email/nom)
-  const convertedProspects = prospects.filter(p => p.statut === 'lead_converti');
+  // Contacts "Client" non représentés par un prospect client_actif (dédupliqués par email/nom)
+  const clientProspects = prospects.filter(p => p.statut === 'client_actif');
   const clientContacts = (_contacts || []).filter(c => {
     if (c.statut !== 'Client') return false;
-    // exclure si déjà représenté par un prospect lead_converti
-    return !convertedProspects.some(p =>
+    return !clientProspects.some(p =>
       (c.email && p.email && c.email === p.email) || c.nom === p.nom
     );
   });
@@ -3514,7 +3513,7 @@ function renderKanban() {
 }
 
 function kbCardHtml(p, plan) {
-  if (p.statut === 'lead_converti') {
+  if (p.statut === 'client_actif' || p.statut === 'lead_converti') {
     const valeur = p.valeur ? `<div style="margin-top:6px;font-size:11px;color:#10b981">💶 ${Number(p.valeur).toLocaleString('fr-FR')} €</div>` : '';
     return `<div class="kb-card" style="border-left:3px solid #10b981;cursor:pointer"
       onclick="openProspModal('${p.id}')">
@@ -3580,8 +3579,8 @@ async function kbDrop(e, colId) {
   e.currentTarget.classList.remove('drag-over');
   if (!dragProspId || dragProspId === 'null' || dragProspId === 'undefined') return;
   const col = KB_COLS.find(c => c.id === colId);
-  // Colonne Clients ✓ = affichage contacts uniquement — on convertit vers lead_converti en DB
-  const dbStatut = col?.clientCol ? 'lead_converti' : colId;
+  // Colonne Clients ✓ = écrit client_actif en DB
+  const dbStatut = col?.clientCol ? 'client_actif' : colId;
   const p = _prospects.find(x => x.id === dragProspId);
   if (p) {
     const oldStatut = p.statut;
@@ -3605,7 +3604,7 @@ function renderProspStats() {
   const prospects = getProspects();
   const total   = prospects.length;
   const enCours = prospects.filter(p => ['lead_contacte','prospect_qualifie','proposition_envoyee'].includes(p.statut)).length;
-  const gagnes  = prospects.filter(p => p.statut === 'lead_converti').length;
+  const gagnes  = prospects.filter(p => p.statut === 'lead_converti' || p.statut === 'client_actif').length;
   const taux    = total > 0 ? Math.round(gagnes / total * 100) : 0;
   const valeur  = prospects.reduce((s, p) => s + (parseFloat(p.valeur) || 0), 0);
 
@@ -3625,7 +3624,7 @@ function drawPieChart(prospects) {
   const canvas = document.getElementById('pie-chart');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  const colorMap = { nouveau_lead:'#4a5a78', lead_contacte:'#93c5fd', prospect_qualifie:'#818cf8', proposition_envoyee:'#fbbf24', lead_converti:'#10b981', non_retenu:'#f87171' };
+  const colorMap = { nouveau_lead:'#4a5a78', lead_contacte:'#93c5fd', prospect_qualifie:'#818cf8', proposition_envoyee:'#fbbf24', lead_converti:'#10b981', client_actif:'#10b981', non_retenu:'#f87171' };
   const data = KB_COLS.map(col => ({ label: col.label, color: colorMap[col.id], count: prospects.filter(p => p.statut === col.id).length }));
   const total = data.reduce((s, d) => s + d.count, 0);
   ctx.clearRect(0, 0, 140, 140);
@@ -3652,7 +3651,7 @@ function drawPieChart(prospects) {
 function renderRelances(prospects) {
   const today = new Date().toISOString().split('T')[0];
   const list  = document.getElementById('relance-list'); if (!list) return;
-  const items = prospects.filter(p => p.relance && !['lead_converti','non_retenu'].includes(p.statut)).sort((a,b) => a.relance.localeCompare(b.relance)).slice(0, 6);
+  const items = prospects.filter(p => p.relance && !['lead_converti','client_actif','non_retenu'].includes(p.statut)).sort((a,b) => a.relance.localeCompare(b.relance)).slice(0, 6);
   if (!items.length) { list.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px 0">Aucune relance prévue 🎉</div>'; return; }
   list.innerHTML = items.map(p => {
     const dDiff = Math.ceil((new Date(p.relance) - new Date(today)) / 86400000);
@@ -3834,8 +3833,8 @@ async function convertProspectToContact(id) {
     const saved = await dbAddContact(fields);
     _contacts.unshift(normalizeContact(saved));
     // Move prospect to "Clients ✓" column
-    p.statut = 'lead_converti';
-    await dbUpdateProspect(p.id, { ...p, statut: 'lead_converti' });
+    p.statut = 'client_actif';
+    await dbUpdateProspect(p.id, { ...p, statut: 'client_actif' });
     addActivity('add', 'Contact créé depuis prospect : ' + p.nom);
     showToast(p.nom + ' ajouté aux contacts ✓');
     renderKanban();
@@ -4023,7 +4022,7 @@ async function importProspectsFromData(rows, fileName) {
 function normalizeProspStatut(val) {
   const v = (val || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
   // Exact new statut IDs — pass through directly
-  const validIds = ['nouveau_lead','lead_contacte','prospect_qualifie','proposition_envoyee','lead_converti','non_retenu'];
+  const validIds = ['nouveau_lead','lead_contacte','prospect_qualifie','proposition_envoyee','lead_converti','non_retenu','client_actif'];
   if (validIds.includes(v.replace(/\s+/g,'_'))) return v.replace(/\s+/g,'_');
   // Négations d'abord
   if (v.includes('pas encore')) return 'nouveau_lead';
@@ -4212,7 +4211,7 @@ function buildAIContext() {
   ).join('\n') || 'Aucune activité.';
 
   const valPipeline = prospects.reduce((s,p) => s + (parseFloat(p.valeur)||0), 0);
-  const convertis   = prospects.filter(p => p.statut === 'lead_converti').length;
+  const convertis   = prospects.filter(p => p.statut === 'lead_converti' || p.statut === 'client_actif').length;
   const urgents     = prospects.filter(p => p.relance && p.relance < todayStr).length;
 
   return `Tu es l'assistant IA commercial de pylotIA. Tu aides l'utilisateur (un commercial/entrepreneur) à piloter son activité.
@@ -4705,7 +4704,7 @@ function renderPerformance() {
 
   // ── BLOC 2 : Prospects ────────────────────────────────
   const totalP  = prospects.length;
-  const converti = prospects.filter(p => p.statut==='lead_converti').length;
+  const converti = prospects.filter(p => p.statut==='lead_converti' || p.statut==='client_actif').length;
   const nonRet   = prospects.filter(p => p.statut==='non_retenu').length;
   const actifP   = totalP - converti - nonRet;
   const convRate = totalP > 0 ? Math.round(converti/totalP*100) : 0;
@@ -5076,6 +5075,7 @@ async function draftMessageProspect() {
       prospect_qualifie:'qualifié, intéressé mais pas encore en discussion d\'offre',
       proposition_envoyee:'proposition commerciale envoyée, en attente de retour',
       lead_converti:'en cours de conversion',
+      client_actif:'client actif',
       non_retenu:'n\'a pas retenu notre offre'
     }[p.statut] || p.statut;
     const sys = `Tu es l'assistant commercial de pylotIA. Rédige un message de relance court et personnalisé pour ce prospect.
@@ -5234,7 +5234,7 @@ function _gatherBriefUrgencies() {
 
   // Relances prospects en retard
   const overdue = (_prospects || []).filter(p =>
-    p.relance && p.relance < todayStr && p.statut !== 'lead_converti'
+    p.relance && p.relance < todayStr && p.statut !== 'lead_converti' && p.statut !== 'client_actif'
   );
   overdue.slice(0, 3).forEach(p => urgencies.push({
     text: `Relancer ${p.nom}${p.entreprise ? ' (' + p.entreprise + ')' : ''} — prévu le ${new Date(p.relance + 'T12:00:00').toLocaleDateString('fr-FR')}`,
@@ -5295,7 +5295,7 @@ async function _generateBriefIntro() {
   loader.style.display = 'block';
   try {
     const todayStr = _briefTodayStr();
-    const overdue  = (_prospects || []).filter(p => p.relance && p.relance < todayStr && p.statut !== 'lead_converti').length;
+    const overdue  = (_prospects || []).filter(p => p.relance && p.relance < todayStr && p.statut !== 'lead_converti' && p.statut !== 'client_actif').length;
     const rdvAuj   = (allAppointments || []).filter(a => a.date === todayStr && a.status !== 'terminé').length;
     const sys = `Tu es l'assistant de pylotIA. Génère UNE SEULE phrase d'accroche naturelle et motivante pour ouvrir un brief commercial quotidien. Données : ${(_contacts||[]).length} contacts, ${(_prospects||[]).length} prospects, ${overdue} relance${overdue>1?'s':''} en retard, ${rdvAuj} RDV aujourd'hui. Phrase directe, sans ponctuation finale excessive. Maximum 20 mots.`;
     const text = await callClaude(sys, [{ role:'user', content:'Génère l\'accroche.' }], 80);
