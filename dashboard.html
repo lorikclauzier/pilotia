@@ -2014,7 +2014,7 @@ function badgeHtml(statut) {
 }
 
 function openModal(id) {
-  editingId = id || null;
+  editingId = (id && id !== 'null' && id !== 'undefined') ? id : null;
   document.getElementById('modal-title').textContent = id ? 'Modifier le contact' : 'Nouveau contact';
   document.getElementById('modal-submit').textContent = id ? 'Enregistrer' : 'Ajouter';
   if (id) {
@@ -2077,7 +2077,7 @@ async function saveContact() {
   }
 }
 
-function editContact(id) { openModal(id); }
+function editContact(id) { if (id && id !== 'null') openModal(id); }
 
 // ─── CONTACT DRAWER ───────────────────────────────────────────
 let currentDrawerContactId = null;
