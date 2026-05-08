@@ -590,6 +590,11 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 #brief-fab{display:none;position:fixed;bottom:28px;right:28px;width:44px;height:44px;background:#2563eb;border:none;border-radius:50%;box-shadow:0 4px 16px rgba(37,99,235,0.35);cursor:pointer;z-index:900;align-items:center;justify-content:center;transition:box-shadow 0.2s,transform 0.15s;padding:0}
 #brief-fab.visible{display:flex}
 #brief-fab:hover{box-shadow:0 6px 24px rgba(37,99,235,0.5);transform:scale(1.07)}
+#brief-fab.pulsing{animation:fabPulse 1.8s ease-in-out infinite}
+@keyframes fabPulse{0%,100%{box-shadow:0 4px 16px rgba(37,99,235,0.35),0 0 0 0 rgba(37,99,235,0.4)}60%{box-shadow:0 4px 16px rgba(37,99,235,0.35),0 0 0 12px rgba(37,99,235,0)}}
+#onboarding-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,0.5);z-index:1200;align-items:center;justify-content:center}
+#onboarding-overlay.open{display:flex}
+#onboarding-modal{background:var(--dark2);border:1px solid var(--border2);border-radius:18px;padding:32px;width:460px;max-width:92vw;max-height:90vh;overflow-y:auto;position:relative}
 #brief-fab svg{width:22px;height:22px;flex-shrink:0}
 @media(max-width:768px){
   #brief-fab{bottom:72px;right:16px;width:40px;height:40px}
@@ -1160,6 +1165,22 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
         </div>
       </div>
 
+      <!-- Configuration IA -->
+      <div class="settings-card settings-full" id="settings-ia-card" style="display:none">
+        <div class="settings-card-title">Configuration IA <span style="font-size:9px;background:rgba(245,158,11,0.2);color:#fbbf24;padding:2px 5px;border-radius:4px;font-weight:700;margin-left:4px">PRO</span></div>
+        <div class="settings-card-sub">Personnalisez l'assistant IA selon votre métier</div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label class="form-label">Secteur d'activité</label>
+          <input class="form-input" id="settings-secteur" placeholder="Ex : Immobilier, BTP, Formation…">
+          <div style="font-size:11px;color:var(--text3);margin-top:5px">Injecté dans tous les appels IA pour adapter le vocabulaire métier</div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <button class="btn btn-blue" onclick="saveSettingsSecteur()">Enregistrer</button>
+          <button class="btn btn-ghost" onclick="relaunchOnboarding()" style="font-size:13px">↺ Relancer le tour guidé</button>
+        </div>
+        <div class="alert alert-success" id="settings-ia-success" style="display:none;margin-top:10px">Secteur enregistré ✓</div>
+      </div>
+
     </div>
   </div>
 
@@ -1657,7 +1678,9 @@ let activeConversation = null;
 // puis envoient la requête Supabase en arrière-plan.
 let _contacts  = [];   // miroir de la table contacts
 let _prospects = [];   // miroir de la table prospects
-let _plan      = 'free'; // plan lu depuis user_plans
+let _plan               = 'free'; // plan lu depuis user_plans
+let _onboardingCompleted = false;
+let _secteurActivite     = null;
 
 // ─── NORMALISATION DB → OBJET APP ────────────────────────────
 function normalizeContact(row) {
@@ -1714,11 +1737,13 @@ async function loadProspectsFromDB() {
 async function loadPlanFromDB() {
   const { data, error } = await supabaseClient
     .from('user_plans')
-    .select('plan')
+    .select('plan, onboarding_completed, secteur_activite')
     .eq('user_id', currentUser.id)
     .single();
-  // Si aucune ligne (nouvel utilisateur), on reste à 'free'
-  _plan = (error || !data) ? 'free' : (data.plan || 'free');
+  if (error || !data) { _plan = 'free'; return; }
+  _plan                = data.plan || 'free';
+  _onboardingCompleted = data.onboarding_completed || false;
+  _secteurActivite     = data.secteur_activite || null;
 }
 
 // ─── ÉCRITURE CONTACTS SUPABASE ───────────────────────────────
@@ -1942,6 +1967,14 @@ async function initApp() {
 
   // Masquer l'overlay de chargement
   document.getElementById('app-loader').style.display = 'none';
+
+  // Settings IA (Pro uniquement)
+  if (['pro','business'].includes(_plan)) {
+    const iaCard = document.getElementById('settings-ia-card');
+    if (iaCard) iaCard.style.display = 'block';
+    const settingsSecteur = document.getElementById('settings-secteur');
+    if (settingsSecteur && _secteurActivite) settingsSecteur.value = _secteurActivite;
+  }
 
   // Brief quotidien (non bloquant)
   initDailyBrief();
@@ -4321,8 +4354,9 @@ function buildAIContext() {
   const convertis   = prospects.filter(p => p.statut === 'lead_converti' || p.statut === 'client_actif').length;
   const urgents     = prospects.filter(p => p.relance && p.relance < todayStr).length;
 
+  const secteurLine = _secteurActivite ? `\nSecteur d'activité : ${_secteurActivite}` : '';
   return `Tu es l'assistant IA commercial de pylotIA. Tu aides l'utilisateur (un commercial/entrepreneur) à piloter son activité.
-Aujourd'hui : ${days[today.getDay()]} ${today.toLocaleDateString('fr-FR')}
+Aujourd'hui : ${days[today.getDay()]} ${today.toLocaleDateString('fr-FR')}${secteurLine}
 
 === CONTACTS (${contacts.length}) ===
 ${contactsStr}
@@ -5434,6 +5468,112 @@ function _renderBriefModal() {
   }
 }
 
+// ── ONBOARDING ────────────────────────────────────────────────
+function startOnboardingPulse() {
+  const fab = document.getElementById('brief-fab');
+  fab.classList.add('pulsing');
+}
+
+function onFabClick() {
+  const fab = document.getElementById('brief-fab');
+  if (fab.classList.contains('pulsing')) {
+    fab.classList.remove('pulsing');
+    openOnboardingModal();
+  } else {
+    openBriefModal();
+  }
+}
+
+async function openOnboardingModal() {
+  document.getElementById('ob-step-welcome').style.display = 'block';
+  document.getElementById('ob-step-secteur').style.display = 'none';
+  document.getElementById('ob-step-done').style.display    = 'none';
+  document.getElementById('onboarding-overlay').classList.add('open');
+  // Message IA d'accueil
+  const name = (currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || '').split(' ')[0];
+  const msgEl = document.getElementById('ob-welcome-msg');
+  try {
+    const text = await callClaude(
+      'Tu es l\'assistant IA de pylotIA, un CRM intelligent. Rédige un message d\'accueil chaleureux et motivant pour un nouvel utilisateur Pro. 3-4 phrases max. Mentionne que tu vas l\'aider à configurer son expérience pour son métier spécifique. Tutoiement. Pas de formule de politesse.',
+      [{ role: 'user', content: `Prénom de l\'utilisateur : ${name || 'l\'utilisateur'}` }], 150
+    );
+    msgEl.innerHTML = formatAiText(text);
+  } catch(e) {
+    msgEl.innerHTML = `Bonjour ${name ? name : ''} ! Je suis votre assistant IA pylotIA. Je vais vous aider à configurer votre espace pour qu'il soit parfaitement adapté à votre métier. Ça ne prend que 30 secondes.`;
+  }
+}
+
+async function skipOnboarding() {
+  document.getElementById('onboarding-overlay').classList.remove('open');
+  _onboardingCompleted = true;
+  await supabaseClient.from('user_plans')
+    .update({ onboarding_completed: true })
+    .eq('user_id', currentUser.id);
+}
+
+function startOnboardingConfig() {
+  document.getElementById('ob-step-welcome').style.display = 'none';
+  document.getElementById('ob-step-secteur').style.display = 'block';
+  document.getElementById('ob-secteur-input').focus();
+}
+
+async function submitSecteur() {
+  const raw = document.getElementById('ob-secteur-input').value.trim();
+  if (!raw) { document.getElementById('ob-secteur-input').focus(); return; }
+  const btn = document.getElementById('ob-secteur-submit');
+  const loader = document.getElementById('ob-secteur-loader');
+  btn.disabled = true;
+  loader.style.display = 'block';
+  let secteur = raw;
+  try {
+    secteur = await callClaude(
+      'Tu es un expert en classification de secteurs d\'activité. Normalise le secteur d\'activité décrit par l\'utilisateur en un terme court et professionnel (1-3 mots, commence par une majuscule). Exemples : "Immobilier", "BTP", "Formation professionnelle", "Santé", "Transport", "Restauration", "Artisanat". Réponds UNIQUEMENT avec le terme normalisé, rien d\'autre.',
+      [{ role: 'user', content: raw }], 30
+    );
+    secteur = secteur.trim().replace(/[".]/g, '');
+  } catch(e) { secteur = raw; }
+  _secteurActivite = secteur;
+  _onboardingCompleted = true;
+  await supabaseClient.from('user_plans')
+    .update({ onboarding_completed: true, secteur_activite: secteur })
+    .eq('user_id', currentUser.id);
+  loader.style.display = 'none';
+  btn.disabled = false;
+  document.getElementById('ob-step-secteur').style.display = 'none';
+  document.getElementById('ob-done-msg').textContent = `Secteur enregistré : ${secteur}. L'assistant IA va maintenant adapter ses réponses à votre activité.`;
+  document.getElementById('ob-step-done').style.display = 'block';
+  // Mettre à jour le champ dans Paramètres
+  const settingsInput = document.getElementById('settings-secteur');
+  if (settingsInput) settingsInput.value = secteur;
+}
+
+function finishOnboarding() {
+  document.getElementById('onboarding-overlay').classList.remove('open');
+}
+
+async function relaunchOnboarding() {
+  _onboardingCompleted = false;
+  await supabaseClient.from('user_plans')
+    .update({ onboarding_completed: false })
+    .eq('user_id', currentUser.id);
+  openOnboardingModal();
+}
+
+async function saveSettingsSecteur() {
+  const val = document.getElementById('settings-secteur').value.trim();
+  if (!val) return;
+  _secteurActivite = val;
+  const { error } = await supabaseClient.from('user_plans')
+    .update({ secteur_activite: val })
+    .eq('user_id', currentUser.id);
+  const successEl = document.getElementById('settings-ia-success');
+  if (!error) {
+    successEl.style.display = 'block';
+    setTimeout(() => successEl.style.display = 'none', 3000);
+  }
+}
+
+// ── BRIEF ─────────────────────────────────────────────────────
 function openBriefModal() {
   document.getElementById('brief-overlay').classList.add('open');
   _renderBriefModal();
@@ -5461,10 +5601,14 @@ function briefActionClick(idx) {
 }
 
 async function initDailyBrief() {
-  if (_briefAlreadyShownToday()) {
-    document.getElementById('brief-fab').classList.add('visible');
+  const fab = document.getElementById('brief-fab');
+  fab.classList.add('visible');
+  // Onboarding Pro/Business non complété → pulse + interception
+  if (['pro','business'].includes(_plan) && !_onboardingCompleted) {
+    startOnboardingPulse();
     return;
   }
+  if (_briefAlreadyShownToday()) return;
   await new Promise(r => setTimeout(r, 1500));
   openBriefModal();
 }
@@ -5546,8 +5690,54 @@ async function initDailyBrief() {
   </div>
 </div>
 
+<!-- ONBOARDING MODAL -->
+<div id="onboarding-overlay" onclick="if(event.target===this)skipOnboarding()">
+  <div id="onboarding-modal" onclick="event.stopPropagation()">
+    <!-- Étape 1 : Accueil -->
+    <div id="ob-step-welcome">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;background:#2563eb;border-radius:50%;flex-shrink:0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09z"/><path d="M18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/></svg>
+        </span>
+        <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:#0f172a">Bienvenue dans pylotIA Pro ✦</div>
+      </div>
+      <div id="ob-welcome-msg" style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:24px">
+        <div style="display:flex;justify-content:center;padding:16px 0"><div class="ai-typing-wrap"><span></span><span></span><span></span></div></div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button class="btn btn-ghost" onclick="skipOnboarding()" style="font-size:13px">Pas maintenant</button>
+        <button class="btn btn-blue" onclick="startOnboardingConfig()">Commencer la configuration →</button>
+      </div>
+    </div>
+    <!-- Étape 2 : Secteur -->
+    <div id="ob-step-secteur" style="display:none">
+      <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#0f172a;margin-bottom:8px">Votre secteur d'activité</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:18px">Cette information permet à l'IA d'adapter son vocabulaire et ses conseils à votre métier.</div>
+      <div class="form-group">
+        <label class="form-label">Décrivez votre activité en quelques mots</label>
+        <input class="form-input" id="ob-secteur-input" placeholder="Ex : agent immobilier, artisan plombier, formateur RH…" style="font-size:14px">
+      </div>
+      <div id="ob-secteur-loader" style="display:none;text-align:center;padding:12px 0">
+        <div class="ai-typing-wrap" style="margin:0 auto"><span></span><span></span><span></span></div>
+        <div style="font-size:12px;color:var(--text3);margin-top:8px">L'IA normalise votre secteur…</div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:6px">
+        <button class="btn btn-ghost" onclick="skipOnboarding()" style="font-size:13px">Ignorer</button>
+        <button class="btn btn-blue" id="ob-secteur-submit" onclick="submitSecteur()">Valider →</button>
+      </div>
+    </div>
+    <!-- Étape 3 : Confirmation -->
+    <div id="ob-step-done" style="display:none;text-align:center;padding:12px 0">
+      <div style="font-size:40px;margin-bottom:14px">✦</div>
+      <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#0f172a;margin-bottom:10px">Configuration terminée !</div>
+      <div id="ob-done-msg" style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:24px"></div>
+      <button class="btn btn-blue" onclick="finishOnboarding()">Accéder à mon dashboard →</button>
+    </div>
+  </div>
+</div>
+
 <!-- FAB Brief -->
-<button id="brief-fab" onclick="openBriefModal()" title="Brief du jour">
+<button id="brief-fab" onclick="onFabClick()" title="Brief du jour">
   <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09z"/><path d="M18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/></svg>
 </button>
 
