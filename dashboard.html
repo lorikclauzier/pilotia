@@ -5507,6 +5507,16 @@ const TOUR_STEPS = [
   { targetId: 'nav-assistant',   section: 'assistant',   label: 'Assistant IA'     },
 ];
 
+const TOUR_NOTES = {
+  'nav-contacts':    'Cette section affichera vos contacts une fois les premières fiches ajoutées.',
+  'nav-agenda':      'Votre calendrier affichera les RDV dès que le premier rendez-vous sera créé.',
+  'nav-activite':    'L\'historique se remplira automatiquement avec toutes vos actions dans le CRM.',
+  'nav-performance': 'Les statistiques s\'alimentent au fur et à mesure de votre activité.',
+  'nav-postvente':   'Le suivi post-vente apparaîtra dès que des rendez-vous seront planifiés.',
+  'nav-messages':    'Vos campagnes s\'afficheront ici une fois la première campagne créée.',
+  'nav-prospection': 'Votre pipeline apparaîtra ici dès que vous aurez ajouté vos premiers prospects.',
+};
+
 const TOUR_FALLBACKS = {
   'brief-fab':       'Votre assistant ouvre ici le brief quotidien personnalisé. Chaque matin, l\'IA analyse vos données et vous dit quoi faire en priorité.',
   'nav-dashboard':   'Vue d\'ensemble de votre activité : contacts, pipeline, rendez-vous du jour. Votre tableau de bord en temps réel.',
@@ -5535,6 +5545,9 @@ async function startTour(fromStep) {
     const step = TOUR_STEPS[_tourStep];
     document.getElementById('tour-step-text').textContent =
       (_tourTexts && _tourTexts[step.targetId]) || TOUR_FALLBACKS[step.targetId] || '';
+    // Re-positionner maintenant que la vraie hauteur est connue
+    const el = document.getElementById(step.targetId);
+    if (el) _positionBubble(el.getBoundingClientRect());
   });
   await tourGoTo(fromStep);
 }
@@ -5574,6 +5587,10 @@ async function tourGoTo(stepIndex) {
   // Bubble content
   document.getElementById('tour-step-label').textContent   = step.label;
   document.getElementById('tour-step-counter').textContent = `${stepIndex + 1} / ${TOUR_STEPS.length}`;
+  const noteEl = document.getElementById('tour-step-note');
+  const note = TOUR_NOTES[step.targetId];
+  noteEl.textContent = note || '';
+  noteEl.style.display = note ? 'block' : 'none';
   if (_tourTexts !== null) {
     document.getElementById('tour-step-loader').style.display = 'none';
     document.getElementById('tour-step-text').style.display   = 'block';
@@ -5633,27 +5650,46 @@ function _drawSpotlight(rect, pad = 12) {
 }
 
 function _positionBubble(rect, pad = 12) {
-  const bubble  = document.getElementById('tour-bubble');
-  const bw = bubble.offsetWidth || 280;
-  const bh = bubble.offsetHeight || 200;
+  const bubble = document.getElementById('tour-bubble');
+  const bw = 280;
+  // Mesure la vraie hauteur APRÈS rendu — sinon prend 240 comme plancher
+  const bh = Math.max(bubble.offsetHeight || 0, 240);
   const mg = 16;
-  const sp = { l: rect.left - pad, r: rect.right + pad, t: rect.top - pad, b: rect.bottom + pad, cy: (rect.top + rect.bottom) / 2, cx: (rect.left + rect.right) / 2 };
-  let left, top;
-  if (sp.r + mg + bw <= window.innerWidth - mg) {
-    left = sp.r + mg;
-    top  = Math.max(mg, Math.min(sp.cy - bh / 2, window.innerHeight - bh - mg));
-  } else if (sp.l - mg - bw >= mg) {
-    left = sp.l - mg - bw;
-    top  = Math.max(mg, Math.min(sp.cy - bh / 2, window.innerHeight - bh - mg));
-  } else if (sp.b + mg + bh <= window.innerHeight - mg) {
-    left = Math.max(mg, Math.min(sp.cx - bw / 2, window.innerWidth - bw - mg));
-    top  = sp.b + mg;
-  } else {
-    left = Math.max(mg, Math.min(sp.cx - bw / 2, window.innerWidth - bw - mg));
-    top  = Math.max(mg, sp.t - mg - bh);
-  }
-  bubble.style.left = left + 'px';
-  bubble.style.top  = top  + 'px';
+  const sp = {
+    l: rect.left  - pad, r: rect.right  + pad,
+    t: rect.top   - pad, b: rect.bottom + pad,
+    cy: (rect.top  + rect.bottom) / 2,
+    cx: (rect.left + rect.right)  / 2
+  };
+
+  // Zone de l'élément ciblé
+  const isLeft   = sp.cx < window.innerWidth  * 0.45; // navbar gauche
+  const isRight  = sp.cx > window.innerWidth  * 0.55; // FAB droite
+  const isBottom = sp.cy > window.innerHeight * 0.65; // bas de page
+
+  const tryRight = () => sp.r + mg + bw <= window.innerWidth - mg;
+  const tryLeft  = () => sp.l - mg - bw >= mg;
+  const tryBelow = () => sp.b + mg + bh <= window.innerHeight - mg;
+  const tryAbove = () => sp.t - mg - bh >= mg;
+
+  const placeRight = () => ({ left: sp.r + mg, top: Math.max(mg, Math.min(sp.cy - bh/2, window.innerHeight - bh - mg)) });
+  const placeLeft  = () => ({ left: sp.l - mg - bw, top: Math.max(mg, Math.min(sp.cy - bh/2, window.innerHeight - bh - mg)) });
+  const placeBelow = () => ({ left: Math.max(mg, Math.min(sp.cx - bw/2, window.innerWidth - bw - mg)), top: sp.b + mg });
+  const placeAbove = () => ({ left: Math.max(mg, Math.min(sp.cx - bw/2, window.innerWidth - bw - mg)), top: sp.t - mg - bh });
+
+  let pos;
+  if      (isLeft   && tryRight()) pos = placeRight();
+  else if (isRight  && tryLeft())  pos = placeLeft();
+  else if (isBottom && tryAbove()) pos = placeAbove();
+  else if (tryRight())             pos = placeRight();
+  else if (tryBelow())             pos = placeBelow();
+  else if (tryLeft())              pos = placeLeft();
+  else                             pos = placeAbove();
+
+  pos.top  = Math.max(mg, pos.top);
+  pos.left = Math.max(mg, Math.min(pos.left, window.innerWidth - bw - mg));
+  bubble.style.left = pos.left + 'px';
+  bubble.style.top  = pos.top  + 'px';
 }
 
 function tourNext() {
@@ -5967,6 +6003,7 @@ async function initDailyBrief() {
     <span class="tour-counter" id="tour-step-counter"></span>
   </div>
   <div class="tour-text" id="tour-step-text" style="display:none"></div>
+  <div id="tour-step-note" style="display:none;margin-top:8px;margin-bottom:4px;padding:7px 10px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:8px;font-size:11px;color:var(--text3);line-height:1.5"></div>
   <div class="tour-loader" id="tour-step-loader">
     <div class="ai-typing-wrap"><span></span><span></span><span></span></div>
     <span>L'IA personnalise…</span>
