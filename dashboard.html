@@ -5650,46 +5650,53 @@ function _drawSpotlight(rect, pad = 12) {
 }
 
 function _positionBubble(rect, pad = 12) {
-  const bubble = document.getElementById('tour-bubble');
-  const bw = 280;
-  // Mesure la vraie hauteur APRÈS rendu — sinon prend 240 comme plancher
-  const bh = Math.max(bubble.offsetHeight || 0, 240);
-  const mg = 16;
-  const sp = {
-    l: rect.left  - pad, r: rect.right  + pad,
-    t: rect.top   - pad, b: rect.bottom + pad,
-    cy: (rect.top  + rect.bottom) / 2,
-    cx: (rect.left + rect.right)  / 2
-  };
+  const bubble  = document.getElementById('tour-bubble');
+  const step    = TOUR_STEPS[_tourStep];
+  const isNavStep = step.targetId.startsWith('nav-');
+  const isFab     = step.targetId === 'brief-fab';
 
-  // Zone de l'élément ciblé
-  const isLeft   = sp.cx < window.innerWidth  * 0.45; // navbar gauche
-  const isRight  = sp.cx > window.innerWidth  * 0.55; // FAB droite
-  const isBottom = sp.cy > window.innerHeight * 0.65; // bas de page
-
-  const tryRight = () => sp.r + mg + bw <= window.innerWidth - mg;
-  const tryLeft  = () => sp.l - mg - bw >= mg;
-  const tryBelow = () => sp.b + mg + bh <= window.innerHeight - mg;
-  const tryAbove = () => sp.t - mg - bh >= mg;
-
-  const placeRight = () => ({ left: sp.r + mg, top: Math.max(mg, Math.min(sp.cy - bh/2, window.innerHeight - bh - mg)) });
-  const placeLeft  = () => ({ left: sp.l - mg - bw, top: Math.max(mg, Math.min(sp.cy - bh/2, window.innerHeight - bh - mg)) });
-  const placeBelow = () => ({ left: Math.max(mg, Math.min(sp.cx - bw/2, window.innerWidth - bw - mg)), top: sp.b + mg });
-  const placeAbove = () => ({ left: Math.max(mg, Math.min(sp.cx - bw/2, window.innerWidth - bw - mg)), top: sp.t - mg - bh });
-
-  let pos;
-  if      (isLeft   && tryRight()) pos = placeRight();
-  else if (isRight  && tryLeft())  pos = placeLeft();
-  else if (isBottom && tryAbove()) pos = placeAbove();
-  else if (tryRight())             pos = placeRight();
-  else if (tryBelow())             pos = placeBelow();
-  else if (tryLeft())              pos = placeLeft();
-  else                             pos = placeAbove();
-
-  pos.top  = Math.max(mg, pos.top);
-  pos.left = Math.max(mg, Math.min(pos.left, window.innerWidth - bw - mg));
-  bubble.style.left = pos.left + 'px';
-  bubble.style.top  = pos.top  + 'px';
+  if (isNavStep) {
+    // Bulle dans la sidebar (220px de large) — ne couvre jamais le contenu principal
+    bubble.style.width = '196px';
+    // Ancrer en bas de la sidebar, juste au-dessus du user-info/logout
+    const userInfo = document.querySelector('.user-info');
+    const anchor   = userInfo ? userInfo.getBoundingClientRect() : null;
+    const bh = Math.max(bubble.offsetHeight || 0, 200);
+    let top;
+    if (anchor && anchor.top - 12 - bh > rect.bottom + 8) {
+      // Espace sous l'élément ciblé et avant user-info → coller en bas de sidebar
+      top = anchor.top - 12 - bh;
+    } else if (rect.top - 12 - bh > 60) {
+      // Pas de place dessous → mettre au-dessus de l'élément ciblé
+      top = rect.top - 12 - bh;
+    } else {
+      // Fallback : sous l'élément ciblé
+      top = rect.bottom + 12;
+    }
+    bubble.style.left = '12px';
+    bubble.style.top  = Math.max(8, top) + 'px';
+  } else if (isFab) {
+    // FAB bas-droite → bulle à gauche et au-dessus
+    bubble.style.width = '260px';
+    const bw = 260;
+    const bh = Math.max(bubble.offsetHeight || 0, 180);
+    const left = Math.max(12, rect.left - pad - 12 - bw);
+    const top  = Math.max(12, rect.top  - bh - 12);
+    bubble.style.left = left + 'px';
+    bubble.style.top  = top  + 'px';
+  } else {
+    // Générique : à droite si possible, sinon dessous
+    bubble.style.width = '280px';
+    const bw = 280, bh = Math.max(bubble.offsetHeight || 0, 200), mg = 16;
+    const sp = { r: rect.right + pad, b: rect.bottom + pad, cy: (rect.top + rect.bottom) / 2 };
+    if (sp.r + mg + bw <= window.innerWidth - mg) {
+      bubble.style.left = (sp.r + mg) + 'px';
+      bubble.style.top  = Math.max(mg, Math.min(sp.cy - bh / 2, window.innerHeight - bh - mg)) + 'px';
+    } else {
+      bubble.style.left = Math.max(mg, (rect.left + rect.right) / 2 - bw / 2) + 'px';
+      bubble.style.top  = (sp.b + mg) + 'px';
+    }
+  }
 }
 
 function tourNext() {
