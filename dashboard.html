@@ -3579,7 +3579,7 @@ async function computeKbScoresAI() {
     valeur: p.valeur || null, relance: p.relance || null,
     note: p.note ? p.note.substring(0, 120) : null
   }));
-  const sys = `Tu es un assistant CRM expert en scoring commercial. Pour chaque prospect, attribue exactement un score parmi: "chaud" (conversion probable dans 15 jours — proposition envoyée, relance urgente, valeur élevée, note détaillée), "tiede" (intéressé mais pas encore prêt — qualifié, contacté, relance prévue), "froid" (peu actif — nouveau lead sans engagement ni relance). RÈGLE IMPÉRATIVE : différencie les prospects — ne mets pas tous le même score. Réponds UNIQUEMENT avec un JSON valide : [{"id":"...","score":"chaud|tiede|froid"}]. Zéro texte en dehors du JSON.`;
+  const sys = `Tu es un assistant CRM expert en scoring commercial. Pour chaque prospect, attribue exactement un score parmi: "chaud" (conversion probable dans 15 jours — proposition envoyée, relance urgente, valeur élevée, note détaillée), "tiede" (intéressé mais pas encore prêt — qualifié, contacté, relance prévue), "froid" (peu actif — nouveau lead sans engagement ni relance). RÈGLE IMPÉRATIVE : différencie les prospects — ne mets pas tous le même score. Réponds UNIQUEMENT avec un JSON valide : [{"id":"...","score":"chaud|tiede|froid"}]. Zéro texte en dehors du JSON.` + _secteurCtx();
   try {
     const resp = await callClaude(sys, [{ role: 'user', content: `Prospects: ${JSON.stringify(list)}` }], 400);
     const match = resp.match(/\[[\s\S]*?\]/);
@@ -4349,6 +4349,11 @@ function switchAiTab(name, btn) {
   btn.classList.add('active');
 }
 
+function _secteurCtx() {
+  if (!_secteurActivite) return '';
+  return `\n\nSecteur d'activité de l'utilisateur : ${_secteurActivite}.\nComprendre et utiliser le vocabulaire technique spécifique à ce secteur (abréviations métier, termes techniques, processus, produits propres au domaine). Si une note contient un terme inconnu, l'interpréter comme un terme métier du secteur — ne jamais l'ignorer.`;
+}
+
 function buildAIContext() {
   const contacts  = getContacts();
   const prospects = getProspects();
@@ -4386,9 +4391,8 @@ function buildAIContext() {
   const convertis   = prospects.filter(p => p.statut === 'lead_converti' || p.statut === 'client_actif').length;
   const urgents     = prospects.filter(p => p.relance && p.relance < todayStr).length;
 
-  const secteurLine = _secteurActivite ? `\nSecteur d'activité : ${_secteurActivite}` : '';
   return `Tu es l'assistant IA commercial de pylotIA. Tu aides l'utilisateur (un commercial/entrepreneur) à piloter son activité.
-Aujourd'hui : ${days[today.getDay()]} ${today.toLocaleDateString('fr-FR')}${secteurLine}
+Aujourd'hui : ${days[today.getDay()]} ${today.toLocaleDateString('fr-FR')}${_secteurCtx()}
 
 === CONTACTS (${contacts.length}) ===
 ${contactsStr}
@@ -5217,7 +5221,7 @@ RÈGLES :
 - Adapte le ton : si peu de données → prise de contact ; si historique → suivi précis
 - Pas de placeholder [À compléter] — le message doit être complet
 - Pas de signature ni formule de politesse finale
-- Termine par une question ou un appel à l'action précis`;
+- Termine par une question ou un appel à l'action précis` + _secteurCtx();
     const text = await callClaude(sys, [{role:'user',content:'Rédige le message.'}], 300);
     result.innerHTML = _buildMsgResult(text, 'drawer-msg-ta');
   } catch(e) { result.innerHTML = _aiAnalyseError(e.message); }
@@ -5268,7 +5272,7 @@ RÈGLES :
 - Adapte au contexte pipeline — si proposition envoyée : relance l'offre spécifiquement
 - Pas de placeholder [À compléter] — le message doit être complet
 - Pas de signature ni formule de politesse finale
-- Termine par une question ou un appel à l'action précis`;
+- Termine par une question ou un appel à l'action précis` + _secteurCtx();
     const text = await callClaude(sys, [{role:'user',content:'Rédige le message.'}], 300);
     section.innerHTML = _buildMsgResult(text, 'prosp-msg-ta');
   } catch(e) { section.innerHTML = _aiAnalyseError(e.message); }
@@ -5319,7 +5323,7 @@ Réponds UNIQUEMENT avec ces 2 blocs :
 **Synthèse :** (2 lignes max) qui est ce contact et où on en est
 **À faire :** 1 action concrète et précise à prioriser maintenant
 
-Direct, sans formule de politesse, sans répéter les données brutes. Si pas assez de données, dis-le en 1 phrase.`;
+Direct, sans formule de politesse, sans répéter les données brutes. Si pas assez de données, dis-le en 1 phrase.` + _secteurCtx();
 
     const text = await callClaude(sys, [{ role: 'user', content: 'Analyse ce contact.' }], 250);
     result.innerHTML = `<div class="ai-analyse-box">${_aiAnalyseHeader()}${formatAiText(text)}</div>`;
@@ -5370,7 +5374,7 @@ Réponds UNIQUEMENT avec ces 2 blocs :
 **Synthèse :** (2 lignes max) où en est ce prospect dans le cycle de vente
 **À faire :** 1 action concrète et précise pour le faire avancer
 
-Direct, sans formule de politesse, sans répéter les données brutes. Si pas assez de données, dis-le en 1 phrase.`;
+Direct, sans formule de politesse, sans répéter les données brutes. Si pas assez de données, dis-le en 1 phrase.` + _secteurCtx();
 
     const text = await callClaude(sys, [{ role: 'user', content: 'Analyse ce prospect.' }], 250);
     section.innerHTML = `<div class="ai-analyse-box">${_aiAnalyseHeader()}${formatAiText(text)}</div>`;
@@ -5470,7 +5474,7 @@ async function _generateBriefIntro() {
     const todayStr = _briefTodayStr();
     const overdue  = (_prospects || []).filter(p => p.relance && p.relance < todayStr && p.statut !== 'lead_converti' && p.statut !== 'client_actif').length;
     const rdvAuj   = (allAppointments || []).filter(a => a.date === todayStr && a.status !== 'terminé').length;
-    const sys = `Tu es l'assistant de pylotIA. Génère UNE SEULE phrase d'accroche naturelle et motivante pour ouvrir un brief commercial quotidien. Données : ${(_contacts||[]).length} contacts, ${(_prospects||[]).length} prospects, ${overdue} relance${overdue>1?'s':''} en retard, ${rdvAuj} RDV aujourd'hui. Phrase directe, sans ponctuation finale excessive. Maximum 20 mots.`;
+    const sys = `Tu es l'assistant de pylotIA. Génère UNE SEULE phrase d'accroche naturelle et motivante pour ouvrir un brief commercial quotidien. Données : ${(_contacts||[]).length} contacts, ${(_prospects||[]).length} prospects, ${overdue} relance${overdue>1?'s':''} en retard, ${rdvAuj} RDV aujourd'hui. Phrase directe, sans ponctuation finale excessive. Maximum 20 mots.` + _secteurCtx();
     const text = await callClaude(sys, [{ role:'user', content:'Génère l\'accroche.' }], 80);
     const result = text.trim().replace(/\.$/, '') + '.';
     localStorage.setItem(cacheKey, result);
