@@ -3448,12 +3448,11 @@ function kbLocalScore(p) {
 function kbScoreBadge(p) {
   const score  = p.score_manuel || _kbScores.get(p.id) || kbLocalScore(p);
   const manual = !!p.score_manuel;
-  const icons  = { chaud: '▲', tiede: '◆', froid: '▽' };
   const labels = { chaud: 'Prospect chaud', tiede: 'Prospect tiède', froid: 'Prospect froid' };
-  const lock   = manual ? `<span style="font-size:7px;opacity:0.8;margin-left:2px">🔒</span>` : '';
-  return `<span class="kb-score ${score}" title="${labels[score]}${manual ? ' (score manuel)' : ''}"
-    style="font-size:8px;color:white;font-weight:700;line-height:1;cursor:pointer;display:inline-flex;align-items:center;gap:1px"
-    onclick="event.stopPropagation();openScoreMenu(event,'${p.id}')">${icons[score]}${lock}</span>`;
+  const ring   = manual ? 'box-shadow:0 0 0 2px white,0 0 0 3.5px var(--border2);' : '';
+  return `<span class="kb-score ${score}" title="${labels[score]}${manual ? ' (score fixé manuellement)' : ''}"
+    style="cursor:pointer;${ring}"
+    onclick="event.stopPropagation();openScoreMenu(event,'${p.id}')"></span>`;
 }
 
 function openScoreMenu(e, prospId) {
@@ -3465,23 +3464,26 @@ function openScoreMenu(e, prospId) {
   menu.style.cssText = `position:fixed;z-index:9999;background:var(--dark2);border:1px solid var(--border2);
     border-radius:10px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,0.15);min-width:140px`;
   const options = [
-    { score: 'chaud', label: '🔴 Chaud', color: '#ef4444' },
-    { score: 'tiede', label: '🟠 Tiède', color: '#f97316' },
-    { score: 'froid', label: '⚫ Froid', color: '#64748b' },
+    { score: 'chaud', label: 'Chaud', color: '#2563eb' },
+    { score: 'tiede', label: 'Tiède', color: '#f97316' },
+    { score: 'froid', label: 'Froid', color: '#64748b' },
   ];
   if (p.score_manuel) {
     options.push({ score: null, label: '↺ Auto', color: 'var(--text3)' });
   }
-  menu.innerHTML = options.map(o => `
-    <div onclick="setScoreManuel('${prospId}',${o.score ? `'${o.score}'` : 'null'},this.parentNode)"
+  menu.innerHTML = options.map(o => {
+    const dot = o.score ? `<span style="width:9px;height:9px;border-radius:50%;background:${o.color};display:inline-block;flex-shrink:0"></span>` : `<span style="font-size:12px;line-height:1">↺</span>`;
+    const active = o.score === p.score_manuel;
+    return `<div onclick="setScoreManuel('${prospId}',${o.score ? `'${o.score}'` : 'null'},this.parentNode)"
       style="padding:7px 10px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;
-             color:${o.score === p.score_manuel ? 'var(--blue)' : o.color};
-             background:${o.score === p.score_manuel ? 'rgba(59,130,246,0.08)' : 'transparent'};
-             transition:background 0.15s"
+             color:${active ? 'var(--blue)' : 'var(--text)'};
+             background:${active ? 'rgba(59,130,246,0.08)' : 'transparent'};
+             display:flex;align-items:center;gap:8px;transition:background 0.15s"
       onmouseover="this.style.background='rgba(0,0,0,0.04)'"
-      onmouseout="this.style.background='${o.score === p.score_manuel ? 'rgba(59,130,246,0.08)' : 'transparent'}'">
-      ${o.label}${o.score === p.score_manuel ? ' ✓' : ''}
-    </div>`).join('');
+      onmouseout="this.style.background='${active ? 'rgba(59,130,246,0.08)' : 'transparent'}'">
+      ${dot}<span>${o.label}${active ? ' ✓' : ''}</span>
+    </div>`;
+  }).join('');
   // Position sous la pastille
   const rect = e.target.getBoundingClientRect();
   menu.style.top  = (rect.bottom + 4) + 'px';
