@@ -599,6 +599,22 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 #onboarding-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,0.5);z-index:1200;align-items:center;justify-content:center}
 #onboarding-overlay.open{display:flex}
 #onboarding-modal{background:var(--dark2);border:1px solid var(--border2);border-radius:18px;padding:32px;width:460px;max-width:92vw;max-height:90vh;overflow-y:auto;position:relative}
+/* ── TOUR GUIDÉ ── */
+#tour-canvas{position:fixed;inset:0;z-index:4000;pointer-events:none;display:none}
+#tour-bubble{position:fixed;z-index:4001;background:var(--dark2);border:1px solid var(--border2);border-radius:16px;padding:20px 20px 16px;width:280px;box-shadow:0 16px 48px rgba(15,23,42,0.2);display:none}
+#tour-quit{position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;line-height:1;padding:3px 6px;border-radius:5px}
+#tour-quit:hover{background:var(--dark3);color:var(--text)}
+.tour-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-right:20px}
+.tour-label{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#0f172a}
+.tour-counter{font-size:11px;color:var(--text3);background:var(--dark3);padding:2px 8px;border-radius:20px;white-space:nowrap}
+.tour-text{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:14px;min-height:58px}
+.tour-loader{display:flex;align-items:center;gap:8px;margin-bottom:14px;min-height:58px;color:var(--text3);font-size:12px}
+.tour-nav{display:flex;gap:8px}
+.tour-btn-prev{flex:1;padding:7px 0;background:transparent;border:1px solid var(--border2);border-radius:8px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.15s}
+.tour-btn-prev:hover{background:var(--dark3)}
+.tour-btn-prev:disabled{opacity:0.3;cursor:default}
+.tour-btn-next{flex:2;padding:7px 0;background:#2563eb;border:none;border-radius:8px;font-size:12px;font-weight:600;color:#fff;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.15s}
+.tour-btn-next:hover{background:#1d4ed8}
 #brief-fab svg{width:22px;height:22px;flex-shrink:0}
 @media(max-width:768px){
   #brief-fab{bottom:72px;right:16px;width:40px;height:40px}
@@ -1741,13 +1757,14 @@ async function loadProspectsFromDB() {
 async function loadPlanFromDB() {
   const { data, error } = await supabaseClient
     .from('user_plans')
-    .select('plan, onboarding_completed, secteur_activite')
+    .select('plan, onboarding_completed, secteur_activite, tour_etape_courante')
     .eq('user_id', currentUser.id)
     .single();
   if (error || !data) { _plan = 'free'; return; }
   _plan                = data.plan || 'free';
   _onboardingCompleted = data.onboarding_completed || false;
   _secteurActivite     = data.secteur_activite || null;
+  _tourStep            = data.tour_etape_courante || 0;
 }
 
 // ─── ÉCRITURE CONTACTS SUPABASE ───────────────────────────────
@@ -5472,6 +5489,203 @@ function _renderBriefModal() {
   }
 }
 
+// ── TOUR GUIDÉ ────────────────────────────────────────────────
+let _tourActive = false;
+let _tourStep   = 0;
+let _tourTexts  = null;
+
+const TOUR_STEPS = [
+  { targetId: 'brief-fab',       section: null,          label: 'Brief quotidien'  },
+  { targetId: 'nav-dashboard',   section: 'dashboard',   label: 'Dashboard'        },
+  { targetId: 'nav-contacts',    section: 'contacts',    label: 'Contacts'         },
+  { targetId: 'nav-agenda',      section: 'agenda',      label: 'Agenda'           },
+  { targetId: 'nav-activite',    section: 'activite',    label: 'Activité'         },
+  { targetId: 'nav-performance', section: 'performance', label: 'Performance'      },
+  { targetId: 'nav-postvente',   section: 'postvente',   label: 'Post-vente'       },
+  { targetId: 'nav-messages',    section: 'messages',    label: 'Campagnes'        },
+  { targetId: 'nav-prospection', section: 'prospection', label: 'Pipeline Kanban'  },
+  { targetId: 'nav-assistant',   section: 'assistant',   label: 'Assistant IA'     },
+];
+
+const TOUR_FALLBACKS = {
+  'brief-fab':       'Votre assistant ouvre ici le brief quotidien personnalisé. Chaque matin, l\'IA analyse vos données et vous dit quoi faire en priorité.',
+  'nav-dashboard':   'Vue d\'ensemble de votre activité : contacts, pipeline, rendez-vous du jour. Votre tableau de bord en temps réel.',
+  'nav-contacts':    'Gérez votre base clients : ajoutez, filtrez et importez vos contacts. Chaque fiche centralise toutes les informations clés.',
+  'nav-agenda':      'Planifiez vos rendez-vous directement dans le CRM. Visualisation par jour ou par liste des prochains RDV.',
+  'nav-activite':    'Historique complet de vos actions : ajouts de contacts, modifications, relances. Gardez une trace de tout.',
+  'nav-performance': 'Tableaux de bord et statistiques pour piloter votre activité. Taux de conversion, pipeline, volume de contacts.',
+  'nav-postvente':   'Suivi de vos clients après conversion : relances planifiées, statut des RDV. Fidélisez et évitez les oublis.',
+  'nav-messages':    'Organisez vos séquences de relance en campagnes ciblées. Gérez vos contacts par groupe et suivez leur progression.',
+  'nav-prospection': 'Pipeline Kanban : visualisez vos prospects étape par étape. Glissez-déposez les cards pour faire avancer les deals.',
+  'nav-assistant':   'Votre copilote IA : posez vos questions en langage naturel, obtenez des analyses et conseils personnalisés.',
+};
+
+async function startTour(fromStep) {
+  fromStep = Math.max(0, Math.min(fromStep || 0, TOUR_STEPS.length - 1));
+  _tourActive = true;
+  _tourStep   = fromStep;
+  document.getElementById('tour-canvas').style.display = 'block';
+  document.getElementById('tour-bubble').style.display = 'block';
+  document.getElementById('tour-step-text').style.display   = 'none';
+  document.getElementById('tour-step-loader').style.display = 'flex';
+  // Pré-générer tous les textes (non bloquant — affichés dès prêts)
+  _generateTourTexts().then(() => {
+    document.getElementById('tour-step-loader').style.display = 'none';
+    document.getElementById('tour-step-text').style.display   = 'block';
+    const step = TOUR_STEPS[_tourStep];
+    document.getElementById('tour-step-text').textContent =
+      (_tourTexts && _tourTexts[step.targetId]) || TOUR_FALLBACKS[step.targetId] || '';
+  });
+  await tourGoTo(fromStep);
+}
+
+async function _generateTourTexts() {
+  _tourTexts = {};
+  const secteur = _secteurActivite || 'commerce';
+  const labels  = TOUR_STEPS.map(s => s.label).join(', ');
+  const sys = `Tu es l'assistant pylotIA. Pour un professionnel du secteur "${secteur}", génère une description courte (2-3 phrases max, concrète, adaptée au métier) pour chaque fonctionnalité CRM listée. Réponds UNIQUEMENT avec un JSON valide : [{"label":"...","text":"..."}]. Zéro texte en dehors du JSON.`;
+  try {
+    const resp = await callClaude(sys, [{ role:'user', content:`Fonctionnalités : ${labels}` }], 750);
+    const m = resp.match(/\[[\s\S]*?\]/);
+    if (m) JSON.parse(m[0]).forEach(item => {
+      const step = TOUR_STEPS.find(s => s.label === item.label);
+      if (step && item.text) _tourTexts[step.targetId] = item.text;
+    });
+  } catch(e) { /* utilise les fallbacks */ }
+}
+
+async function tourGoTo(stepIndex) {
+  if (stepIndex < 0 || stepIndex >= TOUR_STEPS.length) return;
+  _tourStep = stepIndex;
+  const step = TOUR_STEPS[stepIndex];
+
+  // Navigation section (bypass plan gating)
+  if (step.section) {
+    _tourShowSection(step.section);
+    await new Promise(r => setTimeout(r, 220));
+  }
+
+  const el = document.getElementById(step.targetId);
+  if (!el) { if (stepIndex < TOUR_STEPS.length - 1) tourNext(); return; }
+
+  const rect = el.getBoundingClientRect();
+  _drawSpotlight(rect);
+
+  // Bubble content
+  document.getElementById('tour-step-label').textContent   = step.label;
+  document.getElementById('tour-step-counter').textContent = `${stepIndex + 1} / ${TOUR_STEPS.length}`;
+  if (_tourTexts !== null) {
+    document.getElementById('tour-step-loader').style.display = 'none';
+    document.getElementById('tour-step-text').style.display   = 'block';
+    document.getElementById('tour-step-text').textContent =
+      (_tourTexts[step.targetId]) || TOUR_FALLBACKS[step.targetId] || '';
+  }
+  document.getElementById('tour-prev-btn').disabled = stepIndex === 0;
+  document.getElementById('tour-next-btn').textContent = stepIndex === TOUR_STEPS.length - 1 ? 'Terminer ✓' : 'Suivant →';
+
+  _positionBubble(rect);
+
+  // Sauvegarde progression
+  supabaseClient.from('user_plans').update({ tour_etape_courante: stepIndex })
+    .eq('user_id', currentUser.id).catch(() => {});
+}
+
+function _tourShowSection(sectionName) {
+  document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('section-' + sectionName);
+  if (target) target.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navBtn = document.getElementById('nav-' + sectionName);
+  if (navBtn) navBtn.classList.add('active');
+}
+
+function _drawSpotlight(rect, pad = 12) {
+  const canvas = document.getElementById('tour-canvas');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width  = window.innerWidth  * dpr;
+  canvas.height = window.innerHeight * dpr;
+  canvas.style.width  = window.innerWidth  + 'px';
+  canvas.style.height = window.innerHeight + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.fillStyle = 'rgba(15,23,42,0.72)';
+  ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+  const x = Math.max(0, rect.left - pad);
+  const y = Math.max(0, rect.top  - pad);
+  const w = rect.width  + 2 * pad;
+  const h = rect.height + 2 * pad;
+  const r = 10;
+  const rr = (cx, cy, cw, ch, cr) => {
+    ctx.beginPath();
+    ctx.moveTo(cx+cr,cy); ctx.lineTo(cx+cw-cr,cy);
+    ctx.quadraticCurveTo(cx+cw,cy,cx+cw,cy+cr);
+    ctx.lineTo(cx+cw,cy+ch-cr); ctx.quadraticCurveTo(cx+cw,cy+ch,cx+cw-cr,cy+ch);
+    ctx.lineTo(cx+cr,cy+ch); ctx.quadraticCurveTo(cx,cy+ch,cx,cy+ch-cr);
+    ctx.lineTo(cx,cy+cr); ctx.quadraticCurveTo(cx,cy,cx+cr,cy);
+    ctx.closePath();
+  };
+  ctx.globalCompositeOperation = 'destination-out';
+  rr(x, y, w, h, r); ctx.fill();
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.strokeStyle = 'rgba(59,130,246,0.85)'; ctx.lineWidth = 2.5;
+  rr(x, y, w, h, r); ctx.stroke();
+}
+
+function _positionBubble(rect, pad = 12) {
+  const bubble  = document.getElementById('tour-bubble');
+  const bw = bubble.offsetWidth || 280;
+  const bh = bubble.offsetHeight || 200;
+  const mg = 16;
+  const sp = { l: rect.left - pad, r: rect.right + pad, t: rect.top - pad, b: rect.bottom + pad, cy: (rect.top + rect.bottom) / 2, cx: (rect.left + rect.right) / 2 };
+  let left, top;
+  if (sp.r + mg + bw <= window.innerWidth - mg) {
+    left = sp.r + mg;
+    top  = Math.max(mg, Math.min(sp.cy - bh / 2, window.innerHeight - bh - mg));
+  } else if (sp.l - mg - bw >= mg) {
+    left = sp.l - mg - bw;
+    top  = Math.max(mg, Math.min(sp.cy - bh / 2, window.innerHeight - bh - mg));
+  } else if (sp.b + mg + bh <= window.innerHeight - mg) {
+    left = Math.max(mg, Math.min(sp.cx - bw / 2, window.innerWidth - bw - mg));
+    top  = sp.b + mg;
+  } else {
+    left = Math.max(mg, Math.min(sp.cx - bw / 2, window.innerWidth - bw - mg));
+    top  = Math.max(mg, sp.t - mg - bh);
+  }
+  bubble.style.left = left + 'px';
+  bubble.style.top  = top  + 'px';
+}
+
+function tourNext() {
+  if (_tourStep >= TOUR_STEPS.length - 1) { _finishTour(); return; }
+  tourGoTo(_tourStep + 1);
+}
+function tourPrev() {
+  if (_tourStep > 0) tourGoTo(_tourStep - 1);
+}
+function tourQuit() {
+  _tourActive = false;
+  document.getElementById('tour-canvas').style.display = 'none';
+  document.getElementById('tour-bubble').style.display = 'none';
+  showSection('dashboard');
+}
+async function _finishTour() {
+  _tourActive          = false;
+  _onboardingCompleted = true;
+  document.getElementById('tour-canvas').style.display = 'none';
+  document.getElementById('tour-bubble').style.display = 'none';
+  await supabaseClient.from('user_plans')
+    .update({ onboarding_completed: true, tour_etape_courante: TOUR_STEPS.length })
+    .eq('user_id', currentUser.id).catch(() => {});
+  showSection('dashboard');
+  showToast('✓ Tour terminé — bienvenue dans pylotIA !');
+}
+window.addEventListener('resize', () => {
+  if (!_tourActive) return;
+  const el = document.getElementById(TOUR_STEPS[_tourStep].targetId);
+  if (el) { const r = el.getBoundingClientRect(); _drawSpotlight(r); _positionBubble(r); }
+});
+
 // ── ONBOARDING ────────────────────────────────────────────────
 function startOnboardingPulse() {
   document.getElementById('brief-fab').classList.add('pulsing');
@@ -5554,14 +5768,17 @@ async function submitSecteur() {
 
 function finishOnboarding() {
   document.getElementById('onboarding-overlay').classList.remove('open');
+  startTour(0);
 }
 
 async function relaunchOnboarding() {
   _onboardingCompleted = false;
+  _tourTexts = null; // force régénération
   await supabaseClient.from('user_plans')
-    .update({ onboarding_completed: false })
+    .update({ onboarding_completed: false, tour_etape_courante: 0 })
     .eq('user_id', currentUser.id);
-  openOnboardingModal();
+  document.getElementById('onboarding-overlay').classList.remove('open');
+  startTour(0);
 }
 
 async function saveSettingsSecteur() {
@@ -5738,6 +5955,25 @@ async function initDailyBrief() {
       <div id="ob-done-msg" style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:24px"></div>
       <button class="btn btn-blue" onclick="finishOnboarding()">Accéder à mon dashboard →</button>
     </div>
+  </div>
+</div>
+
+<!-- TOUR GUIDÉ -->
+<canvas id="tour-canvas"></canvas>
+<div id="tour-bubble">
+  <button id="tour-quit" onclick="tourQuit()" title="Quitter le tour">✕</button>
+  <div class="tour-header">
+    <span class="tour-label" id="tour-step-label"></span>
+    <span class="tour-counter" id="tour-step-counter"></span>
+  </div>
+  <div class="tour-text" id="tour-step-text" style="display:none"></div>
+  <div class="tour-loader" id="tour-step-loader">
+    <div class="ai-typing-wrap"><span></span><span></span><span></span></div>
+    <span>L'IA personnalise…</span>
+  </div>
+  <div class="tour-nav">
+    <button class="tour-btn-prev" id="tour-prev-btn" onclick="tourPrev()">← Préc.</button>
+    <button class="tour-btn-next" id="tour-next-btn" onclick="tourNext()">Suivant →</button>
   </div>
 </div>
 
