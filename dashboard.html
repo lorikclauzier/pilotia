@@ -22,10 +22,15 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
 .sidebar{width:220px;background:var(--dark2);border-right:1px solid var(--border);padding:24px 12px;display:flex;flex-direction:column;flex-shrink:0}
 .sidebar-logo{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#0f172a;padding:0 10px;margin-bottom:28px;letter-spacing:-0.5px}
 .sidebar-logo span{color:var(--blue)}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;font-size:13px;color:var(--text2);cursor:pointer;transition:all 0.15s;text-decoration:none;border:none;background:none;width:100%;text-align:left;font-family:'Inter',sans-serif}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;font-size:13px;color:var(--text2);cursor:pointer;transition:background 0.15s,color 0.15s,opacity 0.15s;text-decoration:none;border:none;background:none;width:100%;text-align:left;font-family:'Inter',sans-serif}
 .nav-item:hover{background:rgba(0,0,0,0.04);color:var(--text)}
 .nav-item.active{background:rgba(59,130,246,0.1);color:var(--blue2)}
 .nav-item svg{width:15px;height:15px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8}
+#nav-list{display:flex;flex-direction:column}
+.nav-item[draggable="true"]{cursor:grab}
+.nav-item.nav-dragging{opacity:0.35!important;background:rgba(59,130,246,0.06)!important;cursor:grabbing!important}
+.nav-item.nav-drop-above{box-shadow:0 -2px 0 0 var(--blue)}
+.nav-item.nav-drop-below{box-shadow:0 2px 0 0 var(--blue)}
 .sidebar-spacer{flex:1}
 .user-info{padding:10px;border-radius:8px;border:1px solid var(--border);margin-top:8px}
 .user-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -636,6 +641,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
     <span style="margin-left:auto;font-size:9px;background:rgba(99,179,237,0.2);color:#93c5fd;padding:2px 5px;border-radius:4px;font-weight:700" id="search-plan-badge">STARTER</span>
   </button>
 
+  <div id="nav-list">
   <button class="nav-item active" id="nav-dashboard" onclick="showSection('dashboard')">
     <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     Dashboard
@@ -683,6 +689,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
     Paramètres
   </button>
+  </div>
 
   <div class="sidebar-spacer"></div>
   <div class="user-info">
@@ -1757,7 +1764,7 @@ async function loadProspectsFromDB() {
 async function loadPlanFromDB() {
   const { data, error } = await supabaseClient
     .from('user_plans')
-    .select('plan, onboarding_completed, secteur_activite, tour_etape_courante')
+    .select('plan, onboarding_completed, secteur_activite, tour_etape_courante, navbar_order')
     .eq('user_id', currentUser.id)
     .single();
   if (error || !data) { _plan = 'free'; return; }
@@ -1765,6 +1772,7 @@ async function loadPlanFromDB() {
   _onboardingCompleted = data.onboarding_completed || false;
   _secteurActivite     = data.secteur_activite || null;
   _tourStep            = data.tour_etape_courante || 0;
+  if (data.navbar_order?.length) applyNavOrder(data.navbar_order);
 }
 
 // ─── ÉCRITURE CONTACTS SUPABASE ───────────────────────────────
@@ -1996,6 +2004,9 @@ async function initApp() {
     const settingsSecteur = document.getElementById('settings-secteur');
     if (settingsSecteur && _secteurActivite) settingsSecteur.value = _secteurActivite;
   }
+
+  // Drag & drop navbar
+  initNavDnd();
 
   // Brief quotidien (non bloquant)
   initDailyBrief();
@@ -5865,6 +5876,85 @@ function briefActionClick(idx) {
   }
   closeBriefModal();
   setTimeout(() => showSection(action.section), 200);
+}
+
+// ─── NAVBAR DRAG & DROP ──────────────────────────────────────────
+const NAV_DEFAULT_ORDER = [
+  'nav-dashboard','nav-contacts','nav-agenda','nav-activite',
+  'nav-performance','nav-postvente','nav-messages','nav-prospection',
+  'nav-assistant','nav-parametres'
+];
+let _navDragItem = null;
+
+function applyNavOrder(order) {
+  const list = document.getElementById('nav-list');
+  if (!list || !Array.isArray(order)) return;
+  order.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.parentElement === list) list.appendChild(el);
+  });
+}
+
+function saveNavOrder() {
+  const list = document.getElementById('nav-list');
+  if (!list) return;
+  const order = [...list.querySelectorAll('.nav-item[id]')].map(el => el.id);
+  supabaseClient.from('user_plans')
+    .update({ navbar_order: order })
+    .eq('user_id', currentUser.id)
+    .catch(() => {});
+}
+
+function initNavDnd() {
+  const list = document.getElementById('nav-list');
+  if (!list) return;
+  // Rendre chaque item draggable
+  list.querySelectorAll('.nav-item').forEach(item => {
+    item.setAttribute('draggable', 'true');
+  });
+
+  list.addEventListener('dragstart', e => {
+    const item = e.target.closest('.nav-item');
+    if (!item) return;
+    _navDragItem = item;
+    item.classList.add('nav-dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', item.id);
+  });
+
+  list.addEventListener('dragend', () => {
+    if (_navDragItem) _navDragItem.classList.remove('nav-dragging');
+    list.querySelectorAll('.nav-drop-above,.nav-drop-below')
+      .forEach(el => el.classList.remove('nav-drop-above','nav-drop-below'));
+    _navDragItem = null;
+  });
+
+  list.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const target = e.target.closest('.nav-item');
+    if (!target || target === _navDragItem) return;
+    list.querySelectorAll('.nav-drop-above,.nav-drop-below')
+      .forEach(el => el.classList.remove('nav-drop-above','nav-drop-below'));
+    const rect = target.getBoundingClientRect();
+    target.classList.add(e.clientY < rect.top + rect.height / 2 ? 'nav-drop-above' : 'nav-drop-below');
+  });
+
+  list.addEventListener('dragleave', e => {
+    const target = e.target.closest('.nav-item');
+    if (target) target.classList.remove('nav-drop-above','nav-drop-below');
+  });
+
+  list.addEventListener('drop', e => {
+    e.preventDefault();
+    const target = e.target.closest('.nav-item');
+    if (!target || target === _navDragItem || !_navDragItem) return;
+    const before = e.clientY < target.getBoundingClientRect().top + target.getBoundingClientRect().height / 2;
+    list.insertBefore(_navDragItem, before ? target : target.nextSibling);
+    list.querySelectorAll('.nav-drop-above,.nav-drop-below')
+      .forEach(el => el.classList.remove('nav-drop-above','nav-drop-below'));
+    saveNavOrder();
+  });
 }
 
 async function initDailyBrief() {
