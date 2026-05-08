@@ -1533,8 +1533,14 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min
       <button class="btn btn-ghost btn-analyse" id="prosp-analyse-btn" onclick="analyseProspect()" style="display:none">✦ Analyser</button>
       <button class="btn btn-ghost btn-analyse" id="prosp-msg-btn" onclick="draftMessageProspect()" style="display:none">✉ Message</button>
       <button class="btn btn-ghost" id="prosp-convert-btn" onclick="convertProspectToContact(editingProspId)" style="display:none">→ Créer contact</button>
+      <button class="btn btn-ghost" id="prosp-campaign-btn" onclick="toggleCampaignPicker()" style="display:none">→ Campagne</button>
       <button class="btn btn-ghost" onclick="closeProspModal()">Annuler</button>
       <button class="btn btn-blue" id="prosp-modal-submit" onclick="saveProspect()">Ajouter</button>
+    </div>
+    <!-- Sélecteur campagne — affiché sous les boutons -->
+    <div id="prosp-campaign-picker" style="display:none;margin-top:12px;padding:12px;background:var(--dark3);border:1px solid var(--border);border-radius:10px">
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px">Assigner à une campagne</div>
+      <div id="prosp-campaign-list"></div>
     </div>
   </div>
 </div>
@@ -3713,6 +3719,9 @@ function openProspModal(id, defaultStatut) {
   document.getElementById('prosp-modal-title').textContent  = isEdit ? 'Modifier le prospect' : 'Nouveau prospect';
   document.getElementById('prosp-modal-submit').textContent = isEdit ? 'Enregistrer' : 'Ajouter';
   document.getElementById('prosp-delete-btn').style.display  = isEdit ? 'block' : 'none';
+  // Réinitialiser le sélecteur campagne
+  document.getElementById('prosp-campaign-picker').style.display = 'none';
+  document.getElementById('prosp-campaign-list').innerHTML = '';
   if (isEdit) {
     const alreadyContact = _contacts.some(c => {
       const p = getProspects().find(x => x.id === id);
@@ -3720,8 +3729,10 @@ function openProspModal(id, defaultStatut) {
     });
     document.getElementById('prosp-convert-btn').style.display = alreadyContact ? 'none' : 'block';
     document.getElementById('prosp-convert-btn').textContent = '→ Créer contact';
+    document.getElementById('prosp-campaign-btn').style.display = 'inline-flex';
   } else {
     document.getElementById('prosp-convert-btn').style.display = 'none';
+    document.getElementById('prosp-campaign-btn').style.display = 'none';
   }
   if (isEdit) {
     const p = getProspects().find(x => x.id === id);
@@ -3751,7 +3762,51 @@ function closeProspModal() {
   paiSec.style.display = 'none'; paiSec.innerHTML = '';
   const pmsgSec = document.getElementById('prosp-msg-section');
   pmsgSec.style.display = 'none'; pmsgSec.innerHTML = '';
+  document.getElementById('prosp-campaign-picker').style.display = 'none';
+  document.getElementById('prosp-campaign-list').innerHTML = '';
   editingProspId = null;
+}
+
+function toggleCampaignPicker() {
+  const picker = document.getElementById('prosp-campaign-picker');
+  if (picker.style.display !== 'none') { picker.style.display = 'none'; return; }
+  const list = document.getElementById('prosp-campaign-list');
+  const activeCamps = (_campaigns || []).filter(c => c.statut === 'active');
+  if (activeCamps.length === 0) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:4px 0">Aucune campagne active disponible</div>';
+  } else {
+    const p = getProspects().find(x => x.id === editingProspId);
+    list.innerHTML = activeCamps.map(c => {
+      const assigned = p && p.campaign_id === c.id;
+      return `<div onclick="assignProspectToCampaign('${c.id}','${c.nom.replace(/'/g,"\\'")}',this)"
+        style="padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;color:var(--text);
+               background:${assigned ? 'rgba(59,130,246,0.1)' : 'transparent'};
+               border:1px solid ${assigned ? 'rgba(59,130,246,0.3)' : 'transparent'};
+               margin-bottom:4px;transition:background 0.15s"
+        onmouseover="this.style.background='rgba(59,130,246,0.08)'"
+        onmouseout="this.style.background='${assigned ? 'rgba(59,130,246,0.1)' : 'transparent'}'">
+        ${assigned ? '✓ ' : ''}${c.nom}
+      </div>`;
+    }).join('');
+  }
+  picker.style.display = 'block';
+}
+
+async function assignProspectToCampaign(campaignId, campaignNom, el) {
+  if (!editingProspId) return;
+  const p = getProspects().find(x => x.id === editingProspId);
+  if (!p) return;
+  const { error } = await supabaseClient.from('prospects')
+    .update({ campaign_id: campaignId }).eq('id', editingProspId);
+  if (error) { showToast('Erreur lors de l\'assignation', 'error'); return; }
+  p.campaign_id = campaignId;
+  document.getElementById('prosp-campaign-picker').style.display = 'none';
+  const btn = document.getElementById('prosp-campaign-btn');
+  const orig = btn.textContent;
+  btn.textContent = `✓ ${campaignNom}`;
+  btn.style.color = '#4ade80';
+  setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 2000);
+  addActivity('edit', `Prospect assigné à la campagne "${campaignNom}" : ${p.nom}`);
 }
 
 async function saveProspect() {
