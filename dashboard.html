@@ -3449,10 +3449,9 @@ function kbScoreBadge(p) {
   const score  = p.score_manuel || _kbScores.get(p.id) || kbLocalScore(p);
   const manual = !!p.score_manuel;
   const labels = { chaud: 'Prospect chaud', tiede: 'Prospect tiède', froid: 'Prospect froid' };
-  const ring   = manual ? 'box-shadow:0 0 0 2px white,0 0 0 3.5px var(--border2);' : '';
   return `<span class="kb-score ${score}" title="${labels[score]}${manual ? ' (score fixé manuellement)' : ''}"
-    style="cursor:pointer;${ring}"
-    onclick="event.stopPropagation();openScoreMenu(event,'${p.id}')"></span>`;
+    style="cursor:pointer;font-size:9px;line-height:1"
+    onclick="event.stopPropagation();openScoreMenu(event,'${p.id}')">${manual ? '🔒' : ''}</span>`;
 }
 
 function openScoreMenu(e, prospId) {
