@@ -5572,10 +5572,11 @@ async function tourGoTo(stepIndex) {
   _tourStep = stepIndex;
   const step = TOUR_STEPS[stepIndex];
 
-  // Navigation section (bypass plan gating)
+  // Navigation section (bypass plan gating) — 450ms pour les sections async (agenda, assistant)
   if (step.section) {
     _tourShowSection(step.section);
-    await new Promise(r => setTimeout(r, 220));
+    const asyncSections = ['agenda', 'assistant'];
+    await new Promise(r => setTimeout(r, asyncSections.includes(step.section) ? 450 : 250));
   }
 
   const el = document.getElementById(step.targetId);
@@ -5608,13 +5609,10 @@ async function tourGoTo(stepIndex) {
 }
 
 function _tourShowSection(sectionName) {
+  // Fermer les modals ouverts, puis appeler le vrai showSection (sans plan gating)
+  // pour déclencher les fonctions de rendu (renderContacts, renderKanban, etc.)
   document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  const target = document.getElementById('section-' + sectionName);
-  if (target) target.classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const navBtn = document.getElementById('nav-' + sectionName);
-  if (navBtn) navBtn.classList.add('active');
+  _origShowSection(sectionName);
 }
 
 function _drawSpotlight(rect, pad = 12) {
