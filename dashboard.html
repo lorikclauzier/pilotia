@@ -3446,16 +3446,67 @@ function kbLocalScore(p) {
 }
 
 function kbScoreBadge(p) {
-  const score = _kbScores.get(p.id) || kbLocalScore(p);
+  const score  = p.score_manuel || _kbScores.get(p.id) || kbLocalScore(p);
+  const manual = !!p.score_manuel;
   const icons  = { chaud: '▲', tiede: '◆', froid: '▽' };
   const labels = { chaud: 'Prospect chaud', tiede: 'Prospect tiède', froid: 'Prospect froid' };
-  return `<span class="kb-score ${score}" title="${labels[score]}" style="font-size:8px;color:white;font-weight:700;line-height:1">${icons[score]}</span>`;
+  const lock   = manual ? `<span style="font-size:7px;opacity:0.8;margin-left:2px">🔒</span>` : '';
+  return `<span class="kb-score ${score}" title="${labels[score]}${manual ? ' (score manuel)' : ''}"
+    style="font-size:8px;color:white;font-weight:700;line-height:1;cursor:pointer;display:inline-flex;align-items:center;gap:1px"
+    onclick="event.stopPropagation();openScoreMenu(event,'${p.id}')">${icons[score]}${lock}</span>`;
+}
+
+function openScoreMenu(e, prospId) {
+  document.querySelectorAll('.kb-score-menu').forEach(m => m.remove());
+  const p = _prospects.find(x => x.id === prospId);
+  if (!p) return;
+  const menu = document.createElement('div');
+  menu.className = 'kb-score-menu';
+  menu.style.cssText = `position:fixed;z-index:9999;background:var(--dark2);border:1px solid var(--border2);
+    border-radius:10px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,0.15);min-width:140px`;
+  const options = [
+    { score: 'chaud', label: '🔴 Chaud', color: '#ef4444' },
+    { score: 'tiede', label: '🟠 Tiède', color: '#f97316' },
+    { score: 'froid', label: '⚫ Froid', color: '#64748b' },
+  ];
+  if (p.score_manuel) {
+    options.push({ score: null, label: '↺ Auto', color: 'var(--text3)' });
+  }
+  menu.innerHTML = options.map(o => `
+    <div onclick="setScoreManuel('${prospId}',${o.score ? `'${o.score}'` : 'null'},this.parentNode)"
+      style="padding:7px 10px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;
+             color:${o.score === p.score_manuel ? 'var(--blue)' : o.color};
+             background:${o.score === p.score_manuel ? 'rgba(59,130,246,0.08)' : 'transparent'};
+             transition:background 0.15s"
+      onmouseover="this.style.background='rgba(0,0,0,0.04)'"
+      onmouseout="this.style.background='${o.score === p.score_manuel ? 'rgba(59,130,246,0.08)' : 'transparent'}'">
+      ${o.label}${o.score === p.score_manuel ? ' ✓' : ''}
+    </div>`).join('');
+  // Position sous la pastille
+  const rect = e.target.getBoundingClientRect();
+  menu.style.top  = (rect.bottom + 4) + 'px';
+  menu.style.left = Math.min(rect.left, window.innerWidth - 160) + 'px';
+  document.body.appendChild(menu);
+  const close = ev => { if (!menu.contains(ev.target)) { menu.remove(); document.removeEventListener('click', close); } };
+  setTimeout(() => document.addEventListener('click', close), 0);
+}
+
+async function setScoreManuel(prospId, score, menu) {
+  menu?.remove();
+  const p = _prospects.find(x => x.id === prospId);
+  if (!p) return;
+  const { error } = await supabaseClient.from('prospects')
+    .update({ score_manuel: score }).eq('id', prospId);
+  if (error) { showToast('Erreur sauvegarde score', 'error'); return; }
+  p.score_manuel = score;
+  if (score) _kbScores.delete(prospId); // score IA ne prime plus
+  renderKanban();
 }
 
 async function computeKbScoresAI() {
   const plan = getPlan();
   if (!['pro', 'business'].includes(plan)) return;
-  const prospects = getProspects().filter(p => p.statut !== 'lead_converti' && p.statut !== 'client_actif');
+  const prospects = getProspects().filter(p => p.statut !== 'lead_converti' && p.statut !== 'client_actif' && !p.score_manuel);
   if (prospects.length === 0) return;
   const list = prospects.map(p => ({
     id: p.id, nom: p.nom, statut: p.statut,
