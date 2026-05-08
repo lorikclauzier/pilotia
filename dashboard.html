@@ -5518,16 +5518,16 @@ const TOUR_NOTES = {
 };
 
 const TOUR_FALLBACKS = {
-  'brief-fab':       'Votre assistant ouvre ici le brief quotidien personnalisé. Chaque matin, l\'IA analyse vos données et vous dit quoi faire en priorité.',
-  'nav-dashboard':   'Vue d\'ensemble de votre activité : contacts, pipeline, rendez-vous du jour. Votre tableau de bord en temps réel.',
-  'nav-contacts':    'Gérez votre base clients : ajoutez, filtrez et importez vos contacts. Chaque fiche centralise toutes les informations clés.',
-  'nav-agenda':      'Planifiez vos rendez-vous directement dans le CRM. Visualisation par jour ou par liste des prochains RDV.',
-  'nav-activite':    'Historique complet de vos actions : ajouts de contacts, modifications, relances. Gardez une trace de tout.',
-  'nav-performance': 'Tableaux de bord et statistiques pour piloter votre activité. Taux de conversion, pipeline, volume de contacts.',
-  'nav-postvente':   'Suivi de vos clients après conversion : relances planifiées, statut des RDV. Fidélisez et évitez les oublis.',
-  'nav-messages':    'Organisez vos séquences de relance en campagnes ciblées. Gérez vos contacts par groupe et suivez leur progression.',
-  'nav-prospection': 'Pipeline Kanban : visualisez vos prospects étape par étape. Glissez-déposez les cards pour faire avancer les deals.',
-  'nav-assistant':   'Votre copilote IA : posez vos questions en langage naturel, obtenez des analyses et conseils personnalisés.',
+  'brief-fab':       'Votre brief IA quotidien — priorités du jour en un clic.',
+  'nav-dashboard':   'Vue d\'ensemble en temps réel : contacts, pipeline et RDVs.',
+  'nav-contacts':    'Gérez votre base clients avec filtres et import.',
+  'nav-agenda':      'Planifiez et visualisez tous vos rendez-vous.',
+  'nav-activite':    'Historique complet de toutes vos actions dans le CRM.',
+  'nav-performance': 'Statistiques et taux de conversion pour piloter votre activité.',
+  'nav-postvente':   'Suivi post-vente : relances planifiées et alertes de retard.',
+  'nav-messages':    'Campagnes de relance groupées par segment de contacts.',
+  'nav-prospection': 'Pipeline Kanban : glissez vos prospects étape par étape.',
+  'nav-assistant':   'Votre copilote IA : analyses et conseils en langage naturel.',
 };
 
 async function startTour(fromStep) {
@@ -5556,7 +5556,7 @@ async function _generateTourTexts() {
   _tourTexts = {};
   const secteur = _secteurActivite || 'commerce';
   const labels  = TOUR_STEPS.map(s => s.label).join(', ');
-  const sys = `Tu es l'assistant pylotIA. Pour un professionnel du secteur "${secteur}", génère une description courte (2-3 phrases max, concrète, adaptée au métier) pour chaque fonctionnalité CRM listée. Réponds UNIQUEMENT avec un JSON valide : [{"label":"...","text":"..."}]. Zéro texte en dehors du JSON.`;
+  const sys = `Tu es l'assistant pylotIA. Pour un professionnel du secteur "${secteur}", génère une description ultra-courte (1 phrase max, 12 mots maximum, concrète, adaptée au métier) pour chaque fonctionnalité CRM listée. Réponds UNIQUEMENT avec un JSON valide : [{"label":"...","text":"..."}]. Zéro texte en dehors du JSON.`;
   try {
     const resp = await callClaude(sys, [{ role:'user', content:`Fonctionnalités : ${labels}` }], 750);
     const m = resp.match(/\[[\s\S]*?\]/);
@@ -5626,8 +5626,15 @@ function _drawSpotlight(rect, pad = 12) {
   canvas.style.height = window.innerHeight + 'px';
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
+  const curStep   = TOUR_STEPS[_tourStep];
+  const isNavStep = curStep && curStep.targetId.startsWith('nav-');
   ctx.fillStyle = 'rgba(15,23,42,0.72)';
-  ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+  if (isNavStep) {
+    // Assombrir uniquement la sidebar (gauche), laisser le contenu principal visible
+    ctx.fillRect(0, 0, 232, window.innerHeight);
+  } else {
+    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+  }
   const x = Math.max(0, rect.left - pad);
   const y = Math.max(0, rect.top  - pad);
   const w = rect.width  + 2 * pad;
@@ -5656,22 +5663,19 @@ function _positionBubble(rect, pad = 12) {
   const isFab     = step.targetId === 'brief-fab';
 
   if (isNavStep) {
-    // Bulle dans la sidebar (220px de large) — ne couvre jamais le contenu principal
+    // Bulle dans la sidebar (196px) — ne couvre jamais le contenu principal
     bubble.style.width = '196px';
-    // Ancrer en bas de la sidebar, juste au-dessus du user-info/logout
-    const userInfo = document.querySelector('.user-info');
-    const anchor   = userInfo ? userInfo.getBoundingClientRect() : null;
-    const bh = Math.max(bubble.offsetHeight || 0, 200);
+    const bh = Math.max(bubble.offsetHeight || 0, 160);
     let top;
-    if (anchor && anchor.top - 12 - bh > rect.bottom + 8) {
-      // Espace sous l'élément ciblé et avant user-info → coller en bas de sidebar
-      top = anchor.top - 12 - bh;
-    } else if (rect.top - 12 - bh > 60) {
-      // Pas de place dessous → mettre au-dessus de l'élément ciblé
+    // Essayer d'abord en dessous de l'élément
+    if (rect.bottom + 12 + bh <= window.innerHeight - 8) {
+      top = rect.bottom + 12;
+    } else if (rect.top - 12 - bh >= 8) {
+      // Sinon au-dessus
       top = rect.top - 12 - bh;
     } else {
-      // Fallback : sous l'élément ciblé
-      top = rect.bottom + 12;
+      // Fallback : coller en bas de l'écran
+      top = window.innerHeight - bh - 8;
     }
     bubble.style.left = '12px';
     bubble.style.top  = Math.max(8, top) + 'px';
