@@ -5726,15 +5726,19 @@ function tourQuit() {
   showSection('dashboard');
 }
 async function _finishTour() {
-  _tourActive          = false;
-  _onboardingCompleted = true;
+  _tourActive = false;
   document.getElementById('tour-canvas').style.display = 'none';
   document.getElementById('tour-bubble').style.display = 'none';
+  document.getElementById('modal-tour-end').classList.add('open');
+}
+
+async function closeTourEnd() {
+  document.getElementById('modal-tour-end').classList.remove('open');
+  _onboardingCompleted = true;
   await supabaseClient.from('user_plans')
     .update({ onboarding_completed: true, tour_etape_courante: TOUR_STEPS.length })
     .eq('user_id', currentUser.id).catch(() => {});
   showSection('dashboard');
-  showToast('✓ Tour terminé — bienvenue dans pylotIA !');
 }
 window.addEventListener('resize', () => {
   if (!_tourActive) return;
@@ -6094,6 +6098,18 @@ async function initDailyBrief() {
 </div>
 
 <!-- TOUR GUIDÉ -->
+<!-- MODALE FIN DE TOUR -->
+<div class="modal-overlay" id="modal-tour-end" onclick="if(event.target===this)closeTourEnd()">
+  <div class="modal" style="width:400px;max-width:92vw;text-align:center;padding:40px 36px 32px">
+    <div style="width:52px;height:52px;background:rgba(37,99,235,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09z"/><path d="M18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/></svg>
+    </div>
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:#0f172a;letter-spacing:-0.3px;margin-bottom:12px">C'est parti !</div>
+    <div style="font-size:14px;color:var(--text2);line-height:1.65;margin-bottom:28px">Tout est en place pour que vous puissiez vous concentrer sur l'essentiel&nbsp;: vos clients.</div>
+    <button onclick="closeTourEnd()" style="background:#2563eb;color:#fff;border:none;border-radius:9px;padding:12px 28px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.2s" onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">Commencer →</button>
+  </div>
+</div>
+
 <canvas id="tour-canvas"></canvas>
 <div id="tour-bubble">
   <button id="tour-quit" onclick="tourQuit()" title="Quitter le tour">✕</button>
