@@ -932,6 +932,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);hei
         <div style="display:flex;gap:8px;align-items:center">
           <span class="campaign-badge active" id="cd-badge">Active</span>
           <button class="btn btn-outline" onclick="openAddContactsToCampaign()" style="font-size:12px">+ Contacts</button>
+          <button class="btn btn-ghost" onclick="openCampImport()" style="font-size:12px">📥 Importer</button>
           <button onclick="archiveCampaign()" style="background:transparent;border:1px solid rgba(239,68,68,0.3);border-radius:8px;color:#f87171;font-size:12px;padding:6px 12px;cursor:pointer;font-family:'Inter',sans-serif">Archiver</button>
         </div>
       </div>
@@ -1501,6 +1502,59 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);hei
   </div>
 </div>
 
+<!-- CAMPAIGN IMPORT MODAL -->
+<div class="modal-overlay" id="camp-import-overlay" style="display:none" onclick="if(event.target===this)closeCampImport()">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:580px">
+    <div class="modal-title">Importer des contacts dans la campagne</div>
+
+    <!-- Étape 1 : sélection fichier -->
+    <div id="camp-import-step-upload">
+      <div id="camp-import-drop-zone"
+        ondrop="handleCampImportDrop(event)" ondragover="handleCampImportDragOver(event)" ondragleave="handleCampImportDragLeave(event)"
+        onclick="document.getElementById('camp-import-file-input').click()"
+        style="border:2px dashed var(--border2);border-radius:12px;padding:36px;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s">
+        <div style="font-size:32px;margin-bottom:10px">📂</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px">Glissez votre fichier ici</div>
+        <div style="font-size:12px;color:var(--text3)">ou cliquez pour sélectionner — .xlsx, .xls, .csv</div>
+      </div>
+      <input type="file" id="camp-import-file-input" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleCampImportFileSelect(event)">
+      <div style="font-size:12px;color:var(--text3);margin-top:10px;line-height:1.6">
+        Les contacts existants (même email) seront liés à la campagne sans doublon.<br>
+        Les nouveaux contacts seront visibles uniquement dans cette campagne.
+      </div>
+      <div class="form-actions" style="margin-top:16px">
+        <button class="btn btn-cancel" onclick="closeCampImport()">Annuler</button>
+      </div>
+    </div>
+
+    <!-- Étape 2 : aperçu -->
+    <div id="camp-import-step-preview" style="display:none">
+      <div style="font-size:13px;color:var(--text2);margin-bottom:12px">
+        <strong id="camp-import-count">0</strong> ligne(s) détectée(s) — vérifiez l'aperçu avant de confirmer.
+      </div>
+      <div style="overflow:auto;border:1px solid var(--border);border-radius:8px;margin-bottom:16px;max-height:240px">
+        <table id="camp-import-preview-table" style="width:100%;border-collapse:collapse;font-size:12px"></table>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-cancel" onclick="resetCampImport()">← Retour</button>
+        <button class="btn btn-blue" id="camp-import-confirm-btn" onclick="doImportCampaign()">Importer</button>
+      </div>
+    </div>
+
+    <!-- Étape 3 : résultat -->
+    <div id="camp-import-step-result" style="display:none;text-align:center;padding:24px 0">
+      <div style="font-size:32px;margin-bottom:14px">✅</div>
+      <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:20px">Import terminé</div>
+      <div style="display:flex;justify-content:center;gap:28px;margin-bottom:24px">
+        <div><div style="font-size:26px;font-weight:700;color:var(--blue)" id="camp-import-created">0</div><div style="font-size:11px;color:var(--text3)">Contacts créés</div></div>
+        <div><div style="font-size:26px;font-weight:700;color:#10b981" id="camp-import-linked">0</div><div style="font-size:11px;color:var(--text3)">Liés (existants)</div></div>
+        <div><div style="font-size:26px;font-weight:700;color:var(--text3)" id="camp-import-skipped">0</div><div style="font-size:11px;color:var(--text3)">Ignorés</div></div>
+      </div>
+      <button class="btn btn-blue" onclick="closeCampImport()">Fermer</button>
+    </div>
+  </div>
+</div>
+
 <!-- CONTACT DRAWER -->
 <div class="drawer-overlay" id="drawer-overlay" onclick="closeContactDrawer()"></div>
 <div class="contact-drawer" id="contact-drawer">
@@ -1834,7 +1888,7 @@ async function loadContactsFromDB() {
     .eq('user_id', currentUser.id)
     .order('date_ajout', { ascending: false });
   if (error) { console.error('loadContacts:', error.message); return; }
-  _contacts = (data || []).map(normalizeContact);
+  _contacts = (data || []).filter(c => !c.campaign_only).map(normalizeContact);
 }
 
 async function loadProspectsFromDB() {
@@ -2816,6 +2870,8 @@ let _campaigns = [];
 let _campaignContacts = {}; // campaignId → tableau d'items (avec contacts jointure)
 let _currentCampaignId = null;
 let _selectedAddContacts = new Set();
+let _campImportRows = [];
+let _campImportCols = null;
 
 async function loadCampaignsData() {
   const { data: camps } = await supabaseClient.from('campaigns')
@@ -2827,7 +2883,7 @@ async function loadCampaignsData() {
 
 async function loadCampaignContacts(campaignId) {
   const { data } = await supabaseClient.from('campaign_contacts')
-    .select('*, contacts(id,nom,entreprise,email,tel,statut)')
+    .select('*, contacts(id,nom,entreprise,email,tel,statut,campaign_only)')
     .eq('campaign_id', campaignId)
     .order('created_at', { ascending: false });
   _campaignContacts[campaignId] = data || [];
@@ -2984,7 +3040,7 @@ function renderCampaignContacts() {
     <div class="campaign-contact-row">
       <div class="contact-avatar" style="width:36px;height:36px;font-size:13px;flex-shrink:0">${initials}</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:600;color:var(--text1);cursor:pointer" onclick="openContactDrawer('${contact.id}')" onmouseover="this.style.color='#93c5fd'" onmouseout="this.style.color='var(--text1)'">${contact.nom}</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text1);cursor:pointer;display:flex;align-items:center;gap:6px" onclick="openContactDrawer('${contact.id}')" onmouseover="this.style.color='#93c5fd'" onmouseout="this.style.color='var(--text1)'">${contact.nom}${contact.campaign_only?'<span style="font-size:9px;background:rgba(99,179,237,0.15);color:#93c5fd;border:1px solid rgba(99,179,237,0.3);border-radius:4px;padding:1px 5px;font-weight:600;cursor:default">Import</span>':''}</div>
         <div style="font-size:11px;color:var(--text3)">${contact.entreprise||contact.email||'—'}</div>
       </div>
       <select onchange="updateCampaignContactStatus('${item.id}',this.value)"
@@ -3025,6 +3081,164 @@ async function archiveCampaign() {
   renderCampaigns();
   updateDashStats();
   showToast('Campagne archivée');
+}
+
+// ── Import fichier dans une campagne ─────────────────────
+function openCampImport() {
+  document.getElementById('camp-import-overlay').style.display = 'flex';
+  resetCampImport();
+}
+
+function closeCampImport() {
+  document.getElementById('camp-import-overlay').style.display = 'none';
+}
+
+function resetCampImport() {
+  document.getElementById('camp-import-step-upload').style.display = 'block';
+  document.getElementById('camp-import-step-preview').style.display = 'none';
+  document.getElementById('camp-import-step-result').style.display = 'none';
+  const fi = document.getElementById('camp-import-file-input');
+  if (fi) fi.value = '';
+  _campImportRows = [];
+  _campImportCols = null;
+  const dz = document.getElementById('camp-import-drop-zone');
+  if (dz) { dz.style.borderColor = ''; dz.style.background = ''; }
+}
+
+function handleCampImportDragOver(e) {
+  e.preventDefault();
+  const dz = document.getElementById('camp-import-drop-zone');
+  if (dz) { dz.style.borderColor = 'var(--blue)'; dz.style.background = 'rgba(59,130,246,0.04)'; }
+}
+function handleCampImportDragLeave(e) {
+  const dz = document.getElementById('camp-import-drop-zone');
+  if (dz) { dz.style.borderColor = ''; dz.style.background = ''; }
+}
+function handleCampImportDrop(e) {
+  e.preventDefault();
+  handleCampImportDragLeave(e);
+  const file = e.dataTransfer?.files?.[0];
+  if (file) processCampImportFile(file);
+}
+function handleCampImportFileSelect(e) {
+  const file = e.target?.files?.[0];
+  if (file) processCampImportFile(file);
+}
+
+async function processCampImportFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  let rows;
+  try {
+    if (ext === 'csv') {
+      const text = await file.text();
+      rows = parseCSV(text);
+    } else if (['xlsx','xls'].includes(ext)) {
+      const buf = await file.arrayBuffer();
+      const wb  = XLSX.read(buf, { type:'array' });
+      const ws  = wb.Sheets[wb.SheetNames[0]];
+      rows = XLSX.utils.sheet_to_json(ws, { defval:'' });
+    } else {
+      showToast('Format non supporté — utilisez .xlsx, .xls ou .csv'); return;
+    }
+  } catch(e) {
+    showToast('Erreur lecture fichier : ' + e.message); return;
+  }
+  if (!rows || rows.length === 0) { showToast('Le fichier est vide.'); return; }
+  _campImportRows = rows;
+  _campImportCols = detectColumns(Object.keys(rows[0]));
+  showCampImportPreview();
+}
+
+function showCampImportPreview() {
+  const cols    = _campImportCols;
+  const preview = _campImportRows.slice(0, 8);
+  const fields  = ['Nom','Entreprise','Email','Téléphone'];
+  const thStyle = 'padding:8px 10px;background:var(--dark3);font-size:11px;font-weight:600;color:var(--text2);text-align:left;white-space:nowrap;border-bottom:1px solid var(--border)';
+  const tdStyle = 'padding:7px 10px;font-size:12px;color:var(--text);border-bottom:1px solid var(--border);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+
+  const thead = `<thead><tr>${fields.map(f => {
+    const ok = !!cols[f];
+    return `<th style="${thStyle}">${f} ${ok?'<span style="color:#10b981">✓</span>':'<span style="color:var(--text3)">—</span>'}`;
+  }).join('')}</tr></thead>`;
+
+  const tbody = `<tbody>${preview.map(row => `<tr>${fields.map(f => {
+    const val = cols[f] ? (row[cols[f]]||'').toString().trim() : '';
+    return `<td style="${tdStyle}">${val||'<span style="color:var(--text3)">—</span>'}`;
+  }).join('')}</tr>`).join('')}</tbody>`;
+
+  document.getElementById('camp-import-preview-table').innerHTML = thead + tbody;
+  document.getElementById('camp-import-count').textContent = _campImportRows.length;
+  document.getElementById('camp-import-step-upload').style.display = 'none';
+  document.getElementById('camp-import-step-preview').style.display = 'block';
+}
+
+async function doImportCampaign() {
+  const btn = document.getElementById('camp-import-confirm-btn');
+  btn.disabled = true; btn.textContent = 'Import en cours…';
+  const cols   = _campImportCols;
+  const campId = _currentCampaignId;
+  let created = 0, linked = 0, skipped = 0;
+
+  for (const row of _campImportRows) {
+    // Assemblage nom
+    const prenomRaw = (cols['_Prénom'] && cols['_Prénom'] !== cols['Nom']) ? (row[cols['_Prénom']]||'').toString().trim() : '';
+    const nomRaw    = (row[cols['Nom']]||'').toString().trim();
+    const nom       = (prenomRaw && nomRaw) ? prenomRaw + ' ' + nomRaw : (prenomRaw || nomRaw);
+    if (!nom) { skipped++; continue; }
+
+    const email     = cols['Email']      ? (row[cols['Email']]||'').toString().trim().toLowerCase() : '';
+    const tel       = cols['Téléphone']  ? (row[cols['Téléphone']]||'').toString().trim()           : '';
+    const entreprise= cols['Entreprise'] ? (row[cols['Entreprise']]||'').toString().trim()           : '';
+
+    let contactId = null;
+
+    // Vérifier si le contact existe déjà par email
+    if (email) {
+      const { data: existing } = await supabaseClient.from('contacts')
+        .select('id').eq('user_id', currentUser.id).eq('email', email).maybeSingle();
+      if (existing) { contactId = existing.id; linked++; }
+    }
+
+    // Créer si inexistant
+    if (!contactId) {
+      const { data: newC, error } = await supabaseClient.from('contacts').insert([{
+        user_id: currentUser.id,
+        nom,
+        email:         email       || null,
+        tel:           tel         || null,
+        entreprise:    entreprise  || null,
+        statut:        'Lead',
+        campaign_only: true,
+        date_ajout:    new Date().toISOString()
+      }]).select('id').single();
+      if (error || !newC) { skipped++; continue; }
+      contactId = newC.id;
+      created++;
+    }
+
+    // Vérifier si déjà dans la campagne
+    const { data: existCC } = await supabaseClient.from('campaign_contacts')
+      .select('id').eq('campaign_id', campId).eq('contact_id', contactId).maybeSingle();
+    if (!existCC) {
+      await supabaseClient.from('campaign_contacts').insert([{
+        campaign_id: campId,
+        contact_id:  contactId,
+        user_id:     currentUser.id,
+        statut:      'à relancer'
+      }]);
+    }
+  }
+
+  await loadCampaignContacts(campId);
+  renderCampaignContacts();
+  renderCampaigns();
+
+  document.getElementById('camp-import-created').textContent = created;
+  document.getElementById('camp-import-linked').textContent  = linked;
+  document.getElementById('camp-import-skipped').textContent = skipped;
+  document.getElementById('camp-import-step-preview').style.display = 'none';
+  document.getElementById('camp-import-step-result').style.display  = 'block';
+  btn.disabled = false; btn.textContent = 'Importer';
 }
 
 // ── Ajouter contacts à une campagne (depuis vue détail) ──
