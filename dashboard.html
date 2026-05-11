@@ -2700,15 +2700,24 @@ function renderAiTodos(suggestions) {
   };
   const prioColors = { haute:'#ef4444', normale:'#3b82f6', basse:'#94a3b8' };
   const prioLabels = { haute:'Haute', normale:'Normale', basse:'Basse' };
-  container.innerHTML = suggestions.map((s, i) => {
-    const safe    = _briefEsc(s.titre);
-    const prio    = s.priorite||'normale';
-    const cochee  = !!s.cochee;
-    const target  = sectionMap[s.section] || null;
-    const btn     = target
+  // Cochées en bas, ordre original conservé dans chaque groupe
+  const sorted = [...suggestions.map((s,i) => ({...s, _i:i}))].sort((a,b) => (!!a.cochee) - (!!b.cochee));
+  let lastWasCochee = false;
+  container.innerHTML = sorted.map(s => {
+    const i      = s._i;
+    const safe   = _briefEsc(s.titre);
+    const prio   = s.priorite||'normale';
+    const cochee = !!s.cochee;
+    const target = sectionMap[s.section] || null;
+    const btn    = target
       ? `<button class="btn-sm btn-sm-blue" onclick="showSection('${target}')" ${cochee?'disabled style="opacity:0.4"':''}>+ Ajouter</button>`
       : '';
-    return `<div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border);${cochee?'opacity:0.55':''}">
+    let separator = '';
+    if (cochee && !lastWasCochee) {
+      separator = `<div style="padding:8px 16px;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;background:var(--dark3);border-bottom:1px solid var(--border)">Terminé</div>`;
+      lastWasCochee = true;
+    }
+    return separator + `<div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border);${cochee?'opacity:0.55':''}">
       <input type="checkbox" class="todo-cb" ${cochee?'checked':''} onchange="toggleAiSuggestion(${i},this.checked)">
       <div style="flex:1;font-size:13px;color:var(--text);${cochee?'text-decoration:line-through;color:var(--text3)':''}">${safe}</div>
       <span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;background:${prioColors[prio]||'#3b82f6'}18;color:${prioColors[prio]||'#3b82f6'}">${prioLabels[prio]||'Normale'}</span>
