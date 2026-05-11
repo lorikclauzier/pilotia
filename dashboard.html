@@ -2694,19 +2694,31 @@ function renderAiTodos(suggestions) {
   };
   const prioColors = { haute:'#ef4444', normale:'#3b82f6', basse:'#94a3b8' };
   const prioLabels = { haute:'Haute', normale:'Normale', basse:'Basse' };
-  container.innerHTML = suggestions.map(s => {
-    const safe   = _briefEsc(s.titre);
-    const prio   = s.priorite||'normale';
-    const target = sectionMap[s.section] || null;
-    const btn    = target
-      ? `<button class="btn-sm btn-sm-blue" onclick="showSection('${target}')">+ Ajouter</button>`
+  container.innerHTML = suggestions.map((s, i) => {
+    const safe    = _briefEsc(s.titre);
+    const prio    = s.priorite||'normale';
+    const cochee  = !!s.cochee;
+    const target  = sectionMap[s.section] || null;
+    const btn     = target
+      ? `<button class="btn-sm btn-sm-blue" onclick="showSection('${target}')" ${cochee?'disabled style="opacity:0.4"':''}>+ Ajouter</button>`
       : '';
-    return `<div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border)">
-      <div style="flex:1;font-size:13px;color:var(--text)">${safe}</div>
+    return `<div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border);${cochee?'opacity:0.55':''}">
+      <input type="checkbox" class="todo-cb" ${cochee?'checked':''} onchange="toggleAiSuggestion(${i},this.checked)">
+      <div style="flex:1;font-size:13px;color:var(--text);${cochee?'text-decoration:line-through;color:var(--text3)':''}">${safe}</div>
       <span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;background:${prioColors[prio]||'#3b82f6'}18;color:${prioColors[prio]||'#3b82f6'}">${prioLabels[prio]||'Normale'}</span>
       ${btn}
     </div>`;
   }).join('') + '<div style="height:1px"></div>';
+}
+
+function toggleAiSuggestion(index, checked) {
+  if (!Array.isArray(_aiTodosSuggestions) || !_aiTodosSuggestions[index]) return;
+  _aiTodosSuggestions[index].cochee = checked;
+  renderAiTodos(_aiTodosSuggestions);
+  supabaseClient.from('user_plans')
+    .update({ ai_todos_suggestions: _aiTodosSuggestions })
+    .eq('user_id', currentUser.id)
+    .then(() => {}, () => {});
 }
 
 async function genAiTodos() {
