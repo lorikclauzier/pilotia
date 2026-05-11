@@ -1,6 +1,5 @@
 {
   "functions": {
-    "api/claude.js": { "maxDuration": 30 },
-    "api/calendar/[token].js": { "maxDuration": 10 }
+    "api/claude.js": { "maxDuration": 30 }
   }
 }
