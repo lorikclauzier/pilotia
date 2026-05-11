@@ -138,6 +138,19 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);hei
 .alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-top:12px;display:none}
 .alert-success{background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.2)}
 .alert-danger{background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2)}
+.ical-box{background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-top:20px}
+.ical-box-title{font-size:14px;font-weight:600;color:#0f172a;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.ical-box-sub{font-size:12px;color:var(--text3);margin-bottom:16px}
+.ical-link-row{display:flex;gap:8px;align-items:center;margin-bottom:16px}
+.ical-link-input{flex:1;font-size:12px;padding:8px 12px;border:1px solid var(--border2);border-radius:8px;background:var(--dark3);color:var(--text2);font-family:'Inter',sans-serif;cursor:text}
+.ical-tabs{display:flex;gap:8px;margin-bottom:14px}
+.ical-tab{padding:6px 14px;font-size:12px;font-weight:500;border-radius:6px;border:1px solid var(--border2);background:var(--dark3);color:var(--text2);cursor:pointer;transition:all .15s}
+.ical-tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.ical-steps{display:none;flex-direction:column;gap:6px}
+.ical-steps.active{display:flex}
+.ical-step{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--text2);line-height:1.5}
+.ical-step-num{min-width:22px;height:22px;border-radius:50%;background:rgba(59,130,246,0.12);color:var(--blue);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.ical-note{font-size:11px;color:var(--text3);margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
 .alert-error{background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2)}
 
 /* TOAST */
@@ -1166,6 +1179,35 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);hei
         <div id="rdv-upcoming" style="display:none"></div>
       </div>
     </div>
+
+    <!-- iCal sync -->
+    <div class="ical-box" id="ical-sync-box">
+      <div class="ical-box-title">📲 Synchroniser avec mon téléphone</div>
+      <div class="ical-box-sub">Abonnez-vous à votre agenda pylotIA depuis votre application calendrier préférée.</div>
+      <div class="ical-link-row">
+        <input class="ical-link-input" id="ical-link-input" readonly placeholder="Génération du lien…">
+        <button class="btn btn-blue" onclick="copyIcalLink()" id="ical-copy-btn" style="white-space:nowrap;font-size:13px">Copier le lien</button>
+      </div>
+      <div class="ical-tabs">
+        <button class="ical-tab active" onclick="switchIcalTab('iphone',this)">🍎 iPhone</button>
+        <button class="ical-tab" onclick="switchIcalTab('android',this)">🤖 Android</button>
+      </div>
+      <div class="ical-steps active" id="ical-steps-iphone">
+        <div class="ical-step"><div class="ical-step-num">1</div><div>Ouvrez les <strong>Réglages</strong> de votre iPhone</div></div>
+        <div class="ical-step"><div class="ical-step-num">2</div><div>Allez dans <strong>Calendrier → Comptes → Ajouter un compte</strong></div></div>
+        <div class="ical-step"><div class="ical-step-num">3</div><div>Sélectionnez <strong>Autre</strong> puis <strong>Ajouter un cal. avec abonnement</strong></div></div>
+        <div class="ical-step"><div class="ical-step-num">4</div><div>Collez votre lien pylotIA et appuyez sur <strong>Suivant</strong></div></div>
+        <div class="ical-step"><div class="ical-step-num">5</div><div>Appuyez sur <strong>Enregistrer</strong> — vos RDV apparaissent dans votre calendrier</div></div>
+      </div>
+      <div class="ical-steps" id="ical-steps-android">
+        <div class="ical-step"><div class="ical-step-num">1</div><div>Ouvrez <strong>Google Agenda</strong> sur votre téléphone ou sur <strong>calendar.google.com</strong></div></div>
+        <div class="ical-step"><div class="ical-step-num">2</div><div>Cliquez sur <strong>+</strong> à côté de <strong>Autres agendas</strong></div></div>
+        <div class="ical-step"><div class="ical-step-num">3</div><div>Sélectionnez <strong>À partir d'une URL</strong></div></div>
+        <div class="ical-step"><div class="ical-step-num">4</div><div>Collez votre lien pylotIA et cliquez sur <strong>Ajouter</strong></div></div>
+        <div class="ical-step"><div class="ical-step-num">5</div><div>Vos RDV apparaissent dans les <strong>15 à 60 minutes</strong></div></div>
+      </div>
+      <div class="ical-note">⏱ La synchronisation peut prendre jusqu'à 60 minutes selon votre application calendrier.</div>
+    </div>
   </div>
 
   <!-- PARAMÈTRES -->
@@ -1876,6 +1918,7 @@ let _aiTodosDate         = null; // date de génération 'YYYY-MM-DD'
 let _plan               = 'free'; // plan lu depuis user_plans
 let _onboardingCompleted = false;
 let _secteurActivite     = null;
+let _icalToken           = null;
 
 // ─── NORMALISATION DB → OBJET APP ────────────────────────────
 function normalizeContact(row) {
@@ -1932,7 +1975,7 @@ async function loadProspectsFromDB() {
 async function loadPlanFromDB() {
   const { data, error } = await supabaseClient
     .from('user_plans')
-    .select('plan, onboarding_completed, secteur_activite, tour_etape_courante, navbar_order')
+    .select('plan, onboarding_completed, secteur_activite, tour_etape_courante, navbar_order, ical_token')
     .eq('user_id', currentUser.id)
     .single();
   if (error || !data) { _plan = 'free'; return; }
@@ -1941,6 +1984,7 @@ async function loadPlanFromDB() {
   _secteurActivite     = data.secteur_activite || null;
   _tourStep            = data.tour_etape_courante || 0;
   if (data.navbar_order?.length) applyNavOrder(data.navbar_order);
+  _icalToken = data.ical_token || null;
 }
 
 async function loadAiTodosFromDB() {
@@ -3689,6 +3733,7 @@ function initAgenda() {
   if (!calSelectedDate) calSelectedDate = today.toISOString().split('T')[0];
   populateRdvContactSelect();
   loadAppointments();
+  initIcalSync();
 }
 
 async function loadAppointments() {
@@ -6476,6 +6521,51 @@ async function saveSettingsSecteur() {
     successEl.style.display = 'block';
     setTimeout(() => successEl.style.display = 'none', 3000);
   }
+}
+
+// ── iCAL SYNC ─────────────────────────────────────────────────
+async function initIcalSync() {
+  if (_icalToken) {
+    document.getElementById('ical-link-input').value =
+      `https://pilotia.vercel.app/api/calendar/${_icalToken}.ics`;
+    return;
+  }
+  // Générer et sauvegarder un nouveau token
+  const newToken = crypto.randomUUID();
+  const { error } = await supabaseClient
+    .from('user_plans')
+    .update({ ical_token: newToken })
+    .eq('user_id', currentUser.id);
+  if (!error) {
+    _icalToken = newToken;
+    document.getElementById('ical-link-input').value =
+      `https://pilotia.vercel.app/api/calendar/${_icalToken}.ics`;
+  }
+}
+
+function switchIcalTab(tab, btn) {
+  document.querySelectorAll('.ical-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.ical-steps').forEach(s => s.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('ical-steps-' + tab).classList.add('active');
+}
+
+async function copyIcalLink() {
+  const input = document.getElementById('ical-link-input');
+  const btn   = document.getElementById('ical-copy-btn');
+  if (!input.value || input.value === 'Génération du lien…') return;
+  try {
+    await navigator.clipboard.writeText(input.value);
+  } catch {
+    input.select();
+    document.execCommand('copy');
+  }
+  btn.textContent = '✓ Lien copié !';
+  btn.style.background = '#10b981';
+  setTimeout(() => {
+    btn.textContent = 'Copier le lien';
+    btn.style.background = '';
+  }, 2000);
 }
 
 // ── SUPPORT ───────────────────────────────────────────────────
