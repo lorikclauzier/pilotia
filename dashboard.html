@@ -2582,11 +2582,17 @@ function renderTodos() {
   const prioColors = { haute:'#ef4444', normale:'#3b82f6', basse:'#94a3b8' };
   const prioLabels = { haute:'Haute', normale:'Normale', basse:'Basse' };
   const today = new Date().toISOString().split('T')[0];
+  let lastWasCochee = false;
   list.innerHTML = sorted.map(t => {
     const contactName = t.contact_id ? (_contacts.find(c => c.id === t.contact_id)?.nom || '') : '';
     const dateStr = t.date_echeance ? new Date(t.date_echeance+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '';
     const isOverdue = t.date_echeance && !t.cochee && t.date_echeance < today;
-    return `<div class="todo-item${t.cochee?' todo-checked':''}" id="todo-${t.id}">
+    let separator = '';
+    if (t.cochee && !lastWasCochee) {
+      separator = `<div style="padding:8px 16px;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;background:var(--dark3);border-bottom:1px solid var(--border)">Terminé</div>`;
+      lastWasCochee = true;
+    }
+    return separator + `<div class="todo-item${t.cochee?' todo-checked':''}" id="todo-${t.id}">
       <input type="checkbox" class="todo-cb" ${t.cochee?'checked':''} onchange="toggleTodo('${t.id}',this.checked)">
       <div class="todo-body">
         <div class="todo-title">${_briefEsc(t.titre)}</div>
