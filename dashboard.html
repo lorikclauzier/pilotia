@@ -2335,7 +2335,18 @@ function editContact(id) { if (id && id !== 'null') openModal(id); }
 let currentDrawerContactId = null;
 
 function openContactDrawer(id) {
-  const c = _contacts.find(x => x.id === id);
+  let c = _contacts.find(x => x.id === id);
+  // Fallback : contact campaign_only absent de _contacts — cherche dans _campaignContacts
+  if (!c) {
+    for (const arr of Object.values(_campaignContacts)) {
+      const item = arr.find(x => x.contacts?.id === id);
+      if (item?.contacts) {
+        const r = item.contacts;
+        c = { id:r.id, nom:r.nom||'', entreprise:r.entreprise||'', email:r.email||'', tel:r.tel||'', statut:r.statut||'Lead', poste:'', date:null, note:'' };
+        break;
+      }
+    }
+  }
   if (!c) return;
   currentDrawerContactId = id;
 
