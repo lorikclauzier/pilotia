@@ -4545,25 +4545,66 @@ async function assignProspectToCampaign(campaignId, campaignNom) {
   const p = getProspects().find(x => x.id === editingProspId);
   if (!p) return;
 
-  // Fermer le picker immédiatement (avant l'await pour éviter les double-clics)
   document.getElementById('prosp-campaign-picker').style.display = 'none';
   const btn = document.getElementById('prosp-campaign-btn');
   btn.disabled = true;
   _assigningCampaign = true;
 
-  const { error } = await supabaseClient.from('prospects')
-    .update({ campaign_id: campaignId }).eq('id', editingProspId);
+  try {
+    // 1. Trouver ou créer un contact correspondant au prospect
+    let contactId = null;
+    if (p.email) {
+      const existing = _contacts.find(c => c.email && c.email === p.email);
+      if (existing) contactId = existing.id;
+    }
+    if (!contactId) {
+      const existing = _contacts.find(c => c.nom === p.nom);
+      if (existing) contactId = existing.id;
+    }
+    if (!contactId) {
+      // Créer le contact depuis le prospect (sans le passer en client_actif)
+      const saved = await dbAddContact({
+        nom: p.nom, entreprise: p.entreprise, email: p.email,
+        tel: p.tel, statut: 'Lead', note: p.note
+      });
+      contactId = saved.id;
+      _contacts.unshift(normalizeContact(saved));
+    }
 
-  _assigningCampaign = false;
-  btn.disabled = false;
+    // 2. Insérer dans campaign_contacts si pas déjà présent
+    const alreadyIn = (_campaignContacts[campaignId] || []).some(x => x.contact_id === contactId);
+    if (!alreadyIn) {
+      const { data: cc, error: ccErr } = await supabaseClient
+        .from('campaign_contacts')
+        .insert({ campaign_id: campaignId, contact_id: contactId, user_id: currentUser.id, statut: 'à relancer' })
+        .select('*, contacts(id,nom,entreprise,email,tel,statut,campaign_only)')
+        .single();
+      if (ccErr && ccErr.code !== '23505') throw ccErr;
+      if (!_campaignContacts[campaignId]) _campaignContacts[campaignId] = [];
+      if (cc) _campaignContacts[campaignId].push(cc);
+    }
 
-  if (error) { console.error('assignProspectToCampaign:', error); showToast('Erreur : ' + (error.message || 'assignation impossible')); return; }
+    // 3. Marquer le prospect (optionnel — ignore si colonne absente)
+    p.campaign_id = campaignId;
+    await supabaseClient.from('prospects').update({ campaign_id: campaignId }).eq('id', editingProspId)
+      .then(() => {}, () => {});
 
-  p.campaign_id = campaignId;
-  btn.textContent = `✓ ${campaignNom}`;
-  btn.style.color = '#4ade80';
-  setTimeout(() => { btn.textContent = '→ Campagne'; btn.style.color = ''; }, 2000);
-  addActivity('edit', `Prospect assigné à la campagne "${campaignNom}" : ${p.nom}`);
+    btn.textContent = `✓ ${campaignNom}`;
+    btn.style.color = '#4ade80';
+    setTimeout(() => { btn.textContent = '→ Campagne'; btn.style.color = ''; }, 2000);
+    renderCampaigns();
+    updateDashStats();
+    addActivity('edit', `Prospect assigné à la campagne "${campaignNom}" : ${p.nom}`);
+    showToast(`${p.nom} ajouté à "${campaignNom}" ✓`);
+  } catch (e) {
+    console.error('assignProspectToCampaign:', e);
+    showToast('Erreur : ' + (e.message || 'assignation impossible'));
+    btn.textContent = '→ Campagne';
+    btn.style.color = '';
+  } finally {
+    _assigningCampaign = false;
+    btn.disabled = false;
+  }
 }
 
 async function saveProspect() {
