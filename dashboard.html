@@ -626,6 +626,20 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);hei
   #brief-fab svg{width:20px;height:20px}
   #brief-modal{padding:22px 16px}
 }
+/* ─── TODOS ─────────────────────────────────────────────── */
+.todo-item{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border);transition:background 0.15s}
+.todo-item:last-child{border-bottom:none}
+.todo-item:hover{background:var(--dark3)}
+.todo-item.todo-checked{opacity:0.55}
+.todo-cb{width:16px;height:16px;accent-color:var(--blue);cursor:pointer;flex-shrink:0}
+.todo-body{flex:1;min-width:0}
+.todo-title{font-size:13px;color:var(--text);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.todo-checked .todo-title{text-decoration:line-through;color:var(--text3)}
+.todo-meta{font-size:11px;color:var(--text3);margin-top:2px;display:flex;gap:6px;flex-wrap:wrap}
+.todo-prio{font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;white-space:nowrap;flex-shrink:0}
+.todo-del{background:none;border:none;cursor:pointer;color:var(--text3);font-size:13px;padding:4px;opacity:0;transition:opacity 0.15s;flex-shrink:0}
+.todo-item:hover .todo-del{opacity:1}
+.todo-del:hover{color:#ef4444}
 </style>
 </head>
 <body>
@@ -659,6 +673,11 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);hei
   <button class="nav-item" id="nav-activite" onclick="showSection('activite')">
     <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
     Activité
+  </button>
+  <button class="nav-item" id="nav-todos" onclick="showSection('todos')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    Tâches
+    <span class="nav-badge" id="todos-badge" style="display:none">0</span>
   </button>
   <button class="nav-item" id="nav-performance" onclick="showSection('performance')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
@@ -766,6 +785,15 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);hei
         </div>
         <div id="dash-contacts-list"></div>
       </div>
+    </div>
+
+    <!-- Widget Tâches de la semaine -->
+    <div id="dash-todos-widget" style="margin-top:24px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div class="section-label" style="margin-bottom:0">Tâches de la semaine</div>
+        <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="showSection('todos')">Voir toutes →</button>
+      </div>
+      <div id="dash-todos-list"><div style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;font-size:13px;color:var(--text3)">Aucune tâche pour cette semaine. <button onclick="showSection('todos')" style="background:none;border:none;color:var(--blue);cursor:pointer;font-family:'Inter',sans-serif;font-size:13px">+ Ajouter →</button></div></div>
     </div>
   </div>
 
@@ -1309,6 +1337,64 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);hei
     </div>
   </div>
 
+  <!-- TODOS -->
+  <div class="section" id="section-todos">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Tâches de la semaine</div>
+        <div class="page-sub">Organisez vos actions prioritaires</div>
+      </div>
+      <button class="btn btn-blue" onclick="showTodoForm()">+ Ajouter une tâche</button>
+    </div>
+
+    <!-- Formulaire d'ajout -->
+    <div id="todo-form-wrap" style="display:none;background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px">
+      <div style="display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:start;margin-bottom:10px">
+        <input id="todo-titre" class="form-input" placeholder="Titre de la tâche (obligatoire)" onkeydown="if(event.key==='Enter')submitTodo()">
+        <select id="todo-priorite" class="form-select" style="width:130px">
+          <option value="haute">🔴 Haute</option>
+          <option value="normale" selected>🔵 Normale</option>
+          <option value="basse">⚪ Basse</option>
+        </select>
+        <input id="todo-echeance" type="date" class="form-input" style="width:160px">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center">
+        <select id="todo-contact-select" class="form-select">
+          <option value="">— Associer un contact (optionnel) —</option>
+        </select>
+        <button class="btn btn-blue" onclick="submitTodo()">Ajouter</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('todo-form-wrap').style.display='none'">Annuler</button>
+      </div>
+    </div>
+
+    <!-- Liste des tâches -->
+    <div id="todos-list" style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:32px">
+      <div style="padding:24px;text-align:center;color:var(--text3);font-size:13px">Chargement…</div>
+    </div>
+
+    <!-- Suggestions IA -->
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#0f172a">Suggérées par l'IA <span style="font-size:11px;background:rgba(245,158,11,0.15);color:#fbbf24;padding:2px 8px;border-radius:10px;font-weight:600;vertical-align:middle">★ Pro</span></div>
+          <div style="font-size:13px;color:var(--text3);margin-top:2px">Basées sur vos prospects, relances et RDV à venir</div>
+        </div>
+        <button id="btn-refresh-ai-todos" class="btn btn-ghost" style="font-size:12px;padding:6px 12px;display:none" onclick="genAiTodos()">↻ Actualiser</button>
+      </div>
+      <!-- Contenu Pro -->
+      <div id="todos-ai-pro-content" style="display:none;background:var(--dark2);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+        <div id="todos-ai-suggestions"></div>
+      </div>
+      <!-- Gate non-Pro -->
+      <div id="todos-ai-gate" style="display:none;background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:32px;text-align:center">
+        <div style="font-size:32px;margin-bottom:12px">✦</div>
+        <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:8px">Tâches intelligentes — Offre Pro</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:20px;max-width:360px;margin-left:auto;margin-right:auto;line-height:1.7">Passez au plan Pro pour des tâches suggérées par l'IA, basées sur vos prospects en retard, relances urgentes et rendez-vous à venir.</div>
+        <button class="btn btn-blue" onclick="openUpgradeModal()">Voir les plans</button>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <!-- RECHERCHE GLOBALE -->
@@ -1705,6 +1791,7 @@ let activeConversation = null;
 // puis envoient la requête Supabase en arrière-plan.
 let _contacts  = [];   // miroir de la table contacts
 let _prospects = [];   // miroir de la table prospects
+let _todos     = [];   // miroir de la table todos
 let _plan               = 'free'; // plan lu depuis user_plans
 let _onboardingCompleted = false;
 let _secteurActivite     = null;
@@ -1972,7 +2059,8 @@ async function initApp() {
     loadContactsFromDB(),
     loadProspectsFromDB(),
     loadPlanFromDB(),
-    loadCampaignsData()
+    loadCampaignsData(),
+    loadTodosFromDB()
   ]);
 
   // Migration one-shot depuis localStorage si des données existent
@@ -1983,6 +2071,7 @@ async function initApp() {
   renderContacts();
   renderCampaigns();
   renderActivity();
+  renderDashTodos();
   updatePlanBadges();
   checkProspLocks();
 
@@ -2040,6 +2129,7 @@ function showSection(name) {
   if (name === 'prospection') initProspection();
   if (name === 'agenda') initAgenda();
   if (name === 'assistant') initAssistant();
+  if (name === 'todos') initTodos();
 }
 
 // ─── STORAGE HELPERS ──────────────────────────────────
@@ -2408,6 +2498,208 @@ function updateDashStats() {
           <div style="font-size:12px;color:var(--text3)">${new Date(c.date).toLocaleDateString('fr-FR')}</div>
         </div>`).join('');
     }
+  }
+}
+
+// ─── TODOS ────────────────────────────────────────────
+async function loadTodosFromDB() {
+  if (!currentUser) return;
+  const { data, error } = await supabaseClient
+    .from('todos')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false });
+  if (error) { console.error('loadTodos:', error.message); return; }
+  _todos = data || [];
+  // Suppression automatique des tâches cochées depuis la veille
+  const todayMidnight = new Date(); todayMidnight.setHours(0,0,0,0);
+  const toDelete = _todos.filter(t => t.cochee && t.completed_at && new Date(t.completed_at) < todayMidnight);
+  if (toDelete.length > 0) {
+    const ids = toDelete.map(t => t.id);
+    await supabaseClient.from('todos').delete().in('id', ids);
+    _todos = _todos.filter(t => !ids.includes(t.id));
+  }
+}
+
+function renderDashTodos() {
+  const el = document.getElementById('dash-todos-list');
+  if (!el) return;
+  const unchecked = _todos.filter(t => !t.cochee);
+  // Badge nav
+  const badge = document.getElementById('todos-badge');
+  if (badge) {
+    if (unchecked.length > 0) { badge.textContent = unchecked.length; badge.style.display = ''; }
+    else badge.style.display = 'none';
+  }
+  const prioColors = { haute:'#ef4444', normale:'#3b82f6', basse:'#94a3b8' };
+  if (unchecked.length === 0) {
+    el.innerHTML = `<div style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;font-size:13px;color:var(--text3)">Aucune tâche pour cette semaine. <button onclick="showSection('todos')" style="background:none;border:none;color:var(--blue);cursor:pointer;font-family:'Inter',sans-serif;font-size:13px">+ Ajouter →</button></div>`;
+    return;
+  }
+  const first3 = unchecked.slice(0,3);
+  el.innerHTML = `<div style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+    ${first3.map(t => {
+      const dateStr = t.date_echeance ? new Date(t.date_echeance+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '';
+      return `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer" onclick="showSection('todos')">
+        <div style="width:14px;height:14px;border:2px solid ${prioColors[t.priorite]||'#3b82f6'};border-radius:4px;flex-shrink:0"></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;color:var(--text);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${_briefEsc(t.titre)}</div>
+          ${dateStr ? `<div style="font-size:11px;color:var(--text3)">${dateStr}</div>` : ''}
+        </div>
+        <span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;background:${prioColors[t.priorite]||'#3b82f6'}18;color:${prioColors[t.priorite]||'#3b82f6'}">${t.priorite||'normale'}</span>
+      </div>`;
+    }).join('')}
+    ${unchecked.length > 3 ? `<div style="padding:10px 16px;font-size:12px;color:var(--blue);cursor:pointer;text-align:center" onclick="showSection('todos')">+${unchecked.length-3} autre(s) tâche(s) →</div>` : ''}
+  </div>`;
+}
+
+function renderTodos() {
+  renderDashTodos();
+  const list = document.getElementById('todos-list');
+  if (!list) return;
+  const prioOrder = { haute:0, normale:1, basse:2 };
+  const sorted = [..._todos].sort((a,b) => {
+    if (a.cochee !== b.cochee) return a.cochee ? 1 : -1;
+    const pa = prioOrder[a.priorite]??1, pb = prioOrder[b.priorite]??1;
+    if (pa !== pb) return pa - pb;
+    return new Date(b.created_at) - new Date(a.created_at);
+  });
+  if (sorted.length === 0) {
+    list.innerHTML = `<div style="text-align:center;padding:32px;color:var(--text3);font-size:13px">Aucune tâche. Cliquez sur "+ Ajouter une tâche" pour commencer.</div>`;
+    return;
+  }
+  const prioColors = { haute:'#ef4444', normale:'#3b82f6', basse:'#94a3b8' };
+  const prioLabels = { haute:'Haute', normale:'Normale', basse:'Basse' };
+  const today = new Date().toISOString().split('T')[0];
+  list.innerHTML = sorted.map(t => {
+    const contactName = t.contact_id ? (_contacts.find(c => c.id === t.contact_id)?.nom || '') : '';
+    const dateStr = t.date_echeance ? new Date(t.date_echeance+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '';
+    const isOverdue = t.date_echeance && !t.cochee && t.date_echeance < today;
+    return `<div class="todo-item${t.cochee?' todo-checked':''}" id="todo-${t.id}">
+      <input type="checkbox" class="todo-cb" ${t.cochee?'checked':''} onchange="toggleTodo('${t.id}',this.checked)">
+      <div class="todo-body">
+        <div class="todo-title">${_briefEsc(t.titre)}</div>
+        <div class="todo-meta">
+          ${dateStr ? `<span style="color:${isOverdue?'#ef4444':'var(--text3)'}">${isOverdue?'⚠️ ':''}${dateStr}</span>` : ''}
+          ${contactName ? `<span>· ${_briefEsc(contactName)}</span>` : ''}
+        </div>
+      </div>
+      <span class="todo-prio" style="background:${prioColors[t.priorite]||'#3b82f6'}18;color:${prioColors[t.priorite]||'#3b82f6'}">${prioLabels[t.priorite]||'Normale'}</span>
+      <button class="todo-del" onclick="deleteTodo('${t.id}')" title="Supprimer">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function showTodoForm() {
+  const form = document.getElementById('todo-form-wrap');
+  if (!form) return;
+  const isHidden = form.style.display === 'none';
+  form.style.display = isHidden ? 'block' : 'none';
+  if (isHidden) {
+    document.getElementById('todo-titre')?.focus();
+    const sel = document.getElementById('todo-contact-select');
+    if (sel) {
+      sel.innerHTML = '<option value="">— Associer un contact (optionnel) —</option>' +
+        _contacts.map(c => `<option value="${c.id}">${_briefEsc(c.nom)}${c.entreprise?' ('+_briefEsc(c.entreprise)+')':''}</option>`).join('');
+    }
+  }
+}
+
+async function submitTodo() {
+  const titreEl = document.getElementById('todo-titre');
+  const titre = titreEl?.value.trim();
+  if (!titre) { titreEl?.focus(); return; }
+  const echeance = document.getElementById('todo-echeance')?.value || null;
+  const priorite = document.getElementById('todo-priorite')?.value || 'normale';
+  const contactId = document.getElementById('todo-contact-select')?.value || null;
+  const row = { user_id: currentUser.id, titre, priorite, date_echeance: echeance||null, contact_id: contactId||null, cochee: false };
+  const { data, error } = await supabaseClient.from('todos').insert([row]).select().single();
+  if (error) { console.error('submitTodo:', error.message); return; }
+  _todos.unshift(data);
+  titreEl.value = '';
+  document.getElementById('todo-echeance').value = '';
+  document.getElementById('todo-priorite').value = 'normale';
+  document.getElementById('todo-contact-select').value = '';
+  document.getElementById('todo-form-wrap').style.display = 'none';
+  renderTodos();
+  addActivity('add', 'Tâche ajoutée : ' + titre);
+}
+
+async function toggleTodo(id, checked) {
+  const idx = _todos.findIndex(t => t.id === id);
+  if (idx === -1) return;
+  _todos[idx].cochee = checked;
+  _todos[idx].completed_at = checked ? new Date().toISOString() : null;
+  renderTodos();
+  await supabaseClient.from('todos').update({ cochee: checked, completed_at: checked ? new Date().toISOString() : null }).eq('id', id).eq('user_id', currentUser.id);
+}
+
+async function deleteTodo(id) {
+  _todos = _todos.filter(t => t.id !== id);
+  renderTodos();
+  await supabaseClient.from('todos').delete().eq('id', id).eq('user_id', currentUser.id);
+}
+
+async function addTodoFromSuggestion(titre, priorite, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = '✓ Ajouté'; }
+  const row = { user_id: currentUser.id, titre, priorite: priorite||'normale', cochee: false };
+  const { data, error } = await supabaseClient.from('todos').insert([row]).select().single();
+  if (error) { if (btn) { btn.disabled = false; btn.textContent = '+ Ajouter'; } return; }
+  _todos.unshift(data);
+  renderTodos();
+  addActivity('add', 'Tâche ajoutée (IA) : ' + titre);
+}
+
+async function initTodos() {
+  await loadTodosFromDB();
+  renderTodos();
+  const isPro = ['pro','business'].includes(getPlan());
+  const proContent = document.getElementById('todos-ai-pro-content');
+  const gate = document.getElementById('todos-ai-gate');
+  const refreshBtn = document.getElementById('btn-refresh-ai-todos');
+  if (proContent) proContent.style.display = isPro ? 'block' : 'none';
+  if (gate) gate.style.display = isPro ? 'none' : 'block';
+  if (refreshBtn) refreshBtn.style.display = isPro ? '' : 'none';
+  if (isPro) genAiTodos();
+}
+
+async function genAiTodos() {
+  const container = document.getElementById('todos-ai-suggestions');
+  if (!container) return;
+  container.innerHTML = `<div style="display:flex;align-items:center;gap:8px;padding:16px;color:var(--text3);font-size:13px"><div class="ai-typing-wrap"><span></span><span></span><span></span></div> L'IA analyse vos données…</div>`;
+  const today = new Date().toISOString().split('T')[0];
+  const overdueProspects = _prospects.filter(p => p.relance && p.relance < today && p.statut !== 'client_actif');
+  const in7 = new Date(Date.now()+7*86400000).toISOString().split('T')[0];
+  const upcomingAppts = (allAppointments||[]).filter(a => a.date >= today && a.date <= in7);
+  const systemPrompt = `Tu es un assistant CRM qui génère des suggestions de tâches prioritaires pour la semaine.${_secteurCtx()}
+
+Génère entre 3 et 5 suggestions de tâches concrètes et actionnables basées sur :
+- Prospects à relancer : ${overdueProspects.length} en retard (${overdueProspects.slice(0,3).map(p=>p.nom).join(', ')||'aucun'})
+- RDV à venir cette semaine : ${upcomingAppts.length} (${upcomingAppts.slice(0,3).map(a=>a.title).join(', ')||'aucun'})
+- Clients actifs : ${_contacts.filter(c=>c.statut==='Client').length}
+- Tâches existantes : ${_todos.filter(t=>!t.cochee).length} en cours
+
+Réponds UNIQUEMENT avec un tableau JSON valide, sans markdown : [{"titre": "...", "priorite": "haute|normale|basse"}]
+Maximum 5 tâches. Sois concis et pratique.`;
+  try {
+    const result = await callClaude(systemPrompt, [{ role:'user', content:'Génère mes suggestions de tâches pour cette semaine.' }], 400);
+    const jsonMatch = result.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) throw new Error('format');
+    const suggestions = JSON.parse(jsonMatch[0]);
+    if (!Array.isArray(suggestions) || suggestions.length === 0) throw new Error('vide');
+    const prioColors = { haute:'#ef4444', normale:'#3b82f6', basse:'#94a3b8' };
+    const prioLabels = { haute:'Haute', normale:'Normale', basse:'Basse' };
+    container.innerHTML = suggestions.map(s => {
+      const safe = _briefEsc(s.titre);
+      const prio = s.priorite||'normale';
+      return `<div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border)">
+        <div style="flex:1;font-size:13px;color:var(--text)">${safe}</div>
+        <span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;background:${prioColors[prio]||'#3b82f6'}18;color:${prioColors[prio]||'#3b82f6'}">${prioLabels[prio]||'Normale'}</span>
+        <button class="btn-sm btn-sm-blue" onclick="addTodoFromSuggestion(${JSON.stringify(s.titre)},${JSON.stringify(prio)},this)">+ Ajouter</button>
+      </div>`;
+    }).join('') + '<div style="height:1px"></div>';
+  } catch(e) {
+    container.innerHTML = `<div style="padding:16px;font-size:13px;color:var(--text3)">Impossible de générer les suggestions. <button onclick="genAiTodos()" class="btn btn-ghost" style="font-size:12px;padding:5px 10px">Réessayer</button></div>`;
   }
 }
 
@@ -6012,6 +6304,10 @@ async function initDailyBrief() {
 <div id="mobile-more-sheet" style="display:none;position:fixed;bottom:60px;left:0;right:0;z-index:601;background:var(--dark2);border-top:1px solid var(--border);border-radius:16px 16px 0 0;padding:12px 8px;animation:slideUp 0.2s ease">
   <div style="text-align:center;padding:0 0 10px;font-size:11px;color:var(--text3);font-weight:500">Autres sections</div>
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+    <button onclick="closeMobileMore();showSection('todos')" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;background:var(--dark3);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-size:11px;cursor:pointer">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      Tâches
+    </button>
     <button onclick="closeMobileMore();showSection('activite')" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;background:var(--dark3);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-size:11px;cursor:pointer">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       Activité
