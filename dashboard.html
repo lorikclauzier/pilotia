@@ -137,6 +137,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);hei
 .settings-full{grid-column:1/-1}
 .alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-top:12px;display:none}
 .alert-success{background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.2)}
+.alert-danger{background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2)}
 .alert-error{background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2)}
 
 /* TOAST */
@@ -1237,6 +1238,32 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);hei
         <div class="alert alert-success" id="settings-ia-success" style="display:none;margin-top:10px">Secteur enregistré ✓</div>
       </div>
 
+      <!-- Support -->
+      <div class="settings-card settings-full">
+        <div class="settings-card-title">Contacter le support</div>
+        <div class="settings-card-sub">Une question, un bug, une suggestion ? On vous répond sous 24h.</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Sujet</label>
+            <select class="form-input" id="support-sujet">
+              <option value="Bug">Bug</option>
+              <option value="Question">Question</option>
+              <option value="Suggestion">Suggestion</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Message</label>
+            <textarea class="form-input" id="support-message" rows="4" placeholder="Décrivez votre problème ou suggestion (min. 20 caractères)…" style="resize:vertical;min-height:90px"></textarea>
+          </div>
+          <div>
+            <button class="btn btn-blue" onclick="sendSupport()">Envoyer</button>
+          </div>
+          <div class="alert alert-success" id="support-success" style="display:none">✓ Message envoyé ! On vous répond sous 24h.</div>
+          <div class="alert alert-danger" id="support-error" style="display:none"></div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -1827,6 +1854,7 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);hei
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
 const SUPABASE_URL = 'https://wpyhxotefkpvqzpndpgg.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_m_m0c4egKS1E9LsVcJ93IQ_v7TYy-BS';
@@ -2109,6 +2137,7 @@ async function initApp() {
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) { window.location.href = 'login.html'; return; }
   currentUser = session.user;
+  emailjs.init({ publicKey: 'u3mve1BFOCwBPKRBc' });
 
   // Infos UI de base (nom, email)
   const name = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name
@@ -6446,6 +6475,51 @@ async function saveSettingsSecteur() {
   if (!error) {
     successEl.style.display = 'block';
     setTimeout(() => successEl.style.display = 'none', 3000);
+  }
+}
+
+// ── SUPPORT ───────────────────────────────────────────────────
+async function sendSupport() {
+  const sujet   = document.getElementById('support-sujet').value;
+  const message = document.getElementById('support-message').value.trim();
+  const successEl = document.getElementById('support-success');
+  const errorEl   = document.getElementById('support-error');
+  successEl.style.display = 'none';
+  errorEl.style.display   = 'none';
+
+  if (message.length < 20) {
+    errorEl.textContent = 'Le message doit contenir au moins 20 caractères.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  const planLabels = { free:'Gratuit', starter:'Starter', pro:'Pro', business:'Business' };
+  const userName  = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name
+                  || currentUser.email?.split('@')[0] || 'Utilisateur';
+  const userEmail = currentUser.email || '';
+  const userPlan  = planLabels[getPlan()] || getPlan();
+  const now       = new Date().toLocaleString('fr-FR');
+
+  const templateParams = {
+    sujet,
+    message,
+    user_name:  userName,
+    user_email: userEmail,
+    user_plan:  userPlan,
+    date:       now,
+    reply_to:   userEmail,
+    to_email:   'pylotia.app@gmail.com'
+  };
+
+  try {
+    await emailjs.send('service_xql0hy1', 'template_dz1anao', templateParams);
+    successEl.style.display = 'block';
+    document.getElementById('support-sujet').value   = 'Bug';
+    document.getElementById('support-message').value = '';
+    setTimeout(() => { successEl.style.display = 'none'; }, 3000);
+  } catch (e) {
+    errorEl.textContent = 'Erreur d\'envoi. Réessayez ou écrivez à pylotia.app@gmail.com';
+    errorEl.style.display = 'block';
   }
 }
 
