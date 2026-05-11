@@ -1850,7 +1850,7 @@ async function loadProspectsFromDB() {
 async function loadPlanFromDB() {
   const { data, error } = await supabaseClient
     .from('user_plans')
-    .select('plan, onboarding_completed, secteur_activite, tour_etape_courante, navbar_order, ai_todos_suggestions, ai_todos_date')
+    .select('plan, onboarding_completed, secteur_activite, tour_etape_courante, navbar_order')
     .eq('user_id', currentUser.id)
     .single();
   if (error || !data) { _plan = 'free'; return; }
@@ -1859,6 +1859,16 @@ async function loadPlanFromDB() {
   _secteurActivite     = data.secteur_activite || null;
   _tourStep            = data.tour_etape_courante || 0;
   if (data.navbar_order?.length) applyNavOrder(data.navbar_order);
+}
+
+async function loadAiTodosFromDB() {
+  if (!currentUser) return;
+  const { data, error } = await supabaseClient
+    .from('user_plans')
+    .select('ai_todos_suggestions, ai_todos_date')
+    .eq('user_id', currentUser.id)
+    .single();
+  if (error || !data) return; // colonnes absentes si migration non exécutée → silencieux
   _aiTodosSuggestions = data.ai_todos_suggestions || null;
   _aiTodosDate        = data.ai_todos_date || null;
 }
@@ -2660,6 +2670,8 @@ async function initTodos() {
   if (proContent) proContent.style.display = isPro ? 'block' : 'none';
   if (gate) gate.style.display = isPro ? 'none' : 'block';
   if (!isPro) return;
+  // Charger les suggestions persistées si pas encore en mémoire
+  if (!_aiTodosDate) await loadAiTodosFromDB();
   const today = new Date().toISOString().split('T')[0];
   if (_aiTodosDate === today && Array.isArray(_aiTodosSuggestions) && _aiTodosSuggestions.length > 0) {
     renderAiTodos(_aiTodosSuggestions);
@@ -2732,7 +2744,8 @@ Maximum 5 tâches. Sois concis et pratique.`;
       .catch(() => {});
     renderAiTodos(suggestions);
   } catch(e) {
-    container.innerHTML = `<div style="padding:16px;font-size:13px;color:var(--text3)">Impossible de générer les suggestions pour aujourd'hui.</div>`;
+    console.error('genAiTodos:', e);
+    container.innerHTML = `<div style="padding:16px;font-size:13px;color:var(--text3)">Erreur : ${_briefEsc(e.message||'inconnue')} — <button onclick="genAiTodos()" class="btn btn-ghost" style="font-size:12px;padding:5px 10px;margin-left:4px">Réessayer</button></div>`;
   }
 }
 
