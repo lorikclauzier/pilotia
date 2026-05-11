@@ -6481,13 +6481,13 @@ async function saveSettingsSecteur() {
 // ── SUPPORT ───────────────────────────────────────────────────
 async function sendSupport() {
   const sujet   = document.getElementById('support-sujet').value;
-  const message = document.getElementById('support-message').value.trim();
+  const msg     = document.getElementById('support-message').value.trim();
   const successEl = document.getElementById('support-success');
   const errorEl   = document.getElementById('support-error');
   successEl.style.display = 'none';
   errorEl.style.display   = 'none';
 
-  if (message.length < 20) {
+  if (msg.length < 20) {
     errorEl.textContent = 'Le message doit contenir au moins 20 caractères.';
     errorEl.style.display = 'block';
     return;
@@ -6500,19 +6500,23 @@ async function sendSupport() {
   const userPlan  = planLabels[getPlan()] || getPlan();
   const now       = new Date().toLocaleString('fr-FR');
 
-  const templateParams = {
-    sujet,
-    message,
-    user_name:  userName,
-    user_email: userEmail,
-    user_plan:  userPlan,
-    date:       now,
-    reply_to:   userEmail,
-    to_email:   'pylotia.app@gmail.com'
-  };
+  // Le template template_dz1anao utilise uniquement name, email, message.
+  // On construit un message structuré pour que toutes les infos arrivent dans le mail.
+  const fullMessage =
+    `Nouveau message de ${userName} (${userEmail})\n` +
+    `Plan : ${userPlan}\n` +
+    `Objet : ${sujet}\n` +
+    `\n` +
+    `Message :\n${msg}\n` +
+    `\n` +
+    `Envoyé le : ${now}`;
 
   try {
-    await emailjs.send('service_xql0hy1', 'template_dz1anao', templateParams);
+    await emailjs.send('service_xql0hy1', 'template_dz1anao', {
+      name:    `[Support pylotIA] ${sujet} — ${userName}`,
+      email:   userEmail,
+      message: fullMessage
+    });
     successEl.style.display = 'block';
     document.getElementById('support-sujet').value   = 'Bug';
     document.getElementById('support-message').value = '';
