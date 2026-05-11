@@ -2679,8 +2679,20 @@ Génère entre 3 et 5 suggestions de tâches concrètes et actionnables basées 
 - Clients actifs : ${_contacts.filter(c=>c.statut==='Client').length}
 - Tâches existantes : ${_todos.filter(t=>!t.cochee).length} en cours
 
-Réponds UNIQUEMENT avec un tableau JSON valide, sans markdown : [{"titre": "...", "priorite": "haute|normale|basse"}]
+Pour chaque suggestion, indique la section pylotIA la plus pertinente parmi : contacts, relances, agenda, campagnes, performance, post-vente, assistant-ia.
+
+Réponds UNIQUEMENT avec un tableau JSON valide, sans markdown : [{"titre": "...", "priorite": "haute|normale|basse", "section": "contacts|relances|agenda|campagnes|performance|post-vente|assistant-ia"}]
 Maximum 5 tâches. Sois concis et pratique.`;
+  // Mapping section IA → nom de section dashboard
+  const sectionMap = {
+    'contacts':    'contacts',
+    'relances':    'prospection',
+    'agenda':      'agenda',
+    'campagnes':   'messages',
+    'performance': 'performance',
+    'post-vente':  'postvente',
+    'assistant-ia':'assistant'
+  };
   try {
     const result = await callClaude(systemPrompt, [{ role:'user', content:'Génère mes suggestions de tâches pour cette semaine.' }], 400);
     const jsonMatch = result.match(/\[[\s\S]*\]/);
@@ -2692,10 +2704,14 @@ Maximum 5 tâches. Sois concis et pratique.`;
     container.innerHTML = suggestions.map(s => {
       const safe = _briefEsc(s.titre);
       const prio = s.priorite||'normale';
+      const target = sectionMap[s.section] || null;
+      const btn = target
+        ? `<button class="btn-sm btn-sm-blue" onclick="showSection('${target}')">+ Ajouter</button>`
+        : '';
       return `<div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border)">
         <div style="flex:1;font-size:13px;color:var(--text)">${safe}</div>
         <span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;background:${prioColors[prio]||'#3b82f6'}18;color:${prioColors[prio]||'#3b82f6'}">${prioLabels[prio]||'Normale'}</span>
-        <button class="btn-sm btn-sm-blue" onclick="addTodoFromSuggestion(${JSON.stringify(s.titre)},${JSON.stringify(prio)},this)">+ Ajouter</button>
+        ${btn}
       </div>`;
     }).join('') + '<div style="height:1px"></div>';
   } catch(e) {
