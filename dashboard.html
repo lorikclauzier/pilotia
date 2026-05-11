@@ -1877,6 +1877,7 @@ let _aiTodosDate         = null; // date de génération 'YYYY-MM-DD'
 let _plan               = 'free'; // plan lu depuis user_plans
 let _onboardingCompleted = false;
 let _secteurActivite     = null;
+let _assigningCampaign   = false;
 
 // ─── NORMALISATION DB → OBJET APP ────────────────────────────
 function normalizeContact(row) {
@@ -1903,9 +1904,10 @@ function normalizeProspect(row) {
     statut:     row.statut || 'nouveau_lead',
     source:     row.source || 'Manuel',
     valeur:     row.valeur != null ? String(row.valeur) : '',
-    relance:    row.relance || '',
-    note:       row.note || '',
-    date:       row.date_ajout || row.created_at || new Date().toISOString()
+    relance:     row.relance || '',
+    note:        row.note || '',
+    campaign_id: row.campaign_id || null,
+    date:        row.date_ajout || row.created_at || new Date().toISOString()
   };
 }
 
@@ -4459,6 +4461,10 @@ function openProspModal(id, defaultStatut) {
   // Réinitialiser le sélecteur campagne
   document.getElementById('prosp-campaign-picker').style.display = 'none';
   document.getElementById('prosp-campaign-list').innerHTML = '';
+  const campBtn = document.getElementById('prosp-campaign-btn');
+  campBtn.textContent = '→ Campagne';
+  campBtn.style.color = '';
+  campBtn.disabled = false;
   if (isEdit) {
     const alreadyContact = _contacts.some(c => {
       const p = getProspects().find(x => x.id === id);
@@ -4466,7 +4472,7 @@ function openProspModal(id, defaultStatut) {
     });
     document.getElementById('prosp-convert-btn').style.display = alreadyContact ? 'none' : 'block';
     document.getElementById('prosp-convert-btn').textContent = '→ Créer contact';
-    document.getElementById('prosp-campaign-btn').style.display = 'inline-flex';
+    campBtn.style.display = 'inline-flex';
   } else {
     document.getElementById('prosp-convert-btn').style.display = 'none';
     document.getElementById('prosp-campaign-btn').style.display = 'none';
@@ -4501,6 +4507,11 @@ function closeProspModal() {
   pmsgSec.style.display = 'none'; pmsgSec.innerHTML = '';
   document.getElementById('prosp-campaign-picker').style.display = 'none';
   document.getElementById('prosp-campaign-list').innerHTML = '';
+  const campBtn = document.getElementById('prosp-campaign-btn');
+  campBtn.textContent = '→ Campagne';
+  campBtn.style.color = '';
+  campBtn.disabled = false;
+  _assigningCampaign = false;
   editingProspId = null;
 }
 
@@ -4515,7 +4526,7 @@ function toggleCampaignPicker() {
     const p = getProspects().find(x => x.id === editingProspId);
     list.innerHTML = activeCamps.map(c => {
       const assigned = p && p.campaign_id === c.id;
-      return `<div onclick="assignProspectToCampaign('${c.id}','${c.nom.replace(/'/g,"\\'")}',this)"
+      return `<div onclick="assignProspectToCampaign('${c.id}','${c.nom.replace(/'/g,"\\'")}')"
         style="padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;color:var(--text);
                background:${assigned ? 'rgba(59,130,246,0.1)' : 'transparent'};
                border:1px solid ${assigned ? 'rgba(59,130,246,0.3)' : 'transparent'};
@@ -4529,20 +4540,29 @@ function toggleCampaignPicker() {
   picker.style.display = 'block';
 }
 
-async function assignProspectToCampaign(campaignId, campaignNom, el) {
-  if (!editingProspId) return;
+async function assignProspectToCampaign(campaignId, campaignNom) {
+  if (!editingProspId || _assigningCampaign) return;
   const p = getProspects().find(x => x.id === editingProspId);
   if (!p) return;
-  const { error } = await supabaseClient.from('prospects')
-    .update({ campaign_id: campaignId }).eq('id', editingProspId);
-  if (error) { showToast('Erreur lors de l\'assignation', 'error'); return; }
-  p.campaign_id = campaignId;
+
+  // Fermer le picker immédiatement (avant l'await pour éviter les double-clics)
   document.getElementById('prosp-campaign-picker').style.display = 'none';
   const btn = document.getElementById('prosp-campaign-btn');
-  const orig = btn.textContent;
+  btn.disabled = true;
+  _assigningCampaign = true;
+
+  const { error } = await supabaseClient.from('prospects')
+    .update({ campaign_id: campaignId }).eq('id', editingProspId);
+
+  _assigningCampaign = false;
+  btn.disabled = false;
+
+  if (error) { showToast('Erreur lors de l\'assignation'); return; }
+
+  p.campaign_id = campaignId;
   btn.textContent = `✓ ${campaignNom}`;
   btn.style.color = '#4ade80';
-  setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 2000);
+  setTimeout(() => { btn.textContent = '→ Campagne'; btn.style.color = ''; }, 2000);
   addActivity('edit', `Prospect assigné à la campagne "${campaignNom}" : ${p.nom}`);
 }
 
