@@ -4557,7 +4557,7 @@ async function assignProspectToCampaign(campaignId, campaignNom) {
   _assigningCampaign = false;
   btn.disabled = false;
 
-  if (error) { showToast('Erreur lors de l\'assignation'); return; }
+  if (error) { console.error('assignProspectToCampaign:', error); showToast('Erreur : ' + (error.message || 'assignation impossible')); return; }
 
   p.campaign_id = campaignId;
   btn.textContent = `✓ ${campaignNom}`;
