@@ -1374,12 +1374,9 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);hei
 
     <!-- Suggestions IA -->
     <div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-        <div>
-          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#0f172a">Suggérées par l'IA <span style="font-size:11px;background:rgba(245,158,11,0.15);color:#fbbf24;padding:2px 8px;border-radius:10px;font-weight:600;vertical-align:middle">★ Pro</span></div>
-          <div style="font-size:13px;color:var(--text3);margin-top:2px">Basées sur vos prospects, relances et RDV à venir</div>
-        </div>
-        <button id="btn-refresh-ai-todos" class="btn btn-ghost" style="font-size:12px;padding:6px 12px;display:none" onclick="genAiTodos()">↻ Actualiser</button>
+      <div style="margin-bottom:14px">
+        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#0f172a">Suggérées par l'IA <span style="font-size:11px;background:rgba(245,158,11,0.15);color:#fbbf24;padding:2px 8px;border-radius:10px;font-weight:600;vertical-align:middle">★ Pro</span></div>
+        <div style="font-size:13px;color:var(--text3);margin-top:2px">Basées sur vos prospects, relances et RDV à venir</div>
       </div>
       <!-- Contenu Pro -->
       <div id="todos-ai-pro-content" style="display:none;background:var(--dark2);border:1px solid var(--border);border-radius:12px;overflow:hidden">
@@ -1791,7 +1788,9 @@ let activeConversation = null;
 // puis envoient la requête Supabase en arrière-plan.
 let _contacts  = [];   // miroir de la table contacts
 let _prospects = [];   // miroir de la table prospects
-let _todos     = [];   // miroir de la table todos
+let _todos               = [];   // miroir de la table todos
+let _aiTodosSuggestions  = null; // suggestions IA du jour (array ou null)
+let _aiTodosDate         = null; // date de génération 'YYYY-MM-DD'
 let _plan               = 'free'; // plan lu depuis user_plans
 let _onboardingCompleted = false;
 let _secteurActivite     = null;
@@ -1851,7 +1850,7 @@ async function loadProspectsFromDB() {
 async function loadPlanFromDB() {
   const { data, error } = await supabaseClient
     .from('user_plans')
-    .select('plan, onboarding_completed, secteur_activite, tour_etape_courante, navbar_order')
+    .select('plan, onboarding_completed, secteur_activite, tour_etape_courante, navbar_order, ai_todos_suggestions, ai_todos_date')
     .eq('user_id', currentUser.id)
     .single();
   if (error || !data) { _plan = 'free'; return; }
@@ -1860,6 +1859,8 @@ async function loadPlanFromDB() {
   _secteurActivite     = data.secteur_activite || null;
   _tourStep            = data.tour_etape_courante || 0;
   if (data.navbar_order?.length) applyNavOrder(data.navbar_order);
+  _aiTodosSuggestions = data.ai_todos_suggestions || null;
+  _aiTodosDate        = data.ai_todos_date || null;
 }
 
 // ─── ÉCRITURE CONTACTS SUPABASE ───────────────────────────────
@@ -2656,11 +2657,44 @@ async function initTodos() {
   const isPro = ['pro','business'].includes(getPlan());
   const proContent = document.getElementById('todos-ai-pro-content');
   const gate = document.getElementById('todos-ai-gate');
-  const refreshBtn = document.getElementById('btn-refresh-ai-todos');
   if (proContent) proContent.style.display = isPro ? 'block' : 'none';
   if (gate) gate.style.display = isPro ? 'none' : 'block';
-  if (refreshBtn) refreshBtn.style.display = isPro ? '' : 'none';
-  if (isPro) genAiTodos();
+  if (!isPro) return;
+  const today = new Date().toISOString().split('T')[0];
+  if (_aiTodosDate === today && Array.isArray(_aiTodosSuggestions) && _aiTodosSuggestions.length > 0) {
+    renderAiTodos(_aiTodosSuggestions);
+  } else {
+    await genAiTodos();
+  }
+}
+
+function renderAiTodos(suggestions) {
+  const container = document.getElementById('todos-ai-suggestions');
+  if (!container) return;
+  const sectionMap = {
+    'contacts':    'contacts',
+    'relances':    'prospection',
+    'agenda':      'agenda',
+    'campagnes':   'messages',
+    'performance': 'performance',
+    'post-vente':  'postvente',
+    'assistant-ia':'assistant'
+  };
+  const prioColors = { haute:'#ef4444', normale:'#3b82f6', basse:'#94a3b8' };
+  const prioLabels = { haute:'Haute', normale:'Normale', basse:'Basse' };
+  container.innerHTML = suggestions.map(s => {
+    const safe   = _briefEsc(s.titre);
+    const prio   = s.priorite||'normale';
+    const target = sectionMap[s.section] || null;
+    const btn    = target
+      ? `<button class="btn-sm btn-sm-blue" onclick="showSection('${target}')">+ Ajouter</button>`
+      : '';
+    return `<div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border)">
+      <div style="flex:1;font-size:13px;color:var(--text)">${safe}</div>
+      <span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;background:${prioColors[prio]||'#3b82f6'}18;color:${prioColors[prio]||'#3b82f6'}">${prioLabels[prio]||'Normale'}</span>
+      ${btn}
+    </div>`;
+  }).join('') + '<div style="height:1px"></div>';
 }
 
 async function genAiTodos() {
@@ -2683,39 +2717,22 @@ Pour chaque suggestion, indique la section pylotIA la plus pertinente parmi : co
 
 Réponds UNIQUEMENT avec un tableau JSON valide, sans markdown : [{"titre": "...", "priorite": "haute|normale|basse", "section": "contacts|relances|agenda|campagnes|performance|post-vente|assistant-ia"}]
 Maximum 5 tâches. Sois concis et pratique.`;
-  // Mapping section IA → nom de section dashboard
-  const sectionMap = {
-    'contacts':    'contacts',
-    'relances':    'prospection',
-    'agenda':      'agenda',
-    'campagnes':   'messages',
-    'performance': 'performance',
-    'post-vente':  'postvente',
-    'assistant-ia':'assistant'
-  };
   try {
     const result = await callClaude(systemPrompt, [{ role:'user', content:'Génère mes suggestions de tâches pour cette semaine.' }], 400);
     const jsonMatch = result.match(/\[[\s\S]*\]/);
     if (!jsonMatch) throw new Error('format');
     const suggestions = JSON.parse(jsonMatch[0]);
     if (!Array.isArray(suggestions) || suggestions.length === 0) throw new Error('vide');
-    const prioColors = { haute:'#ef4444', normale:'#3b82f6', basse:'#94a3b8' };
-    const prioLabels = { haute:'Haute', normale:'Normale', basse:'Basse' };
-    container.innerHTML = suggestions.map(s => {
-      const safe = _briefEsc(s.titre);
-      const prio = s.priorite||'normale';
-      const target = sectionMap[s.section] || null;
-      const btn = target
-        ? `<button class="btn-sm btn-sm-blue" onclick="showSection('${target}')">+ Ajouter</button>`
-        : '';
-      return `<div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border)">
-        <div style="flex:1;font-size:13px;color:var(--text)">${safe}</div>
-        <span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;background:${prioColors[prio]||'#3b82f6'}18;color:${prioColors[prio]||'#3b82f6'}">${prioLabels[prio]||'Normale'}</span>
-        ${btn}
-      </div>`;
-    }).join('') + '<div style="height:1px"></div>';
+    // Persistance en Supabase + cache mémoire
+    _aiTodosSuggestions = suggestions;
+    _aiTodosDate        = today;
+    supabaseClient.from('user_plans')
+      .update({ ai_todos_suggestions: suggestions, ai_todos_date: today })
+      .eq('user_id', currentUser.id)
+      .catch(() => {});
+    renderAiTodos(suggestions);
   } catch(e) {
-    container.innerHTML = `<div style="padding:16px;font-size:13px;color:var(--text3)">Impossible de générer les suggestions. <button onclick="genAiTodos()" class="btn btn-ghost" style="font-size:12px;padding:5px 10px">Réessayer</button></div>`;
+    container.innerHTML = `<div style="padding:16px;font-size:13px;color:var(--text3)">Impossible de générer les suggestions pour aujourd'hui.</div>`;
   }
 }
 
