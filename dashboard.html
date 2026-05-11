@@ -2741,7 +2741,7 @@ Maximum 5 tâches. Sois concis et pratique.`;
     supabaseClient.from('user_plans')
       .update({ ai_todos_suggestions: suggestions, ai_todos_date: today })
       .eq('user_id', currentUser.id)
-      .catch(() => {});
+      .then(() => {}, () => {});
     renderAiTodos(suggestions);
   } catch(e) {
     console.error('genAiTodos:', e);
@@ -5958,7 +5958,7 @@ async function tourGoTo(stepIndex) {
 
   // Sauvegarde progression
   supabaseClient.from('user_plans').update({ tour_etape_courante: stepIndex })
-    .eq('user_id', currentUser.id).catch(() => {});
+    .eq('user_id', currentUser.id).then(() => {}, () => {});
 }
 
 function _tourShowSection(sectionName) {
@@ -6079,7 +6079,7 @@ async function closeTourEnd() {
   _onboardingCompleted = true;
   await supabaseClient.from('user_plans')
     .update({ onboarding_completed: true, tour_etape_courante: TOUR_STEPS.length })
-    .eq('user_id', currentUser.id).catch(() => {});
+    .eq('user_id', currentUser.id).then(() => {}, () => {});
   showSection('dashboard');
 }
 window.addEventListener('resize', () => {
