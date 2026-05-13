@@ -217,6 +217,8 @@ h1 .underline{position:relative;display:inline-block}
 .price-note{font-size:12px;color:var(--text3);margin-bottom:22px}
 .plan-cta{width:100%;padding:11px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;margin-bottom:22px;letter-spacing:0.1px}
 .plan-cta-coming{width:100%;padding:11px;border-radius:10px;font-size:14px;font-weight:500;margin-bottom:22px;background:rgba(74,90,120,0.1);color:var(--text3);border:1px solid rgba(74,90,120,0.18);text-align:center;cursor:default;box-sizing:border-box}
+.plan-cta-waitlist{width:100%;padding:11px;border-radius:10px;font-size:14px;font-weight:500;margin-bottom:22px;background:rgba(77,142,245,0.08);color:var(--blue);border:1px solid rgba(77,142,245,0.25);text-align:center;cursor:pointer;box-sizing:border-box;font-family:'Inter',sans-serif;transition:all 0.2s}
+.plan-cta-waitlist:hover{background:rgba(77,142,245,0.14);border-color:rgba(77,142,245,0.4)}
 .cta-blue{background:var(--blue);color:#fff;border:none;box-shadow:0 2px 12px rgba(77,142,245,0.3)}
 .cta-blue:hover{background:var(--blue2);box-shadow:0 4px 20px rgba(77,142,245,0.4)}
 .cta-outline{background:transparent;color:var(--text2);border:1px solid var(--border2)}
@@ -1142,7 +1144,7 @@ footer{padding:32px 52px;border-top:1px solid var(--border);display:flex;align-i
   <!-- Flat-rate banner -->
   <div class="flat-banner">
     <span>💡</span>
-    <div data-i18n-html="pricing.banner"><strong>Prix flat rate</strong> — pas par utilisateur. Avec nous, pas de mauvaise surprise quand ton équipe grandit.</div>
+    <div data-i18n-html="pricing.banner"><strong>Prix flat rate</strong> — Un seul abonnement pour vous. Multi-comptes disponible en Plan Business.</div>
   </div>
 
   <div class="pricing-grid">
@@ -1151,6 +1153,7 @@ footer{padding:32px 52px;border-top:1px solid var(--border);display:flex;align-i
     <div class="plan-card">
       <div class="plan-name" data-i18n="plan.free.name">Gratuit</div>
       <div class="plan-desc" data-i18n="plan.free.desc">Pour tester l'outil</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px" data-i18n="plan.users.one">1 utilisateur</div>
       <div class="plan-price"><span class="price-num">0€</span></div>
       <div class="price-note" data-i18n="plan.free.note">Pour toujours gratuit</div>
       <a href="signup.html" class="plan-cta cta-outline" style="text-decoration:none;display:block;text-align:center" data-i18n="plan.free.cta">Commencer gratuitement</a>
@@ -1158,7 +1161,7 @@ footer{padding:32px 52px;border-top:1px solid var(--border);display:flex;align-i
         <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.free.f1">Jusqu'à 10 contacts</span></div>
         <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.free.f2">1 campagne de relance</span></div>
         <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.free.f3">Agenda de base</span></div>
-        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.free.f4">Import CSV limité (20 contacts max)</span></div>
+        <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.free.f4">Import limité à 10 contacts max</span></div>
       </div>
     </div>
 
@@ -1166,9 +1169,10 @@ footer{padding:32px 52px;border-top:1px solid var(--border);display:flex;align-i
     <div class="plan-card">
       <div class="plan-name" data-i18n="plan.starter.name">Starter</div>
       <div class="plan-desc" data-i18n="plan.starter.desc">Pour l'indépendant qui veut remplacer Excel</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px" data-i18n="plan.users.one">1 utilisateur</div>
       <div class="plan-price"><span class="price-num">29€</span><span class="price-period" data-i18n="price.period">/mois</span></div>
       <div class="price-note" data-i18n="plan.coming.note">Sans engagement</div>
-      <div class="plan-cta-coming" data-i18n="plan.coming.btn">Prochainement</div>
+      <button class="plan-cta-waitlist" onclick="openWaitlistModal()" data-i18n="plan.coming.btn">Rejoindre la liste d'attente</button>
       <div class="plan-features">
         <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.starter.f1">Contacts illimités</span></div>
         <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.starter.f2">Prospects et Kanban illimités</span></div>
@@ -1187,9 +1191,10 @@ footer{padding:32px 52px;border-top:1px solid var(--border);display:flex;align-i
       <div class="featured-tag" data-i18n="plan.pro.badge">⭐ Le plus populaire</div>
       <div class="plan-name" data-i18n="plan.pro.name">Pro</div>
       <div class="plan-desc" data-i18n="plan.pro.desc">Pour celui qui veut accélérer sa prospection</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px" data-i18n="plan.users.one">1 utilisateur</div>
       <div class="plan-price"><span class="price-num">89€</span><span class="price-period" data-i18n="price.period">/mois</span></div>
       <div class="price-note" data-i18n="plan.coming.note">Sans engagement</div>
-      <div class="plan-cta-coming" data-i18n="plan.coming.btn">Prochainement</div>
+      <button class="plan-cta-waitlist" onclick="openWaitlistModal()" data-i18n="plan.coming.btn">Rejoindre la liste d'attente</button>
       <div class="plan-features">
         <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="plan.pro.f1">Tout le Starter</span></div>
         <div class="pf-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="pf-yes"><path d="M20 6L9 17l-5-5"/></svg><strong data-i18n="plan.pro.f2">Assistant IA</strong> <span data-i18n="plan.pro.f2b"> connecté à tes données</span></div>
@@ -1206,6 +1211,7 @@ footer{padding:32px 52px;border-top:1px solid var(--border);display:flex;align-i
     <div class="plan-card">
       <div class="plan-name" data-i18n="plan.biz.name">Business</div>
       <div class="plan-desc" data-i18n="plan.biz.desc">Pour les équipes commerciales</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px" data-i18n="plan.users.multi">Multi-utilisateurs</div>
       <div class="plan-price"><span class="price-num" style="font-size:26px" data-i18n="plan.biz.price">Sur devis</span></div>
       <div class="price-note">&nbsp;</div>
       <button class="plan-cta cta-blue" onclick="openDevisModal()" data-i18n="plan.biz.cta">Demander un devis</button>
@@ -1294,23 +1300,10 @@ footer{padding:32px 52px;border-top:1px solid var(--border);display:flex;align-i
   </div>
 </section>
 
-<!-- SECTION RETOURS TERRAIN -->
-<section class="terrain-section">
-  <div class="section-label" data-i18n="terrain.label">Retours terrain</div>
-  <h2 class="section-title" data-i18n="terrain.title">Retours terrain</h2>
-  <div class="terrain-grid">
-    <div class="terrain-card">
-      <p class="terrain-text" data-i18n="terrain.t1">"Simple et efficace, ça m'évite d'oublier des clients."</p>
-      <div class="terrain-author" data-i18n="terrain.a1">— Test utilisateur</div>
-    </div>
-    <div class="terrain-card">
-      <p class="terrain-text" data-i18n="terrain.t2">"J'ai enfin un suivi clair sans me compliquer la vie."</p>
-      <div class="terrain-author" data-i18n="terrain.a2">— Indépendant</div>
-    </div>
-    <div class="terrain-card">
-      <p class="terrain-text" data-i18n="terrain.t3">"Avant je perdais des prospects parce que j'oubliais de relancer. Maintenant c'est automatique."</p>
-      <div class="terrain-author" data-i18n="terrain.a3">— Artisan, Paris</div>
-    </div>
+<!-- POSITIONNEMENT FONDATEURS -->
+<section style="padding:72px 48px;text-align:center;border-top:1px solid var(--border)">
+  <div style="max-width:580px;margin:0 auto">
+    <p style="font-size:18px;color:var(--text2);line-height:1.9;font-style:italic" data-i18n-html="position.q">pylotIA a été conçu par un commercial qui en avait besoin.<br>Pas par des ingénieurs qui imaginent ce dont vous avez besoin.</p>
   </div>
 </section>
 
@@ -1318,12 +1311,12 @@ footer{padding:32px 52px;border-top:1px solid var(--border);display:flex;align-i
 <section class="cta-section">
   <div class="cta-glow"></div>
   <h2 class="cta-title" data-i18n-html="cta.title">Arrêtez de perdre des clients.<br>Testez pylotIA gratuitement.</h2>
-  <p class="cta-sub" data-i18n="cta.sub">Sans carte bancaire. En ligne en moins de 2 minutes.</p>
+  <p class="cta-sub" data-i18n="cta.sub">Plan Gratuit sans carte bancaire — pour toujours.</p>
   <a href="signup.html" class="btn-main" style="font-size:16px;padding:16px 36px;text-decoration:none" data-i18n="cta.btn">Commencer gratuitement</a>
   <div style="margin-top:16px">
     <button onclick="openDevisModal()" style="background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;text-decoration:underline" data-i18n="cta.demo">Demander une démo personnalisée</button>
   </div>
-  <div class="cta-note" data-i18n="cta.note">Aucune carte bancaire requise · Gratuit pour toujours</div>
+  <div class="cta-note" data-i18n="cta.note">Starter et Pro : essai 14 jours gratuit, carte requise, sans engagement.</div>
 </section>
 
 <!-- CONTACT FORM -->
@@ -1737,9 +1730,10 @@ const TRANSLATIONS = {
     'feat.f5.title':'Import Excel instantané','feat.f5.desc':'Glissez-déposez votre fichier client existant. pylotIA importe tout automatiquement en 30 secondes.',
     'feat.f6.title':'Rapports automatiques (Pro)','feat.f6.desc':'Recevez chaque semaine un résumé de votre activité, des alertes relances et des opportunités à saisir.',
     'pricing.label':'Tarifs','pricing.title':'Simple, transparent, sans surprise','pricing.sub':'Commencez gratuitement. Évoluez quand vous êtes prêt.',
-    'pricing.banner':'<strong>Prix flat rate</strong> — pas par utilisateur. Avec nous, pas de mauvaise surprise quand ton équipe grandit.',
+    'pricing.banner':'<strong>Prix flat rate</strong> — Un seul abonnement pour vous. Multi-comptes disponible en Plan Business.',
     'plan.free.name':'Gratuit','plan.free.desc':'Pour tester l\'outil','plan.free.note':'Pour toujours gratuit','plan.free.cta':'Commencer gratuitement',
-    'plan.free.f1':'Jusqu\'à 10 contacts','plan.free.f2':'1 campagne de relance','plan.free.f3':'Agenda de base','plan.free.f4':'Import CSV limité (20 contacts max)',
+    'plan.free.f1':'Jusqu\'à 10 contacts','plan.free.f2':'1 campagne de relance','plan.free.f3':'Agenda de base','plan.free.f4':'Import limité à 10 contacts max',
+    'plan.users.one':'1 utilisateur','plan.users.multi':'Multi-utilisateurs',
     'plan.starter.name':'Starter','plan.starter.desc':'Pour l\'indépendant qui veut remplacer Excel',
     'plan.starter.f1':'Contacts illimités','plan.starter.f2':'Prospects et Kanban illimités','plan.starter.f3':'Campagnes de relance illimitées',
     'plan.starter.f4':'Agenda complet','plan.starter.f5':'Import Excel/CSV illimité','plan.starter.f6':'Fiche contact avec documents joints',
@@ -1751,7 +1745,9 @@ const TRANSLATIONS = {
     'plan.biz.name':'Business','plan.biz.desc':'Pour les équipes commerciales','plan.biz.price':'Sur devis','plan.biz.cta':'Demander un devis',
     'plan.biz.f1':'Tout le Pro','plan.biz.f2':'Multi-comptes commerciaux','plan.biz.f3':'Vue consolidée direction',
     'plan.biz.f4':'Agent IA de prospection','plan.biz.f5':'Agent IA de closing','plan.biz.f6':'Formation et onboarding inclus','plan.biz.f7':'Support dédié',
-    'plan.coming.note':'Sans engagement','plan.coming.btn':'Prochainement','plan.soon':'(bientôt)',
+    'plan.coming.note':'Sans engagement','plan.coming.btn':'Rejoindre la liste d\'attente','plan.soon':'(bientôt)',
+    'waitlist.title':'Soyez parmi les premiers','waitlist.sub':'Laissez votre email, on vous prévient dès l\'ouverture.','waitlist.email':'Votre email','waitlist.btn':'Me prévenir','waitlist.success':'C\'est noté ! On vous prévient dès l\'ouverture.',
+    'position.q':'pylotIA a été conçu par un commercial qui en avait besoin.<br>Pas par des ingénieurs qui imaginent ce dont vous avez besoin.',
     'devis.title':'Demander un devis Business','devis.firstname':'Nom et prénom','devis.company':'Entreprise','devis.email':'Email','devis.phone':'Téléphone (optionnel)',
     'devis.size':'Nombre de commerciaux envisagés','devis.sector':'Secteur d\'activité','devis.msg':'Message libre',
     'devis.submit':'Envoyer la demande','devis.success':'Merci ! Florian vous recontactera sous 48h.',
@@ -1763,10 +1759,10 @@ const TRANSLATIONS = {
     'faq.q5':'Comment fonctionne l\'assistant IA ?','faq.a5':'L\'assistant IA (disponible en offre Pro) analyse votre portefeuille client en temps réel. Posez-lui n\'importe quelle question — "qui dois-je relancer ?" ou "quel est mon CA potentiel ?" — et il répond instantanément avec vos vraies données.',
     'faq.q6':'L\'essai gratuit de 14 jours nécessite-t-il une carte bancaire ?','faq.a6':'Cela dépend du plan choisi. Le plan Gratuit est accessible sans aucune carte bancaire. Pour les plans Starter et Pro, une carte bancaire est requise à l\'inscription pour activer l\'essai de 14 jours — vous ne serez prélevé qu\'à l\'issue de cette période. Vous pouvez annuler à tout moment avant la fin de l\'essai sans aucun frais.',
     'cta.title':'Arrêtez de perdre des clients.<br>Testez pylotIA gratuitement.',
-    'cta.sub':'Sans carte bancaire. En ligne en moins de 2 minutes.',
+    'cta.sub':'Plan Gratuit sans carte bancaire — pour toujours.',
     'cta.btn':'Commencer gratuitement',
     'cta.demo':'Demander une démo personnalisée',
-    'cta.note':'Aucune carte bancaire requise · Gratuit pour toujours',
+    'cta.note':'Starter et Pro : essai 14 jours gratuit, carte requise, sans engagement.',
     'contact.label':'Contact','contact.title':'Une question ?<br>Écrivez-nous.','contact.sub':'Florian ou Lorik vous répond sous 24h.',
     'contact.name':'Votre nom','contact.namePh':'Jean Dupont',
     'contact.email':'Votre email','contact.emailPh':'jean@entreprise.fr',
@@ -1842,10 +1838,10 @@ const TRANSLATIONS = {
     'terrain.t2':'"I finally have clear tracking without overcomplicating things."','terrain.a2':'— Freelancer',
     'terrain.t3':'"I used to lose prospects because I forgot to follow up. Now it\'s automatic."','terrain.a3':'— Craftsman, Paris',
     'cta.title':'Stop losing clients.<br>Try pylotIA for free.',
-    'cta.sub':'No credit card. Online in under 2 minutes.',
+    'cta.sub':'Free plan — no credit card, forever.',
     'cta.btn':'Get started free',
     'cta.demo':'Request a personalized demo',
-    'cta.note':'No credit card required · Free forever',
+    'cta.note':'Starter & Pro: 14-day free trial, card required, no commitment.',
     'feat.label':'Features','feat.title':'Everything your business needs',
     'feat.sub':'One tool to replace your Excel files, paper calendar and manual follow-ups.',
     'feat.f1.title':'Client portfolio','feat.f1.desc':'Centralize all your contacts. Import your Excel in 30 seconds. Track every client at a glance.',
@@ -1855,9 +1851,10 @@ const TRANSLATIONS = {
     'feat.f5.title':'Instant Excel import','feat.f5.desc':'Drag and drop your existing client file. pylotIA imports everything automatically in 30 seconds.',
     'feat.f6.title':'Automated reports (Pro)','feat.f6.desc':'Receive a weekly summary of your activity, follow-up alerts and opportunities to seize.',
     'pricing.label':'Pricing','pricing.title':'Simple, transparent, no surprises','pricing.sub':'Start for free. Scale when you\'re ready.',
-    'pricing.banner':'<strong>Flat rate pricing</strong> — not per user. No nasty surprises as your team grows.',
+    'pricing.banner':'<strong>Flat rate pricing</strong> — One subscription for you. Multi-user accounts available on the Business plan.',
     'plan.free.name':'Free','plan.free.desc':'To try the tool','plan.free.note':'Free forever','plan.free.cta':'Get started free',
-    'plan.free.f1':'Up to 10 contacts','plan.free.f2':'1 follow-up campaign','plan.free.f3':'Basic calendar','plan.free.f4':'Limited CSV import (20 contacts max)',
+    'plan.free.f1':'Up to 10 contacts','plan.free.f2':'1 follow-up campaign','plan.free.f3':'Basic calendar','plan.free.f4':'Limited import (10 contacts max)',
+    'plan.users.one':'1 user','plan.users.multi':'Multi-user',
     'plan.starter.name':'Starter','plan.starter.desc':'For freelancers who want to ditch Excel',
     'plan.starter.f1':'Unlimited contacts','plan.starter.f2':'Unlimited prospects & Kanban','plan.starter.f3':'Unlimited follow-up campaigns',
     'plan.starter.f4':'Full calendar','plan.starter.f5':'Unlimited Excel/CSV import','plan.starter.f6':'Contact sheet with attachments',
@@ -1869,7 +1866,9 @@ const TRANSLATIONS = {
     'plan.biz.name':'Business','plan.biz.desc':'For sales teams','plan.biz.price':'Custom pricing','plan.biz.cta':'Request a quote',
     'plan.biz.f1':'Everything in Pro','plan.biz.f2':'Multi-user sales accounts','plan.biz.f3':'Consolidated management view',
     'plan.biz.f4':'AI prospecting agent','plan.biz.f5':'AI closing agent','plan.biz.f6':'Training & onboarding included','plan.biz.f7':'Dedicated support',
-    'plan.coming.note':'No commitment','plan.coming.btn':'Coming soon','plan.soon':'(soon)',
+    'plan.coming.note':'No commitment','plan.coming.btn':'Join the waitlist','plan.soon':'(soon)',
+    'waitlist.title':'Be among the first','waitlist.sub':'Leave your email and we\'ll notify you on launch.','waitlist.email':'Your email','waitlist.btn':'Notify me','waitlist.success':'Noted! We\'ll let you know when we launch.',
+    'position.q':'pylotIA was designed by a salesperson who needed it.<br>Not by engineers imagining what you need.',
     'devis.title':'Request a Business Quote','devis.firstname':'Full name','devis.company':'Company','devis.email':'Email','devis.phone':'Phone (optional)',
     'devis.size':'Number of sales reps','devis.sector':'Industry','devis.msg':'Additional message',
     'devis.submit':'Send request','devis.success':'Thank you! Florian will get back to you within 48h.',
@@ -1952,6 +1951,35 @@ function toggleLang() { setLang(_currentLang === 'fr' ? 'en' : 'fr'); }
 setLang(_currentLang);
 
 // ─── DEVIS MODAL ───────────────────────────────────────
+function openWaitlistModal() {
+  document.getElementById('waitlist-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeWaitlistModal() {
+  document.getElementById('waitlist-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+async function submitWaitlistForm(e) {
+  e.preventDefault();
+  const btn = document.getElementById('waitlist-btn');
+  btn.disabled = true;
+  btn.textContent = '...';
+  const email = document.getElementById('wl-email').value;
+  try {
+    await emailjs.send('service_xql0hy1', 'template_dz1anao', {
+      from_name: 'Liste d\'attente',
+      reply_to: email,
+      message: 'Inscription liste d\'attente Starter/Pro : ' + email
+    });
+  } catch(err) {}
+  document.getElementById('waitlist-form').style.display = 'none';
+  document.getElementById('waitlist-success').style.display = 'block';
+  setTimeout(closeWaitlistModal, 3000);
+}
+document.getElementById('waitlist-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeWaitlistModal();
+});
+
 function openDevisModal() {
   document.getElementById('devis-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -1986,6 +2014,31 @@ document.getElementById('devis-modal').addEventListener('click', function(e) {
   if (e.target === this) closeDevisModal();
 });
 </script>
+
+<!-- MODAL LISTE D'ATTENTE -->
+<div class="modal-overlay" id="waitlist-modal">
+  <div class="modal" style="width:420px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div class="modal-title" style="margin-bottom:0" data-i18n="waitlist.title">Soyez parmi les premiers</div>
+      <button onclick="closeWaitlistModal()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px;line-height:1">✕</button>
+    </div>
+    <p style="font-size:14px;color:var(--text2);margin-bottom:20px;line-height:1.65" data-i18n="waitlist.sub">Laissez votre email, on vous prévient dès l'ouverture.</p>
+    <form id="waitlist-form" onsubmit="submitWaitlistForm(event)">
+      <div class="form-group">
+        <label class="form-label" data-i18n="waitlist.email">Votre email</label>
+        <input id="wl-email" class="form-input" type="email" required placeholder="jean@entreprise.fr">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeWaitlistModal()">Annuler</button>
+        <button type="submit" id="waitlist-btn" class="btn btn-blue" data-i18n="waitlist.btn">Me prévenir</button>
+      </div>
+    </form>
+    <div id="waitlist-success" style="display:none;text-align:center;padding:20px 0">
+      <div style="font-size:36px;margin-bottom:12px">✅</div>
+      <div style="font-size:15px;font-weight:600;color:#34d399" data-i18n="waitlist.success">C'est noté ! On vous prévient dès l'ouverture.</div>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL DEVIS BUSINESS -->
 <div class="modal-overlay" id="devis-modal">
